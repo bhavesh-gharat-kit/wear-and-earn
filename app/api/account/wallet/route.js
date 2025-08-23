@@ -1,0 +1,211 @@
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../../auth/[...nextauth]/route'
+import { PrismaClient } from '@prisma/client'
+import { serializeBigInt, paisaToRupees } from '@/lib/serialization-utils'
+
+const prisma = new PrismaClient()
+
+export async function GET(request) {
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session || !session.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const userId = parseInt(session.user.id)
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get('page')) || 1
+    const limit = parseInt(searchParams.get('limit')) || 20
+    const type = searchParams.get('type') // filter by transaction type
+
+    // Get user wallet info
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        walletBalance: true,
+        monthlyPurchase: true,
+        lastMonthPurchase: true,
+        isActive: true,
+        isKycApproved: true
+      }
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      )
+    }
+
+    // Build where clause for transactions
+    let whereClause = { userId: userId }
+    if (type) {
+      whereClause.type = type
+    }
+
+    // Get wallet transactions
+    const transactions = await prisma.ledger.findMany({
+      where: whereClause,
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        id: true,
+        type: true,
+        amount: true,
+        levelDepth: true,
+        note: true,
+        ref: true,
+        createdAt: true
+      }
+    })
+
+    const totalTransactions = await prisma.ledger.count({
+      where: whereClause
+    })
+
+    // Get pending self payouts
+    const pendingPayouts = await prisma.selfPayoutSchedule.findMany({
+      where: { 
+        userId: userId,
+        status: 'scheduled'
+      },
+      orderBy: { dueAt: 'asc' },
+      select: {
+        id: true,
+        amount: true,
+        dueAt: true,
+        status: true,
+        orderId: true
+      }
+    })
+
+    // Calculate earnings summary
+    const earningsSummary = await prisma.ledger.groupBy({
+      by: ['type'],
+      where: { userId: userId },
+      _sum: {
+        amount: true
+      }
+    })
+
+    // Get monthly earnings for current month
+    const currentMonth = new Date()
+    currentMonth.setDate(1)
+    currentMonth.setHours(0, 0, 0, 0)
+
+    const monthlyEarnings = await prisma.ledger.aggregate({
+      where: {
+        userId: userId,
+        createdAt: { gte: currentMonth },
+        type: {
+          in: ['sponsor_commission', 'repurchase_commission', 'self_joining_instalment']
+        }
+      },
+      _sum: {
+        amount: true
+      }
+    })
+
+    // Format earnings by type
+    const earningsByType = {}
+    earningsSummary.forEach(earning => {
+      earningsByType[earning.type] = {
+        paisa: earning._sum.amount || 0,
+        rupees: paisaToRupees(earning._sum.amount || 0)
+      }
+    })
+
+    const walletData = {
+      balance: {
+        paisa: user.walletBalance,
+        rupees: paisaToRupees(user.walletBalance)
+      },
+      monthlyPurchase: {
+        current: {
+          paisa: user.monthlyPurchase,
+          rupees: paisaToRupees(user.monthlyPurchase)
+        },
+        lastMonth: {
+          paisa: user.lastMonthPurchase,
+          rupees: paisaToRupees(user.lastMonthPurchase)
+        },
+        required: {
+          paisa: 50000, // ₹500
+          rupees: paisaToRupees(50000)
+        },
+        isEligible: user.monthlyPurchase >= 50000
+      },
+      earnings: {
+        total: {
+          paisa: Object.values(earningsByType).reduce((sum, earning) => sum + earning.paisa, 0),
+          rupees: Object.values(earningsByType).reduce((sum, earning) => sum + earning.rupees, 0)
+        },
+        monthly: {
+          paisa: monthlyEarnings._sum.amount || 0,
+          rupees: paisaToRupees(monthlyEarnings._sum.amount || 0)
+        },
+        byType: earningsByType
+      },
+      pendingPayouts: {
+        count: pendingPayouts.length,
+        totalAmount: {
+          paisa: pendingPayouts.reduce((sum, payout) => sum + payout.amount, 0),
+          rupees: paisaToRupees(pendingPayouts.reduce((sum, payout) => sum + payout.amount, 0))
+        },
+        list: pendingPayouts.map(payout => ({
+          id: payout.id,
+          amount: {
+            paisa: payout.amount,
+            rupees: paisaToRupees(payout.amount)
+          },
+          dueAt: payout.dueAt,
+          status: payout.status,
+          orderId: payout.orderId
+        }))
+      },
+      transactions: {
+        data: transactions.map(tx => ({
+          id: tx.id,
+          type: tx.type,
+          amount: {
+            paisa: tx.amount,
+            rupees: paisaToRupees(tx.amount)
+          },
+          levelDepth: tx.levelDepth,
+          note: tx.note,
+          reference: tx.ref,
+          createdAt: tx.createdAt,
+          isCredit: tx.amount > 0
+        })),
+        pagination: {
+          page,
+          limit,
+          total: totalTransactions,
+          totalPages: Math.ceil(totalTransactions / limit)
+        }
+      },
+      status: {
+        isActive: user.isActive,
+        isKycApproved: user.isKycApproved,
+        canEarnCommissions: user.isActive && user.isKycApproved && user.monthlyPurchase >= 50000
+      }
+    }
+
+    return NextResponse.json(serializeBigInt(walletData))
+
+  } catch (error) {
+    console.error('Error fetching wallet data:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch wallet data' },
+      { status: 500 }
+    )
+  } finally {
+    await prisma.$disconnect()
+  }
+}

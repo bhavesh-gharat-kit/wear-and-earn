@@ -1,0 +1,50 @@
+html,
+body {
+  position: relative;
+  height: 100%;
+}
+
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+
+  /* Center slide text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Image styling handled in component via next/image */
+
+.swiper {
+  margin-left: auto;
+  margin-right: auto;
+}
+.banner-swiper .swiper-button-prev:after,
+.banner-swiper .swiper-rtl .swiper-button-next:after,
+.banner-swiper .swiper-button-next:after,
+.banner-swiper .swiper-rtl .swiper-button-prev:after {
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  font-size: 26px;
+}
+
+.banner-swiper .swiper-pagination-bullets,
+.banner-swiper .swiper-pagination-bullets.swiper-pagination-horizontal {
+  bottom: 14px;
+}
+
+.banner-swiper .swiper-pagination-bullet {
+  background: rgba(255,255,255,0.8);
+  opacity: 1;
+}
+
+.banner-swiper .swiper-pagination-bullet-active {
+  background: #ffffff;
+}

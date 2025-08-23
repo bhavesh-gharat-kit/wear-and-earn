@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@plugin "daisyui";
+
+html{
+    scroll-behavior: smooth;
+}
+body{
+    /* Prevent accidental horizontal scroll due to wide children */
+    overflow-x: hidden;
+}
+
+/* Fluid layout overrides: make container/max-w-screen-* span full width */
+.container {
+    max-width: 100% !important;
+}
+[class*="max-w-screen-"] {
+    max-width: 100% !important;
+}
+
+

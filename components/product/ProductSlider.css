@@ -1,0 +1,127 @@
+/* Product Slider Styles */
+
+/* Header Section Styling */
+.trending-header {
+  position: relative;
+  padding: 2rem 0;
+}
+
+.trending-header h2 {
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.trending-header p {
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.trending-divider {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 50%, #f59e0b 100%);
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+/* MLM Product Slider Styles */
+.mlm-product-slider .swiper-pagination-bullet {
+  background: #8b5cf6;
+  width: 10px;
+  height: 10px;
+  margin: 0 4px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.mlm-product-slider .swiper-pagination-bullet-active {
+  background: #7c3aed;
+  transform: scale(1.2);
+}
+
+.mlm-product-slider .swiper-button-next,
+.mlm-product-slider .swiper-button-prev {
+  color: #8b5cf6;
+  background: rgba(255, 255, 255, 0.9);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
+  transition: all 0.3s ease;
+}
+
+.mlm-product-slider .swiper-button-next:hover,
+.mlm-product-slider .swiper-button-prev:hover {
+  color: #7c3aed;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  transform: scale(1.05);
+}
+
+.mlm-product-slider .swiper-button-next::after,
+.mlm-product-slider .swiper-button-prev::after {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.basic-product-slider {
+  padding-bottom: 50px; /* Space for pagination */
+}
+
+.basic-product-slider .swiper-slide {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.basic-product-slider .swiper-pagination {
+  bottom: 10px !important;
+}
+
+.basic-product-slider .swiper-pagination-bullet {
+  background: #d97706;
+  width: 10px;
+  height: 10px;
+  margin: 0 4px;
+}
+
+.basic-product-slider .swiper-pagination-bullet-active {
+  background: #92400e;
+}
+
+.basic-product-slider .swiper-button-next,
+.basic-product-slider .swiper-button-prev {
+  color: #d97706;
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
+}
+
+.basic-product-slider .swiper-button-next:after,
+.basic-product-slider .swiper-button-prev:after {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.basic-product-slider .swiper-button-next:hover,
+.basic-product-slider .swiper-button-prev:hover {
+  color: #92400e;
+}
+
+/* Ensure cards have consistent height */
+.basic-product-slider .swiper-slide > div {
+  height: 100%;
+}
+
+/* Fix any overflow issues */
+.basic-product-slider .swiper-wrapper {
+  align-items: stretch;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+  .basic-product-slider .swiper-button-next,
+  .basic-product-slider .swiper-button-prev {
+    display: none;
+  }
+}

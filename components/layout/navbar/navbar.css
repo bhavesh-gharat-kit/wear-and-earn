@@ -1,0 +1,43 @@
+
+
+.nav-link-hover-effect {
+  position: relative; }
+
+.nav-link-hover-effect::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 1.5px;
+  width: 0%;
+  background-color: #007bff;
+  transition: width 0.3s linear;
+}
+
+.nav-link-hover-effect:hover::after {
+  width: 105%;
+}
+.nav-link-hover-effect{
+  width: 105%;
+}
+
+
+
+@keyframes smoothGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.top-header-bg-color-animtion {
+  /* Override to plain white and disable animation */
+  background: #ffffff !important;
+  background-size: auto !important;
+  animation: none !important;
+}

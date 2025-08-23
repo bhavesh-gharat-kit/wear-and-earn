@@ -1,0 +1,812 @@
+'use client'
+import { useSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
+import Link fr  const shareReferralLink = async () => {
+    if (mlmData?.user?.referralLink && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join my team!',
+          text: 'Join our community and start earning!',
+          url: mlmData.user.referralLink
+        })
+      } catch (error) {
+        console.error('Error sharing:', error)
+      }
+    }
+  }
+
+  const handleManualActivation = async () => {
+    try {
+      const response = await fetch('/api/activate-mlm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (response.ok) {
+        // Refresh the MLM data
+        const mlmRes = await fetch('/api/account/mlm-profile')
+        if (mlmRes.ok) {
+          const mlm = await mlmRes.json()
+          setMlmData(mlm)
+        }
+        alert('Account activated successfully!')
+      } else {
+        const error = await response.json()
+        alert(`Activation failed: ${error.error || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Error activating account:', error)
+      alert('Failed to activate account. Please try again.')
+    }
+  }'
+import { 
+  User, 
+  Package, 
+  Settings, 
+  ShoppingCart, 
+  MapPin, 
+  Bell,
+  Eye,
+  TrendingUp,
+  Heart,
+  CreditCard,
+  Share2,
+  Copy,
+  Users,
+  Wallet,
+  Award,
+  CheckCircle,
+  XCircle,
+  Clock,
+  DollarSign,
+  UserCheck,
+  FileText,
+  RefreshCw,
+  TrendingDown
+} from 'lucide-react'
+
+export default function AccountDashboard() {
+  const { data: session, status } = useSession()
+  const [userStats, setUserStats] = useState({
+    totalOrders: 0,
+    pendingOrders: 0,
+    cartItems: 0,
+    totalSpent: 0
+  })
+  const [recentOrders, setRecentOrders] = useState([])
+  const [userProfile, setUserProfile] = useState(null)
+  const [mlmData, setMlmData] = useState(null)
+  const [teamData, setTeamData] = useState(null)
+  const [kycData, setKycData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState('overview')
+  const [copySuccess, setCopySuccess] = useState(false)
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchUserData()
+    }
+  }, [session])
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch all user data in parallel
+      const [statsRes, ordersRes, profileRes, mlmRes, teamRes, kycRes] = await Promise.all([
+        fetch(`/api/account/stats`),
+        fetch(`/api/account/recent-orders`),
+        fetch(`/api/account/profile`),
+        fetch(`/api/account/mlm-profile`),
+        fetch(`/api/account/team?limit=5`),
+        fetch(`/api/account/kyc`)
+      ])
+
+      if (statsRes.ok) {
+        const stats = await statsRes.json()
+        setUserStats(stats)
+      }
+
+      if (ordersRes.ok) {
+        const orders = await ordersRes.json()
+        setRecentOrders(orders)
+      }
+
+      if (profileRes.ok) {
+        const profile = await profileRes.json()
+        setUserProfile(profile)
+      }
+
+      if (mlmRes.ok) {
+        const mlm = await mlmRes.json()
+        setMlmData(mlm)
+      }
+
+      if (teamRes.ok) {
+        const team = await teamRes.json()
+        setTeamData(team)
+      }
+
+      if (kycRes.ok) {
+        const kyc = await kycRes.json()
+        setKycData(kyc)
+      }
+
+    } catch (error) {
+      console.error('Error fetching user data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const copyReferralLink = async () => {
+    if (mlmData?.user?.referralLink) {
+      try {
+        await navigator.clipboard.writeText(mlmData.user.referralLink)
+        setCopySuccess(true)
+        setTimeout(() => setCopySuccess(false), 2000)
+      } catch (err) {
+        console.error('Failed to copy:', err)
+      }
+    }
+  }
+
+  const shareReferralLink = async () => {
+    if (mlmData?.user?.referralLink && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join Wear & Earn',
+          text: 'Join me on Wear & Earn and start earning!',
+          url: mlmData.user.referralLink
+        })
+      } catch (err) {
+        console.error('Error sharing:', err)
+      }
+    }
+  }
+
+  if (status === 'loading' || loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="bg-white p-6 rounded-xl shadow-sm">
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                  <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <User className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Please Login</h2>
+          <p className="text-gray-600 mb-6">You need to be logged in to view your account dashboard.</p>
+          <Link 
+            href="/login-register" 
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+          >
+            Go to Login
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  const tabs = [
+    { id: 'overview', name: 'Overview', icon: User },
+    { id: 'referral', name: 'Referral', icon: Share2 },
+    { id: 'team', name: 'My Team', icon: Users },
+    { id: 'wallet', name: 'Wallet', icon: Wallet },
+    { id: 'kyc', name: 'KYC', icon: FileText }
+  ]
+
+  const renderOverviewTab = () => (
+    <div className="space-y-8">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white overflow-hidden shadow-sm rounded-xl">
+          <div className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Package className="h-8 w-8 text-blue-600" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Total Orders
+                  </dt>
+                  <dd className="text-2xl font-bold text-gray-900">
+                    {userStats.totalOrders}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow-sm rounded-xl">
+          <div className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Users className="h-8 w-8 text-green-600" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Team Members
+                  </dt>
+                  <dd className="text-2xl font-bold text-gray-900">
+                    {mlmData?.team?.totalMembers || 0}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow-sm rounded-xl">
+          <div className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Wallet className="h-8 w-8 text-purple-600" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Wallet Balance
+                  </dt>
+                  <dd className="text-2xl font-bold text-gray-900">
+                    ₹{mlmData?.wallet?.balance?.rupees || '0.00'}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow-sm rounded-xl">
+          <div className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <TrendingUp className="h-8 w-8 text-yellow-600" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Monthly Earnings
+                  </dt>
+                  <dd className="text-2xl font-bold text-gray-900">
+                    ₹{mlmData?.wallet?.monthlyEarnings?.rupees || '0.00'}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* MLM Status */}
+      <div className="bg-white shadow-sm rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">MLM Status</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex items-center p-4 bg-blue-50 rounded-lg">
+            <div className={`p-2 rounded-lg mr-4 ${mlmData?.user?.isActive ? 'bg-green-500' : 'bg-gray-400'}`}>
+              {mlmData?.user?.isActive ? (
+                <CheckCircle className="h-6 w-6 text-white" />
+              ) : (
+                <XCircle className="h-6 w-6 text-white" />
+              )}
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Account Status</p>
+              <p className="font-medium text-gray-900">
+                {mlmData?.user?.isActive ? 'Active' : 'Inactive'}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center p-4 bg-green-50 rounded-lg">
+            <div className={`p-2 rounded-lg mr-4 ${mlmData?.user?.isKycApproved ? 'bg-green-500' : 'bg-yellow-500'}`}>
+              {mlmData?.user?.isKycApproved ? (
+                <UserCheck className="h-6 w-6 text-white" />
+              ) : (
+                <Clock className="h-6 w-6 text-white" />
+              )}
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">KYC Status</p>
+              <p className="font-medium text-gray-900">
+                {mlmData?.user?.isKycApproved ? 'Approved' : 'Pending'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center p-4 bg-purple-50 rounded-lg">
+            <div className={`p-2 rounded-lg mr-4 ${mlmData?.user?.isEligibleRepurchase ? 'bg-green-500' : 'bg-gray-400'}`}>
+              <Award className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Repurchase Eligibility</p>
+              <p className="font-medium text-gray-900">
+                {mlmData?.user?.isEligibleRepurchase ? 'Eligible' : 'Not Eligible'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderReferralTab = () => (
+    <div className="space-y-6">
+      <div className="bg-white shadow-sm rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Your Referral Code & Link</h3>
+        
+        {mlmData?.user?.isActive ? (
+          <div className="space-y-6">
+            {/* Referral Code */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Referral Code
+              </label>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="text"
+                  value={mlmData?.user?.referralCode || ''}
+                  readOnly
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 font-mono text-lg"
+                />
+                <button
+                  onClick={copyReferralLink}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  <span>{copySuccess ? 'Copied!' : 'Copy'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Referral Link */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Referral Link
+              </label>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="text"
+                  value={mlmData?.user?.referralLink || ''}
+                  readOnly
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm"
+                />
+                <div className="flex space-x-2">
+                  <button
+                    onClick={copyReferralLink}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+                  >
+                    <Copy className="h-4 w-4" />
+                    <span>Copy</span>
+                  </button>
+                  {navigator.share && (
+                    <button
+                      onClick={shareReferralLink}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      <span>Share</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Referral Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-center">
+                  <Users className="h-8 w-8 text-blue-600 mr-4" />
+                  <div>
+                    <p className="text-sm text-gray-600">Direct Referrals</p>
+                    <p className="text-2xl font-bold text-gray-900">{mlmData?.team?.directReferrals || 0}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 bg-green-50 rounded-lg">
+                <div className="flex items-center">
+                  <TrendingUp className="h-8 w-8 text-green-600 mr-4" />
+                  <div>
+                    <p className="text-sm text-gray-600">Total Team</p>
+                    <p className="text-2xl font-bold text-gray-900">{mlmData?.team?.totalMembers || 0}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Clock className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h4 className="text-lg font-medium text-gray-900 mb-2">Account Not Active</h4>
+            <p className="text-gray-500 mb-6">Make your first purchase to activate your account and get referral link!</p>
+            <div className="space-y-4">
+              <Link 
+                href="/products"
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+              >
+                Shop Now
+              </Link>
+              <div className="text-center">
+                <button
+                  onClick={handleManualActivation}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                >
+                  Test Activation (For Testing)
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
+  const renderTeamTab = () => (
+    <div className="space-y-6">
+      <div className="bg-white shadow-sm rounded-xl p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold text-gray-900">My Team</h3>
+          <Link 
+            href="/account/team"
+            className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center"
+          >
+            View Full Team
+            <Eye className="ml-1 h-4 w-4" />
+          </Link>
+        </div>
+
+        {teamData?.directReferrals?.length > 0 ? (
+          <div className="space-y-4">
+            {teamData.directReferrals.map((member) => (
+              <div key={member.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <User className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-900">{member.fullName}</h4>
+                    <p className="text-sm text-gray-500">{member.email}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center space-x-4">
+                    <div className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      member.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {member.isActive ? 'Active' : 'Inactive'}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Team: {member.teamSize}
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Joined: {new Date(member.joinedAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h4 className="text-lg font-medium text-gray-900 mb-2">No Team Members Yet</h4>
+            <p className="text-gray-500 mb-6">Start sharing your referral link to build your team!</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
+  const renderWalletTab = () => (
+    <div className="space-y-6">
+      {/* Wallet Balance */}
+      <div className="bg-white shadow-sm rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Wallet Overview</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-blue-100">Available Balance</p>
+                <p className="text-3xl font-bold">₹{mlmData?.wallet?.balance?.rupees || '0.00'}</p>
+              </div>
+              <Wallet className="h-8 w-8 text-blue-200" />
+            </div>
+          </div>
+          
+          <div className="p-6 bg-gradient-to-r from-green-500 to-green-600 rounded-xl text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-green-100">Total Earned</p>
+                <p className="text-3xl font-bold">₹{mlmData?.wallet?.totalEarned?.rupees || '0.00'}</p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-green-200" />
+            </div>
+          </div>
+          
+          <div className="p-6 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-purple-100">This Month</p>
+                <p className="text-3xl font-bold">₹{mlmData?.wallet?.monthlyEarnings?.rupees || '0.00'}</p>
+              </div>
+              <DollarSign className="h-8 w-8 text-purple-200" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Pending Payouts */}
+      {mlmData?.wallet?.pendingPayouts?.length > 0 && (
+        <div className="bg-white shadow-sm rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Pending Payouts</h3>
+          <div className="space-y-3">
+            {mlmData.wallet.pendingPayouts.map((payout) => (
+              <div key={payout.id} className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                <div className="flex items-center">
+                  <Clock className="h-5 w-5 text-yellow-600 mr-3" />
+                  <div>
+                    <p className="font-medium text-gray-900">₹{payout.amount.rupees}</p>
+                    <p className="text-sm text-gray-500">
+                      Due: {new Date(payout.dueAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="px-2 py-1 text-xs font-medium bg-yellow-200 text-yellow-800 rounded-full">
+                  {payout.status}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recent Transactions */}
+      <div className="bg-white shadow-sm rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Recent Transactions</h3>
+          <Link 
+            href="/account/transactions"
+            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+          >
+            View All
+          </Link>
+        </div>
+        {mlmData?.wallet?.recentTransactions?.length > 0 ? (
+          <div className="space-y-3">
+            {mlmData.wallet.recentTransactions.slice(0, 5).map((tx) => (
+              <div key={tx.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                <div className="flex items-center">
+                  <div className={`p-2 rounded-full mr-3 ${
+                    tx.amount.paisa > 0 ? 'bg-green-100' : 'bg-red-100'
+                  }`}>
+                    {tx.amount.paisa > 0 ? (
+                      <TrendingUp className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <TrendingDown className="h-4 w-4 text-red-600" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 capitalize">
+                      {tx.type.replace(/_/g, ' ')}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(tx.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <div className={`font-medium ${
+                  tx.amount.paisa > 0 ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {tx.amount.paisa > 0 ? '+' : ''}₹{tx.amount.rupees}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <DollarSign className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500">No transactions yet</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
+  const renderKYCTab = () => (
+    <div className="space-y-6">
+      <div className="bg-white shadow-sm rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">KYC Verification</h3>
+        
+        {kycData?.hasKyc ? (
+          <div className="space-y-6">
+            <div className="flex items-center p-4 bg-blue-50 rounded-lg">
+              <div className={`p-3 rounded-full mr-4 ${
+                kycData.kycData.status === 'approved' ? 'bg-green-500' : 
+                kycData.kycData.status === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'
+              }`}>
+                {kycData.kycData.status === 'approved' ? (
+                  <CheckCircle className="h-6 w-6 text-white" />
+                ) : kycData.kycData.status === 'rejected' ? (
+                  <XCircle className="h-6 w-6 text-white" />
+                ) : (
+                  <Clock className="h-6 w-6 text-white" />
+                )}
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">
+                  KYC Status: {kycData.kycData.status.charAt(0).toUpperCase() + kycData.kycData.status.slice(1)}
+                </h4>
+                <p className="text-sm text-gray-500">
+                  Submitted: {new Date(kycData.kycData.submittedAt).toLocaleDateString()}
+                </p>
+                {kycData.kycData.reviewNote && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Note: {kycData.kycData.reviewNote}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-4 border border-gray-200 rounded-lg">
+                <h5 className="font-medium text-gray-900 mb-2">Personal Information</h5>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <p><span className="font-medium">Name:</span> {kycData.kycData.fullName}</p>
+                  <p><span className="font-medium">Date of Birth:</span> {new Date(kycData.kycData.dateOfBirth).toLocaleDateString()}</p>
+                  <p><span className="font-medium">Gender:</span> {kycData.kycData.gender}</p>
+                  {kycData.kycData.fatherName && (
+                    <p><span className="font-medium">Father&apos;s Name:</span> {kycData.kycData.fatherName}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-4 border border-gray-200 rounded-lg">
+                <h5 className="font-medium text-gray-900 mb-2">Verification Status</h5>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span>Documents Submitted</span>
+                    {kycData.kycData.hasDocuments ? (
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-600" />
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Bank Details</span>
+                    {kycData.kycData.hasBankDetails ? (
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-600" />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {kycData.kycData.status !== 'approved' && (
+              <div className="flex justify-end">
+                <Link 
+                  href="/account/kyc-form"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Update KYC
+                </Link>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h4 className="text-lg font-medium text-gray-900 mb-2">KYC Not Submitted</h4>
+            <p className="text-gray-500 mb-6">
+              Complete your KYC verification to be eligible for commissions and withdrawals.
+            </p>
+            <Link 
+              href="/account/kyc-form"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+            >
+              <FileText className="h-5 w-5 mr-2" />
+              Submit KYC
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* KYC Requirements */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+        <h4 className="text-lg font-medium text-yellow-800 mb-4">KYC Requirements</h4>
+        <ul className="space-y-2 text-sm text-yellow-700">
+          <li className="flex items-center">
+            <CheckCircle className="h-4 w-4 mr-2" />
+            KYC approval is required to receive commissions
+          </li>
+          <li className="flex items-center">
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Minimum ₹500 monthly purchase required for earnings eligibility
+          </li>
+          <li className="flex items-center">
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Documents: Aadhar Card, PAN Card, Bank Details
+          </li>
+        </ul>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Welcome back, {session.user?.fullName || userProfile?.fullName || session.user?.name || 'User'}!
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Manage your account, team, and earnings
+            </p>
+          </div>
+          <div className="hidden md:flex items-center space-x-4">
+            <div className="bg-gray-50 px-4 py-2 rounded-lg">
+              <span className="text-sm text-gray-500">Member since</span>
+              <p className="font-semibold text-gray-900">
+                {session.user?.createdAt ? new Date(session.user.createdAt).toLocaleDateString() : 'Recently'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="bg-white rounded-xl shadow-sm">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`${
+                  activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2`}
+              >
+                <tab.icon className="h-4 w-4" />
+                <span>{tab.name}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
+        
+        <div className="p-6">
+          {activeTab === 'overview' && renderOverviewTab()}
+          {activeTab === 'referral' && renderReferralTab()}
+          {activeTab === 'team' && renderTeamTab()}
+          {activeTab === 'wallet' && renderWalletTab()}
+          {activeTab === 'kyc' && renderKYCTab()}
+        </div>
+      </div>
+    </div>
+  )
+}
