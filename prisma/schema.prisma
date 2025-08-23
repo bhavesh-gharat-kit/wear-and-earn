@@ -44,6 +44,10 @@ model User {
   ancestorHierarchy Hierarchy[] @relation("HierarchyAncestor")
   descendantHierarchy Hierarchy[] @relation("HierarchyDescendant")
   kycData           KycData?
+  
+  // Withdrawal relationships
+  withdrawalRequests    WithdrawalRequest[] @relation("UserWithdrawals")
+  processedWithdrawals  WithdrawalRequest[] @relation("ProcessedWithdrawals")
 
   @@index([sponsorId], map: "users_sponsorId_fkey")
   @@index([referralCode])
@@ -210,19 +214,21 @@ model Hierarchy {
 }
 
 model Ledger {
-  id         Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId     Int?     @db.UnsignedInt // null for company/system fund
-  type       String   // company_fund | sponsor_commission | self_joining_instalment | repurchase_commission | rollup_to_company | withdrawal_debit | reversal
-  ref        String?  // idempotency key: orderId:line
-  amount     Int      // +credit, -debit in paisa
-  levelDepth Int?
-  note       String?
-  createdAt  DateTime @default(now())
+  id           Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId       Int?     @db.UnsignedInt // null for company/system fund
+  type         String   // company_fund | sponsor_commission | self_joining_instalment | repurchase_commission | rollup_to_company | withdrawal_debit | reversal | WITHDRAWAL_REQUEST | WITHDRAWAL_APPROVED | WITHDRAWAL_REFUND
+  amount       Int      // +credit, -debit in paisa
+  description  String?  // human readable description
+  referenceId  String?  // reference to related entity (orderId, withdrawalId, etc.)
+  balanceAfter Int?     // wallet balance after this transaction
+  levelDepth   Int?
+  note         String?
+  createdAt    DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, type])
-  @@index([ref])
+  @@index([referenceId])
   @@map("ledger")
 }
 
@@ -305,4 +311,28 @@ model KycData {
 
   @@index([userId])
   @@index([status])
+}
+
+model WithdrawalRequest {
+  id            Int       @id @default(autoincrement())
+  userId        Int       @db.UnsignedInt
+  amount        Float     // withdrawal amount
+  method        String    // bank_transfer, upi, paytm
+  details       Json?     // method-specific details (account info, etc.)
+  status        String    @default("pending") // pending, approved, rejected
+  requestedAt   DateTime  @default(now())
+  processedAt   DateTime?
+  processedBy   Int?      @db.UnsignedInt // admin user id
+  adminNotes    String?
+  transactionId String?   // bank transaction reference
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user            User  @relation("UserWithdrawals", fields: [userId], references: [id], onDelete: Cascade)
+  processedByUser User? @relation("ProcessedWithdrawals", fields: [processedBy], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([requestedAt])
+  @@map("withdrawal_requests")
 }
