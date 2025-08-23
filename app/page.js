@@ -1,6 +1,5 @@
-import { redirect } from 'next/navigation'
+import HomePage from '@/pages/user/Home-Page/HomePage'
 
 export default function RootPage() {
-  // Redirect root to the main home route
-  redirect('/home')
+  return <HomePage />
 }
