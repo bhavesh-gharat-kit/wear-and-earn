@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(req) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -62,17 +62,20 @@ export async function GET() {
     // Count paid orders
     const paidOrdersCount = orders.filter(order => order.paidAt !== null).length;
 
-    // Generate expected referral link
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3002';
-    const expectedReferralLink = user.referralCode ? 
-      `${baseUrl}/login-register?spid=${user.id}` : null;
+    // Generate expected referral link based on request origin (works on Vercel) with env fallback
+    const origin = req?.nextUrl?.origin || process.env.NEXTAUTH_URL;
+    const expectedReferralLink = (user.referralCode && origin)
+      ? `${origin}/login-register?spid=${user.id}`
+      : null;
 
-    // Check what the MLM profile API returns
-    const mlmProfileResponse = await fetch(`${baseUrl}/api/account/mlm-profile`, {
-      headers: {
-        'Cookie': `next-auth.session-token=${session.sessionToken}` // This won't work in practice, but shows the idea
+    // Check what the MLM profile API returns (best-effort; cookies won't pass from server route)
+    if (origin) {
+      try {
+        await fetch(`${origin}/api/account/mlm-profile`, { cache: 'no-store' });
+      } catch (_e) {
+        // Ignore connectivity errors in diagnosis helper
       }
-    });
+    }
 
     return NextResponse.json({
       success: true,

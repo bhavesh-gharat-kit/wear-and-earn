@@ -13,15 +13,14 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'wearnearn.com',
             },
+            // Allow images from your Vercel domain and any subdomain
             {
-                protocol: 'http',
-                hostname: 'localhost',
-                port: '3000',
+                protocol: 'https',
+                hostname: '**.vercel.app',
             },
             {
-                protocol: 'http',
-                hostname: 'localhost',
-                port: '3002',
+                protocol: 'https',
+                hostname: 'res.cloudinary.com',
             },
         ],
     },

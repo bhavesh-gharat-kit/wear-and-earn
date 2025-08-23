@@ -6,7 +6,7 @@ import { serializeBigInt, paisaToRupees } from '@/lib/serialization-utils'
 
 const prisma = new PrismaClient()
 
-export async function GET() {
+export async function GET(req) {
   try {
     const session = await getServerSession(authOptions)
     
@@ -119,13 +119,14 @@ export async function GET() {
     })
 
     // Format response data
-    const mlmData = {
+  const origin = req?.nextUrl?.origin || process.env.NEXTAUTH_URL;
+  const mlmData = {
       user: {
         id: user.id,
         fullName: user.fullName,
         isActive: user.isActive,
         referralCode: user.referralCode,
-        referralLink: user.referralCode ? `${process.env.NEXTAUTH_URL || 'http://localhost:3002'}/login-register?spid=${user.id}` : null,
+  referralLink: (user.referralCode && origin) ? `${origin}/login-register?spid=${user.id}` : null,
         isKycApproved: user.isKycApproved,
         walletBalance: {
           paisa: user.walletBalance,

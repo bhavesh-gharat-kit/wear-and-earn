@@ -44,10 +44,11 @@ export async function POST(req) {
         }
       })
 
-      if (completedOrdersCount === 1) {
+  if (completedOrdersCount === 1) {
         // This is the first completed order, activate MLM
         try {
-          const activateResponse = await fetch(`${process.env.NEXTAUTH_URL}/api/activate-mlm`, {
+          const origin = req?.headers?.get('origin') || process.env.NEXTAUTH_URL;
+          const activateResponse = await fetch(`${origin}/api/activate-mlm`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

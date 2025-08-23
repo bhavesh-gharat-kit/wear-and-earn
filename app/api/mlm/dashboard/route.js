@@ -106,7 +106,8 @@ export async function GET(request) {
     const currentMonth = new Date().toISOString().slice(0, 7);
     const thisMonthPurchase = user.lastMonthPurchase === currentMonth ? user.monthlyPurchase : 0;
 
-    const dashboardData = {
+  const origin = request?.nextUrl?.origin || process.env.NEXTAUTH_URL;
+  const dashboardData = {
       user: {
         ...user,
         walletBalance: user.walletBalance / 100, // Convert to rupees
@@ -137,7 +138,7 @@ export async function GET(request) {
         amount: t.amount / 100,
         createdAt: t.createdAt
       })),
-      referralLink: `${process.env.NEXTAUTH_URL}/signup?ref=${user.referralCode}`
+  referralLink: origin ? `${origin}/signup?ref=${user.referralCode}` : null
     };
 
     return NextResponse.json({

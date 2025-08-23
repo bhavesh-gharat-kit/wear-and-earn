@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { uploadToCloudinary } from "@/lib/upload-to-cloudinary";
 
 const allowedImageTypes = [
   "image/jpeg",
@@ -11,7 +12,8 @@ const allowedImageTypes = [
   "image/jpg",
 ];
 
-const ImagesUploaderComponent = ({ label, maxFiles, images, setImages }) => {
+// When cloudUpload=true, this component uploads files to Cloudinary immediately and stores URLs
+const ImagesUploaderComponent = ({ label, maxFiles, images, setImages, cloudUpload = true }) => {
   
   const handleImageChange = (event) => {
     const files = Array.from(event.target.files);
@@ -33,7 +35,24 @@ const ImagesUploaderComponent = ({ label, maxFiles, images, setImages }) => {
       validFiles.push(file);
     }
 
-    setImages((prev) => [...prev, ...validFiles].slice(0, maxFiles));
+    if (cloudUpload) {
+      // Upload sequentially to show clear toasts; could be batched if needed
+      (async () => {
+        for (const file of validFiles) {
+          try {
+            const res = await uploadToCloudinary(file);
+            // Keep only the secure_url to store in DB
+            setImages((prev) => [...prev, res.secure_url].slice(0, maxFiles));
+            toast.success(`${file.name} uploaded`);
+          } catch (e) {
+            console.error(e);
+            toast.error(`Upload failed: ${file.name}`);
+          }
+        }
+      })();
+    } else {
+      setImages((prev) => [...prev, ...validFiles].slice(0, maxFiles));
+    }
   };
 
   const removeImage = (index) => {
@@ -53,13 +72,23 @@ const ImagesUploaderComponent = ({ label, maxFiles, images, setImages }) => {
       <div className="flex flex-wrap gap-2 mt-2">
         {images?.map((file, index) => (
           <div key={index} className="relative">
-            <Image
-              height={256}
-              width={256}
-              src={URL.createObjectURL(file)}
-              alt="Preview"
-              className="w-24 h-24 rounded-lg border"
-            />
+            {typeof file === 'string' ? (
+              <Image
+                height={256}
+                width={256}
+                src={file}
+                alt="Preview"
+                className="w-24 h-24 rounded-lg border object-cover"
+              />
+            ) : (
+              <Image
+                height={256}
+                width={256}
+                src={URL.createObjectURL(file)}
+                alt="Preview"
+                className="w-24 h-24 rounded-lg border object-cover"
+              />
+            )}
             <button
               type="button"
               onClick={() => removeImage(index)}
