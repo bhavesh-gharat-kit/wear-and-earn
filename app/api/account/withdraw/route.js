@@ -47,48 +47,115 @@ export async function POST(request) {
       }, { status: 400 })
     }
 
-    // Minimum withdrawal amount check (₹100)
-    if (amountInPaisa < 10000) { // 100 * 100 paisa
+    // Minimum withdrawal amount check (₹500)
+    if (amountInPaisa < 50000) { // 500 * 100 paisa
       return NextResponse.json({ 
-        error: 'Minimum withdrawal amount is ₹100' 
+        error: 'Minimum withdrawal amount is ₹500' 
       }, { status: 400 })
     }
 
-    // Process withdrawal in a transaction
-    const result = await prisma.$transaction(async (tx) => {
-      // Deduct amount from wallet
-      const updatedUser = await tx.user.update({
-        where: { id: user.id },
-        data: {
-          walletBalance: {
-            decrement: amountInPaisa
-          }
-        }
-      })
+    // Check for pending withdrawal requests
+    const pendingRequest = await prisma.ledger.findFirst({
+      where: {
+        userId,
+        type: 'withdrawal_request',
+        note: { contains: 'pending' }
+      }
+    })
 
-      // Create ledger entry for withdrawal
-      const ledgerEntry = await tx.ledger.create({
-        data: {
-          userId: user.id,
-          type: 'withdrawal_debit',
-          amount: -amountInPaisa, // Negative for debit
-          note: `Withdrawal to bank account: ${user.kycData.bankAccountNumber.slice(-4)}`,
-          ref: `withdrawal_${Date.now()}`
-        }
-      })
+    if (pendingRequest) {
+      return NextResponse.json({
+        error: 'You have a pending withdrawal request. Please wait for approval.'
+      }, { status: 400 })
+    }
 
-      return { updatedUser, ledgerEntry }
+    // Create withdrawal request (not deducting balance yet)
+    const withdrawalRequest = await prisma.ledger.create({
+      data: {
+        userId,
+        type: 'withdrawal_request',
+        amount: amountInPaisa,
+        note: `Withdrawal request - pending admin approval. Bank: ${user.kycData.bankName}, Account: ${user.kycData.bankAccountNumber.slice(-4)}`,
+        ref: `withdrawal_req_${Date.now()}`
+      }
     })
 
     return NextResponse.json({
-      message: 'Withdrawal request submitted successfully',
-      newBalance: result.updatedUser.walletBalance,
-      withdrawalAmount: amountInPaisa,
-      transactionId: result.ledgerEntry.id
+      success: true,
+      message: 'Withdrawal request submitted successfully. It will be processed within 24-48 hours after admin approval.',
+      requestId: withdrawalRequest.id,
+      amount: amount,
+      status: 'pending'
     })
 
   } catch (error) {
-    console.error('Error processing withdrawal:', error)
+    console.error('Error processing withdrawal request:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+// Get withdrawal history
+export async function GET(request) {
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const userId = parseInt(session.user.id)
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get('page')) || 1
+    const limit = parseInt(searchParams.get('limit')) || 10
+
+    const withdrawals = await prisma.ledger.findMany({
+      where: {
+        userId,
+        type: {
+          in: ['withdrawal_request', 'withdrawal_debit', 'withdrawal_approved', 'withdrawal_rejected']
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit
+    })
+
+    const total = await prisma.ledger.count({
+      where: {
+        userId,
+        type: {
+          in: ['withdrawal_request', 'withdrawal_debit', 'withdrawal_approved', 'withdrawal_rejected']
+        }
+      }
+    })
+
+    const formattedWithdrawals = withdrawals.map(withdrawal => ({
+      id: withdrawal.id,
+      amount: withdrawal.amount / 100, // Convert to rupees
+      type: withdrawal.type,
+      status: withdrawal.note.includes('pending') ? 'pending' : 
+              withdrawal.note.includes('approved') ? 'approved' : 
+              withdrawal.note.includes('rejected') ? 'rejected' : 'processed',
+      note: withdrawal.note,
+      createdAt: withdrawal.createdAt,
+      ref: withdrawal.ref
+    }))
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        withdrawals: formattedWithdrawals,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      }
+    })
+
+  } catch (error) {
+    console.error('Error fetching withdrawal history:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

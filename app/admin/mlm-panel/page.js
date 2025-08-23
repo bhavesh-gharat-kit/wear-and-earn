@@ -11,13 +11,16 @@ import {
   Download,
   RefreshCw,
   UserCheck,
-  Wallet
+  Wallet,
+  AlertTriangle,
+  Settings
 } from 'lucide-react'
 
 export default function AdminMLMPanel() {
   const { data: session, status } = useSession()
   const [mlmOverview, setMlmOverview] = useState(null)
   const [commissions, setCommissions] = useState(null)
+  const [diagnostics, setDiagnostics] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
   const [filters, setFilters] = useState({
@@ -45,6 +48,15 @@ export default function AdminMLMPanel() {
             const commissionsData = await commissionsRes.json()
             setCommissions(commissionsData)
           }
+
+          // Fetch diagnostics data if on diagnostics tab
+          if (activeTab === 'diagnostics') {
+            const diagnosticsRes = await fetch('/api/admin/mlm-diagnostics')
+            if (diagnosticsRes.ok) {
+              const diagnosticsData = await diagnosticsRes.json()
+              setDiagnostics(diagnosticsData)
+            }
+          }
         } catch (error) {
           console.error('Error fetching MLM data:', error)
         } finally {
@@ -54,7 +66,7 @@ export default function AdminMLMPanel() {
     }
     
     fetchData()
-  }, [session?.user?.role, filters.page, filters.limit, filters.userFilter])
+  }, [session?.user?.role, filters.page, filters.limit, filters.userFilter, activeTab])
 
   const fetchMLMData = async () => {
     try {
@@ -459,6 +471,175 @@ export default function AdminMLMPanel() {
     </div>
   )
 
+  const renderDiagnosticsTab = () => (
+    <div className="space-y-6">
+      {/* Diagnostics Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center">
+            <AlertTriangle className="h-8 w-8 text-red-600 mr-4" />
+            <div>
+              <p className="text-sm text-gray-600">Users with Paid Orders</p>
+              <p className="text-2xl font-bold text-gray-900">{diagnostics?.usersWithPaidOrders || 0}</p>
+              <p className="text-xs text-red-600">{diagnostics?.inactiveWithPaidOrders || 0} not activated</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center">
+            <Users className="h-8 w-8 text-yellow-600 mr-4" />
+            <div>
+              <p className="text-sm text-gray-600">Missing Referral Code</p>
+              <p className="text-2xl font-bold text-gray-900">{diagnostics?.missingReferralCode || 0}</p>
+              <p className="text-xs text-yellow-600">Need manual fix</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center">
+            <Settings className="h-8 w-8 text-blue-600 mr-4" />
+            <div>
+              <p className="text-sm text-gray-600">Matrix Issues</p>
+              <p className="text-2xl font-bold text-gray-900">{diagnostics?.matrixIssues || 0}</p>
+              <p className="text-xs text-blue-600">Placement problems</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center">
+            <DollarSign className="h-8 w-8 text-green-600 mr-4" />
+            <div>
+              <p className="text-sm text-gray-600">Commission Issues</p>
+              <p className="text-2xl font-bold text-gray-900">{diagnostics?.commissionIssues || 0}</p>
+              <p className="text-xs text-green-600">Unpaid commissions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Problem Users Table */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Users Needing Attention</h3>
+          <button
+            onClick={async () => {
+              setLoading(true)
+              const diagnosticsRes = await fetch('/api/admin/mlm-diagnostics')
+              if (diagnosticsRes.ok) {
+                const diagnosticsData = await diagnosticsRes.json()
+                setDiagnostics(diagnosticsData)
+              }
+              setLoading(false)
+            }}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span>Refresh</span>
+          </button>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">User</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Issue</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Paid Orders</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Referral Code</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {diagnostics?.problemUsers?.map((user) => (
+                <tr key={user.id}>
+                  <td className="px-4 py-3">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
+                      <p className="text-xs text-gray-500">ID: {user.id}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="space-y-1">
+                      {!user.isActive && user.paidOrdersCount > 0 && (
+                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                          Not Activated
+                        </span>
+                      )}
+                      {!user.referralCode && (
+                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                          No Referral Code
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900">
+                    {user.paidOrdersCount}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      user.isActive 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {user.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm font-mono text-gray-600">
+                    {user.referralCode || '-'}
+                  </td>
+                  <td className="px-4 py-3">
+                    {!user.isActive && user.paidOrdersCount > 0 && (
+                      <button
+                        onClick={async () => {
+                          try {
+                            const response = await fetch('/api/admin/fix-user-activation', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ userId: user.id })
+                            })
+                            const data = await response.json()
+                            if (data.success) {
+                              alert(`User ${user.fullName} activated successfully!`)
+                              // Refresh diagnostics
+                              const diagnosticsRes = await fetch('/api/admin/mlm-diagnostics')
+                              if (diagnosticsRes.ok) {
+                                const diagnosticsData = await diagnosticsRes.json()
+                                setDiagnostics(diagnosticsData)
+                              }
+                            } else {
+                              alert(`Failed to activate user: ${data.message}`)
+                            }
+                          } catch (error) {
+                            alert('Error activating user. Please try again.')
+                            console.error('Activation error:', error)
+                          }
+                        }}
+                        className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors"
+                      >
+                        Activate MLM
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {(!diagnostics?.problemUsers || diagnostics.problemUsers.length === 0) && (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No issues found! All users with paid orders are properly activated.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -483,6 +664,7 @@ export default function AdminMLMPanel() {
               { id: 'overview', name: 'Overview', icon: TrendingUp },
               { id: 'users', name: 'Users', icon: Users },
               { id: 'commissions', name: 'Commissions', icon: DollarSign },
+              { id: 'diagnostics', name: 'Diagnostics', icon: AlertTriangle },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -504,6 +686,7 @@ export default function AdminMLMPanel() {
         {activeTab === 'overview' && renderOverviewTab()}
         {activeTab === 'users' && renderUsersTab()}
         {activeTab === 'commissions' && renderCommissionsTab()}
+        {activeTab === 'diagnostics' && renderDiagnosticsTab()}
       </div>
     </div>
   )

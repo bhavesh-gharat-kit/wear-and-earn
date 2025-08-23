@@ -18,17 +18,17 @@ export async function POST(req) {
     const isAuthentic = expectedSignature === razorpay_signature
 
     if (isAuthentic) {
-      // Update order status to completed
+      // Update order status to delivered
       const updatedOrder = await prisma.order.update({
         where: { id: orderId },
         data: {
-          status: 'completed',
+          status: 'delivered',
           paymentId: razorpay_payment_id,
-          paymentStatus: 'completed'
+          paidAt: new Date() // Set paidAt when payment is verified
         },
         include: {
           user: true,
-          orderItems: {
+          orderProducts: {
             include: {
               product: true
             }
@@ -36,36 +36,44 @@ export async function POST(req) {
         }
       })
 
-      // Trigger MLM activation if this is user's first completed order
-      const completedOrdersCount = await prisma.order.count({
-        where: {
-          userId: updatedOrder.userId,
-          status: 'completed'
+      // Check if user needs MLM activation (regardless of order count)
+      const user = await prisma.user.findUnique({
+        where: { id: updatedOrder.userId },
+        select: {
+          isActive: true,
+          referralCode: true
         }
-      })
+      });
 
-  if (completedOrdersCount === 1) {
-        // This is the first completed order, activate MLM
+      // Trigger MLM activation if user is not active or has no referral code
+      // This handles both first-time buyers and users with multiple purchases who weren't activated
+      if (!user.isActive || !user.referralCode) {
         try {
           const origin = req?.headers?.get('origin') || process.env.NEXTAUTH_URL;
-          const activateResponse = await fetch(`${origin}/api/activate-mlm`, {
+          const activateResponse = await fetch(`${origin}/api/activate-mlm-internal`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               userId: updatedOrder.userId,
-              amount: updatedOrder.amount,
+              amount: updatedOrder.total,
               orderId: updatedOrder.id
             })
           })
 
           if (!activateResponse.ok) {
-            console.error('Failed to activate MLM for user:', updatedOrder.userId)
+            const errorText = await activateResponse.text();
+            console.error('Failed to activate MLM for user:', updatedOrder.userId, 'Error:', errorText);
+          } else {
+            const result = await activateResponse.json();
+            console.log('MLM activation successful for user:', updatedOrder.userId, 'Result:', result);
           }
         } catch (error) {
           console.error('Error activating MLM:', error)
         }
+      } else {
+        console.log('User', updatedOrder.userId, 'already has MLM activated with referral code:', user.referralCode);
       }
 
       return NextResponse.json({ 

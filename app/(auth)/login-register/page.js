@@ -1,9 +1,11 @@
-import LoginRegister from '@/pages/auth/login-register-page/LoginRegister'
+"use client"
 
-function page() {
-  return (
-    <LoginRegister/>
-  )
+import { useEffect } from 'react'
+
+export default function Page() {
+  useEffect(() => {
+    const params = typeof window !== 'undefined' ? window.location.search : ''
+    window.location.replace(`/login${params}`)
+  }, [])
+  return null
 }
-
-export default page

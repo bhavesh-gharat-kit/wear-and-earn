@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-  "dev": "next dev -p 3000",
+    "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
-  "lint": "next lint",
-  "postinstall": "prisma generate",
+    "lint": "next lint",
+    "postinstall": "prisma generate",
     "seed": "node prisma/seed.mjs"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "@prisma/client": "^6.13.0",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
+    "cloudinary": "^2.7.0",
     "daisyui": "^5.0.49",
     "flowbite": "^3.1.2",
     "formidable": "^3.5.4",

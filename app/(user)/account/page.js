@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { 
   User, 
@@ -31,18 +31,584 @@ import {
   Shield,
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
+  Star,
+  Mail,
+  MessageSquare,
+  Lightbulb
 } from 'lucide-react'
+
+// KYC Form Component
+const KYCForm = ({ userData, kycData, onSubmit }) => {
+  const [formData, setFormData] = useState({
+    fullName: kycData?.fullName || userData?.fullName || '',
+    dateOfBirth: kycData?.dateOfBirth ? new Date(kycData.dateOfBirth).toISOString().split('T')[0] : '',
+    gender: kycData?.gender || '',
+    fatherName: kycData?.fatherName || '',
+    aadharNumber: kycData?.aadharNumber || '',
+    panNumber: kycData?.panNumber || '',
+    bankAccountNumber: kycData?.bankAccountNumber || '',
+    ifscCode: kycData?.ifscCode || '',
+    bankName: kycData?.bankName || '',
+    branchName: kycData?.branchName || ''
+  })
+  const [submitting, setSubmitting] = useState(false)
+  const [message, setMessage] = useState('')
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setSubmitting(true)
+    setMessage('')
+
+    try {
+      const response = await fetch('/api/account/kyc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setMessage('KYC application submitted successfully! Your documents are under review.')
+        onSubmit() // Refresh KYC data
+      } else {
+        setMessage(data.error || 'Failed to submit KYC application')
+      }
+    } catch (error) {
+      setMessage('Error submitting KYC application')
+      console.error('KYC submission error:', error)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  // If user is already verified
+  if (userData?.isKycApproved) {
+    return (
+      <div className="text-center py-12">
+        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">KYC Verified Successfully</h3>
+        <p className="text-gray-600">Your account has been verified and you can now access all features.</p>
+      </div>
+    )
+  }
+
+  // If KYC is submitted and pending
+  if (kycData?.status === 'pending') {
+    return (
+      <div className="text-center py-12">
+        <Clock className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">KYC Under Review</h3>
+        <p className="text-gray-600 mb-4">Your KYC documents are being reviewed by our team.</p>
+        <p className="text-sm text-gray-500">This process usually takes 24-48 hours.</p>
+        <div className="mt-6 bg-blue-50 border border-blue-200 p-4 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>Submitted on:</strong> {new Date(kycData.submittedAt).toLocaleDateString()}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show form for new submission or resubmission (if rejected)
+  return (
+    <div>
+      {kycData?.status === 'rejected' && (
+        <div className="bg-red-50 border border-red-200 p-4 rounded-lg mb-6">
+          <h4 className="font-medium text-red-900 mb-2">Resubmission Required</h4>
+          <p className="text-sm text-red-800">
+            Your previous KYC application was rejected. Please review the feedback and submit updated information.
+          </p>
+        </div>
+      )}
+
+      {message && (
+        <div className={`mb-6 p-4 rounded-lg ${
+          message.includes('success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+        }`}>
+          {message}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Personal Information */}
+        <div>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+              <input 
+                type="text" 
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleInputChange}
+                required
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                placeholder="Enter your full name" 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+              <input 
+                type="date" 
+                name="dateOfBirth"
+                value={formData.dateOfBirth}
+                onChange={handleInputChange}
+                required
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+              <select 
+                name="gender"
+                value={formData.gender}
+                onChange={handleInputChange}
+                required
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Father&apos;s Name</label>
+              <input 
+                type="text" 
+                name="fatherName"
+                value={formData.fatherName}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                placeholder="Enter father's name" 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Identity Documents */}
+        <div>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Identity Documents</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Aadhar Number</label>
+              <input 
+                type="text" 
+                name="aadharNumber"
+                value={formData.aadharNumber}
+                onChange={handleInputChange}
+                required
+                pattern="[0-9]{12}"
+                maxLength="12"
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                placeholder="Enter 12-digit Aadhar number" 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">PAN Number</label>
+              <input 
+                type="text" 
+                name="panNumber"
+                value={formData.panNumber}
+                onChange={handleInputChange}
+                required
+                pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                maxLength="10"
+                style={{ textTransform: 'uppercase' }}
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                placeholder="Enter PAN number" 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Bank Details */}
+        <div>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Bank Account Details</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Bank Account Number</label>
+              <input 
+                type="text" 
+                name="bankAccountNumber"
+                value={formData.bankAccountNumber}
+                onChange={handleInputChange}
+                required
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                placeholder="Enter account number" 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">IFSC Code</label>
+              <input 
+                type="text" 
+                name="ifscCode"
+                value={formData.ifscCode}
+                onChange={handleInputChange}
+                required
+                pattern="[A-Z]{4}0[A-Z0-9]{6}"
+                maxLength="11"
+                style={{ textTransform: 'uppercase' }}
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                placeholder="Enter IFSC code" 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
+              <input 
+                type="text" 
+                name="bankName"
+                value={formData.bankName}
+                onChange={handleInputChange}
+                required
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                placeholder="Enter bank name" 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Branch Name</label>
+              <input 
+                type="text" 
+                name="branchName"
+                value={formData.branchName}
+                onChange={handleInputChange}
+                required
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                placeholder="Enter branch name" 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <div className="pt-4">
+          <button 
+            type="submit"
+            disabled={submitting}
+            className="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
+          >
+            {submitting ? 'Submitting...' : kycData?.status === 'rejected' ? 'Resubmit KYC Application' : 'Submit KYC Application'}
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+// Wallet Actions Component
+const WalletActions = ({ walletBalance }) => {
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false)
+  const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [withdrawing, setWithdrawing] = useState(false)
+  const [message, setMessage] = useState('')
+
+  const handleWithdraw = async () => {
+    if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) {
+      setMessage('Please enter a valid amount')
+      return
+    }
+
+    if (parseFloat(withdrawAmount) > walletBalance) {
+      setMessage('Insufficient balance')
+      return
+    }
+
+    setWithdrawing(true)
+    setMessage('')
+
+    try {
+      const response = await fetch('/api/account/withdraw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: parseFloat(withdrawAmount) })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setMessage('Withdrawal request submitted successfully!')
+        setWithdrawAmount('')
+        setShowWithdrawModal(false)
+        // Refresh wallet data
+        window.location.reload()
+      } else {
+        setMessage(data.error || 'Failed to submit withdrawal request')
+      }
+    } catch (error) {
+      setMessage('Error submitting withdrawal request')
+      console.error('Withdrawal error:', error)
+    } finally {
+      setWithdrawing(false)
+    }
+  }
+
+  return (
+    <div className="mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+        <button 
+          onClick={() => setShowWithdrawModal(true)}
+          className="bg-green-50 border border-green-200 p-4 rounded-lg hover:bg-green-100 transition-colors"
+        >
+          <Download className="w-6 h-6 text-green-600 mx-auto mb-2" />
+          <p className="font-medium text-green-700">Withdraw Money</p>
+        </button>
+      </div>
+
+      {/* Withdraw Modal */}
+      {showWithdrawModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Withdraw Funds</h3>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Amount (₹)
+              </label>
+              <input
+                type="number"
+                value={withdrawAmount}
+                onChange={(e) => setWithdrawAmount(e.target.value)}
+                placeholder="Enter amount"
+                min="500"
+                max={walletBalance}
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Available balance: ₹{walletBalance?.toFixed(2) || '0.00'}
+              </p>
+              <p className="text-xs text-gray-500">
+                Minimum withdrawal: ₹500
+              </p>
+            </div>
+
+            {message && (
+              <div className={`mb-4 p-3 rounded-lg text-sm ${
+                message.includes('success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+              }`}>
+                {message}
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowWithdrawModal(false)
+                  setWithdrawAmount('')
+                  setMessage('')
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleWithdraw}
+                disabled={withdrawing}
+                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+              >
+                {withdrawing ? 'Processing...' : 'Submit Request'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Referral Section Component
+const ReferralSection = ({ userData }) => {
+  const [referralData, setReferralData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [copying, setCopying] = useState(false)
+
+  const fetchReferralData = useCallback(async (retryCount = 0) => {
+    try {
+      const response = await fetch('/api/account/referral')
+      const data = await response.json()
+      
+      if (data.success) {
+        setReferralData(data.data)
+      } else {
+        // Check if this is an activation-in-progress error
+        if (data.hasOrders && retryCount < 2) {
+          console.log('Account activation in progress, retrying in 3 seconds...')
+          setTimeout(() => {
+            fetchReferralData(retryCount + 1)
+          }, 3000)
+          return
+        }
+        console.error('Referral data error:', data.message)
+      }
+    } catch (error) {
+      console.error('Error fetching referral data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchReferralData()
+  }, [fetchReferralData])
+
+  const copyToClipboard = async (text) => {
+    try {
+      setCopying(true)
+      await navigator.clipboard.writeText(text)
+      // You might want to add a toast notification here
+    } catch (error) {
+      console.error('Failed to copy:', error)
+    } finally {
+      setCopying(false)
+    }
+  }
+
+  const generateShareMessage = async (platform) => {
+    try {
+      const response = await fetch('/api/account/referral', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform })
+      })
+      const data = await response.json()
+      
+      if (data.success) {
+        if (platform === 'whatsapp') {
+          const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(data.data.message)}`
+          window.open(whatsappUrl, '_blank')
+        } else if (platform === 'email') {
+          const subject = encodeURIComponent('Join WearEarn - Earn Money While Shopping!')
+          const body = encodeURIComponent(data.data.message)
+          window.open(`mailto:?subject=${subject}&body=${body}`, '_blank')
+        } else if (platform === 'sms') {
+          window.open(`sms:?body=${encodeURIComponent(data.data.message)}`, '_blank')
+        } else {
+          copyToClipboard(data.data.message)
+        }
+      }
+    } catch (error) {
+      console.error('Error generating share message:', error)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading referral data...</p>
+      </div>
+    )
+  }
+
+  if (!referralData?.isActive) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 p-6 rounded-lg text-center">
+        <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Referral Link Not Available</h3>
+        <p className="text-gray-600 mb-4">You need to make your first purchase to get your referral link and start earning commissions.</p>
+        <button className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+          Shop Now
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Referral Code Card */}
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 p-6 rounded-lg">
+        <h3 className="font-medium text-gray-900 mb-3">Your Referral Code</h3>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-white border border-gray-300 px-4 py-2 rounded-lg font-mono text-lg flex-1">
+            {referralData.referralCode}
+          </div>
+          <button 
+            onClick={() => copyToClipboard(referralData.referralCode)}
+            disabled={copying}
+            className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2 disabled:opacity-50"
+          >
+            <Copy className="w-4 h-4" />
+            {copying ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+        
+        <div className="text-sm text-gray-600">
+          <p className="mb-1">Referral URL:</p>
+          <div className="bg-white border border-gray-300 px-3 py-2 rounded text-xs break-all">
+            {referralData.referralUrl}
+          </div>
+        </div>
+      </div>
+
+      {/* Share Options */}
+      <div>
+        <h3 className="font-medium text-gray-900 mb-3">Share Your Referral Link</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <button 
+            onClick={() => generateShareMessage('whatsapp')}
+            className="bg-green-50 border border-green-200 p-3 rounded-lg hover:bg-green-100 transition-colors text-center"
+          >
+            <Share2 className="w-6 h-6 text-green-600 mx-auto mb-1" />
+            <p className="text-sm font-medium text-green-700">WhatsApp</p>
+          </button>
+          <button 
+            onClick={() => generateShareMessage('email')}
+            className="bg-indigo-50 border border-indigo-200 p-3 rounded-lg hover:bg-indigo-100 transition-colors text-center"
+          >
+            <Mail className="w-6 h-6 text-indigo-600 mx-auto mb-1" />
+            <p className="text-sm font-medium text-indigo-700">Email</p>
+          </button>
+          <button 
+            onClick={() => generateShareMessage('sms')}
+            className="bg-blue-50 border border-blue-200 p-3 rounded-lg hover:bg-blue-100 transition-colors text-center"
+          >
+            <MessageSquare className="w-6 h-6 text-blue-600 mx-auto mb-1" />
+            <p className="text-sm font-medium text-blue-700">SMS</p>
+          </button>
+          <button 
+            onClick={() => copyToClipboard(referralData.referralUrl)}
+            className="bg-purple-50 border border-purple-200 p-3 rounded-lg hover:bg-purple-100 transition-colors text-center"
+          >
+            <Copy className="w-6 h-6 text-purple-600 mx-auto mb-1" />
+            <p className="text-sm font-medium text-purple-700">Copy Link</p>
+          </button>
+        </div>
+      </div>
+
+      {/* Referral Instructions */}
+      <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+        <h4 className="font-medium text-blue-900 mb-2">How it works:</h4>
+        <ul className="text-sm text-blue-800 space-y-1">
+          <li>• Share your referral code or link with friends and family</li>
+          <li>• When they register and make their first purchase, you earn commission</li>
+          <li>• Build your team and earn from multiple levels</li>
+          <li>• The more active your team, the more you earn!</li>
+        </ul>
+      </div>
+    </div>
+  )
+}
 
 const AccountDashboard = () => {
   const { data: session, status } = useSession()
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('wallet')
   const [showBalance, setShowBalance] = useState(true)
   const [userData, setUserData] = useState(null)
   const [mlmData, setMlmData] = useState(null)
   const [orders, setOrders] = useState([])
   const [stats, setStats] = useState(null)
   const [kycData, setKycData] = useState(null)
+  const [walletData, setWalletData] = useState(null)
+  const [teamData, setTeamData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [kycForm, setKycForm] = useState({
     fullName: '',
@@ -75,6 +641,8 @@ const AccountDashboard = () => {
       fetchOrders()
       fetchStats()
       fetchKycData()
+      fetchWalletData()
+      fetchTeamData()
     } else {
       setLoading(false)
     }
@@ -97,7 +665,53 @@ const AccountDashboard = () => {
       const response = await fetch('/api/account/mlm-profile')
       if (response.ok) {
         const data = await response.json()
-        setMlmData(data)
+        // Normalize API shape to what the UI expects
+        const d = data || {}
+        const user = d.user || {}
+        const team = d.team || {}
+        const wallet = d.wallet || {}
+        const earnings = wallet.earnings || {}
+        const recent = wallet.recentTransactions || []
+
+        const origin = typeof window !== 'undefined' ? window.location.origin : ''
+        const normalized = {
+          // Status
+          isActive: !!user.isActive,
+          // Referral basics
+          referralCode: user.referralCode || null,
+          referralLink: user.referralLink || (user.id ? `${origin}/login-register?spid=${user.id}` : null),
+          // Wallet summary (amounts in paisa as per UI usage)
+          walletBalance: wallet?.balance?.paisa ?? 0,
+          totalEarnings: wallet?.totalEarned?.paisa ?? 0,
+          monthlyEarnings: wallet?.monthlyEarnings?.paisa ?? 0,
+          withdrawableBalance: wallet?.balance?.paisa ?? 0,
+          totalWithdrawn: 0,
+          // Team summary
+          totalReferrals: team?.totalMembers ?? team?.directReferrals ?? 0,
+          activeReferrals: 0,
+          level: 1,
+          teamVolume: 0,
+          levelBreakdown: {},
+          monthlyTeamSales: 0,
+          totalTeamEarnings: 0,
+          teamCommission: 0,
+          monthlyNewMembers: 0,
+          // Earnings breakdown (best-effort if available elsewhere)
+          referralEarnings: 0,
+          levelEarnings: 0,
+          bonusEarnings: 0,
+          // Recent transactions mapped to UI fields
+          recentTransactions: recent.map(tx => ({
+            id: tx.id,
+            type: tx.type,
+            amount: typeof tx.amount === 'number' ? tx.amount : (tx.amount?.paisa ?? 0),
+            date: tx.createdAt,
+            note: tx.note,
+            levelDepth: tx.levelDepth
+          }))
+        }
+
+        setMlmData(normalized)
       }
     } catch (error) {
       console.error('Error fetching MLM data:', error)
@@ -135,13 +749,44 @@ const AccountDashboard = () => {
       const response = await fetch('/api/account/kyc')
       if (response.ok) {
         const data = await response.json()
-        setKycData(data)
-        if (data) {
-          setKycForm(data)
+        setKycData(data?.kycData || null)
+        // Pre-fill only safe non-sensitive fields when available
+        if (data?.hasKyc && data?.kycData) {
+          setKycForm(prev => ({
+            ...prev,
+            fullName: data.kycData.fullName || '',
+            dateOfBirth: data.kycData.dateOfBirth ? new Date(data.kycData.dateOfBirth).toISOString().slice(0,10) : '',
+            gender: data.kycData.gender || '',
+            fatherName: data.kycData.fatherName || ''
+          }))
         }
       }
     } catch (error) {
       console.error('Error fetching KYC data:', error)
+    }
+  }
+
+  const fetchWalletData = async () => {
+    try {
+      const response = await fetch('/api/account/wallet')
+      if (response.ok) {
+        const data = await response.json()
+        setWalletData(data)
+      }
+    } catch (error) {
+      console.error('Error fetching wallet data:', error)
+    }
+  }
+
+  const fetchTeamData = async () => {
+    try {
+      const response = await fetch('/api/account/team')
+      if (response.ok) {
+        const data = await response.json()
+        setTeamData(data)
+      }
+    } catch (error) {
+      console.error('Error fetching team data:', error)
     }
   }
 
@@ -163,6 +808,7 @@ const AccountDashboard = () => {
         alert('Withdrawal request submitted successfully!')
         setWithdrawAmount('')
         fetchMlmData() // Refresh wallet data
+        fetchWalletData() // Refresh detailed wallet data
       } else {
         const error = await response.json()
         alert(error.message || 'Withdrawal failed')
@@ -203,8 +849,8 @@ const AccountDashboard = () => {
   }
 
   const copyReferralLink = () => {
-    if (mlmData?.referralCode) {
-      const link = `${window.location.origin}/login-register?ref=${mlmData.referralCode}`
+    const link = mlmData?.referralLink || (mlmData?.referralCode ? `${window.location.origin}/login-register?spid=${session?.user?.id}` : null)
+    if (link) {
       navigator.clipboard.writeText(link)
       alert('Referral link copied to clipboard!')
     }
@@ -579,209 +1225,247 @@ const AccountDashboard = () => {
     </div>
   )
 
-  const renderWalletTab = () => (
-    <div className="space-y-6">
+  const renderWalletTab = () => {
+    const wallet = walletData || {}
+    const balance = wallet.balance || {}
+    const earnings = wallet.earnings || {}
+    const transactions = wallet.transactions?.data || []
+    const pendingPayouts = wallet.pendingPayouts?.list || []
+    
+    return (
+    <div className="space-y-8">
       {/* Wallet Header */}
-      <div className="bg-gradient-to-br from-green-500 via-emerald-600 to-teal-600 text-white p-8 rounded-2xl shadow-xl">
+      <div className="bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 text-white p-8 rounded-3xl shadow-2xl">
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-3xl font-bold mb-2">My Wallet 💰</h2>
-            <p className="text-green-100 mb-4">Manage your earnings and withdrawals</p>
+            <p className="text-green-100 mb-6">Track your earnings and manage withdrawals</p>
             <div className="flex items-center space-x-4">
-              <div className="text-5xl font-bold">
-                {showBalance ? `₹${((mlmData?.walletBalance || 0) / 100).toFixed(2)}` : '₹ ****'}
+              <div className="text-6xl font-bold">
+                {showBalance ? `₹${balance.rupees?.toFixed(2) || '0.00'}` : '₹ ****'}
               </div>
               <button
                 onClick={() => setShowBalance(!showBalance)}
-                className="p-3 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                className="p-4 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-all duration-300 hover:scale-110"
               >
-                {showBalance ? <EyeOff size={24} /> : <Eye size={24} />}
+                {showBalance ? <EyeOff size={28} /> : <Eye size={28} />}
               </button>
             </div>
-            <p className="text-green-100 text-sm mt-2">Current wallet balance</p>
+            <p className="text-green-100 text-lg mt-3">Available for withdrawal</p>
           </div>
           <div className="text-right">
-            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
-              <Wallet className="w-12 h-12 mx-auto mb-2" />
-              <p className="text-sm">Available Balance</p>
+            <div className="p-6 bg-white bg-opacity-20 rounded-2xl">
+              <Wallet className="w-16 h-16 mx-auto mb-3" />
+              <p className="text-lg font-semibold">Digital Wallet</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Wallet Stats */}
+      {/* Wallet Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-green-50 rounded-lg">
-              <TrendingUp className="w-8 h-8 text-green-600" />
+        <div className="bg-gradient-to-br from-green-400 to-emerald-500 text-white p-8 rounded-2xl shadow-lg">
+          <div className="flex items-center space-x-4">
+            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
+              <TrendingUp className="w-10 h-10" />
             </div>
             <div>
-              <p className="text-gray-500 text-sm font-medium">Total Earnings</p>
-              <p className="text-2xl font-bold text-gray-800">₹{((mlmData?.totalEarnings || 0) / 100).toFixed(2)}</p>
-              <p className="text-xs text-green-600 font-medium">All time earnings</p>
+              <p className="text-green-100 text-sm font-medium">Total Earnings</p>
+              <p className="text-3xl font-bold">₹{earnings.total?.rupees?.toFixed(2) || '0.00'}</p>
+              <p className="text-xs text-green-200 font-medium">Lifetime earnings</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <Calendar className="w-8 h-8 text-blue-600" />
+        <div className="bg-gradient-to-br from-blue-400 to-indigo-500 text-white p-8 rounded-2xl shadow-lg">
+          <div className="flex items-center space-x-4">
+            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
+              <Calendar className="w-10 h-10" />
             </div>
             <div>
-              <p className="text-gray-500 text-sm font-medium">This Month</p>
-              <p className="text-2xl font-bold text-gray-800">₹{((mlmData?.monthlyEarnings || 0) / 100).toFixed(2)}</p>
-              <p className="text-xs text-blue-600 font-medium">Current month earnings</p>
+              <p className="text-blue-100 text-sm font-medium">This Month</p>
+              <p className="text-3xl font-bold">₹{earnings.monthly?.rupees?.toFixed(2) || '0.00'}</p>
+              <p className="text-xs text-blue-200 font-medium">Current month</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-purple-50 rounded-lg">
-              <CreditCard className="w-8 h-8 text-purple-600" />
+        <div className="bg-gradient-to-br from-purple-400 to-pink-500 text-white p-8 rounded-2xl shadow-lg">
+          <div className="flex items-center space-x-4">
+            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
+              <CreditCard className="w-10 h-10" />
             </div>
             <div>
-              <p className="text-gray-500 text-sm font-medium">Withdrawable</p>
-              <p className="text-2xl font-bold text-gray-800">₹{((mlmData?.withdrawableBalance || 0) / 100).toFixed(2)}</p>
-              <p className="text-xs text-purple-600 font-medium">Ready to withdraw</p>
+              <p className="text-purple-100 text-sm font-medium">Withdrawable</p>
+              <p className="text-3xl font-bold">₹{balance.rupees?.toFixed(2) || '0.00'}</p>
+              <p className="text-xs text-purple-200 font-medium">Ready to withdraw</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-yellow-50 rounded-lg">
-              <Banknote className="w-8 h-8 text-yellow-600" />
+        <div className="bg-gradient-to-br from-orange-400 to-red-500 text-white p-8 rounded-2xl shadow-lg">
+          <div className="flex items-center space-x-4">
+            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
+              <Clock className="w-10 h-10" />
             </div>
             <div>
-              <p className="text-gray-500 text-sm font-medium">Total Withdrawn</p>
-              <p className="text-2xl font-bold text-gray-800">₹{((mlmData?.totalWithdrawn || 0) / 100).toFixed(2)}</p>
-              <p className="text-xs text-yellow-600 font-medium">Lifetime withdrawals</p>
+              <p className="text-orange-100 text-sm font-medium">Pending</p>
+              <p className="text-3xl font-bold">₹{wallet.pendingPayouts?.totalAmount?.rupees?.toFixed(2) || '0.00'}</p>
+              <p className="text-xs text-orange-200 font-medium">{pendingPayouts.length} payouts</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Monthly Purchase Status */}
+      {wallet.monthlyPurchase && (
+        <div className="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 p-8 rounded-2xl">
+          <h3 className="text-xl font-bold text-orange-800 mb-6 flex items-center">
+            <Award className="w-6 h-6 mr-3" />
+            Monthly Purchase Status
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center p-6 bg-white rounded-xl shadow-md">
+              <p className="text-sm text-gray-600 mb-2">Current Month</p>
+              <p className="text-3xl font-bold text-orange-600">₹{wallet.monthlyPurchase?.current?.rupees?.toFixed(2) || '0.00'}</p>
+            </div>
+            <div className="text-center p-6 bg-white rounded-xl shadow-md">
+              <p className="text-sm text-gray-600 mb-2">Required</p>
+              <p className="text-3xl font-bold text-gray-800">₹{wallet.monthlyPurchase?.required?.rupees?.toFixed(2) || '500.00'}</p>
+            </div>
+            <div className="text-center p-6 bg-white rounded-xl shadow-md">
+              <p className="text-sm text-gray-600 mb-2">Status</p>
+              <span className={`inline-block px-6 py-3 rounded-xl text-lg font-bold ${
+                wallet.monthlyPurchase?.isEligible ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+              }`}>
+                {wallet.monthlyPurchase?.isEligible ? '✅ Eligible' : '❌ Not Eligible'}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Action Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Withdraw Section */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <h3 className="text-xl font-semibold mb-4 flex items-center">
-            <Download className="w-5 h-5 mr-2 text-green-600" />
+        <div className="bg-gradient-to-br from-white to-green-50 p-8 rounded-2xl shadow-lg border-2 border-green-200">
+          <h3 className="text-2xl font-bold mb-6 flex items-center text-green-800">
+            <Download className="w-6 h-6 mr-3" />
             Withdraw Funds
           </h3>
           {userData?.isKycApproved ? (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-lg font-semibold text-gray-800 mb-3">
                   Withdrawal Amount
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-xl">₹</span>
                   <input
                     type="number"
                     placeholder="0.00"
                     value={withdrawAmount}
                     onChange={(e) => setWithdrawAmount(e.target.value)}
-                    className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    min="1"
-                    max={(mlmData?.withdrawableBalance || 0) / 100}
+                    className="w-full pl-12 pr-4 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-300 focus:border-green-500 text-xl font-semibold"
+                    min="100"
+                    max={balance.rupees || 0}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Min: ₹1 | Max: ₹{((mlmData?.withdrawableBalance || 0) / 100).toFixed(2)}
+                <p className="text-sm text-gray-600 mt-2">
+                  Minimum: ₹100 | Maximum: ₹{balance.rupees?.toFixed(2) || '0.00'}
                 </p>
               </div>
               
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-medium text-gray-700 mb-2">Bank Details</h4>
-                <p className="text-sm text-gray-600">
+              <div className="p-6 bg-gray-50 rounded-xl border border-gray-200">
+                <h4 className="font-bold text-gray-800 mb-3">Bank Transfer Details</h4>
+                <p className="text-gray-700 mb-2">
                   Funds will be transferred to your registered bank account
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm text-gray-500">
                   Processing time: 1-3 business days
                 </p>
               </div>
 
               <button
                 onClick={handleWithdraw}
-                disabled={withdrawLoading || !withdrawAmount || withdrawAmount <= 0}
-                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+                disabled={withdrawLoading || !withdrawAmount || withdrawAmount < 100}
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 px-6 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 font-bold text-lg disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
               >
                 {withdrawLoading ? (
                   <>
-                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
                     Processing...
                   </>
                 ) : (
                   <>
-                    <Download className="w-4 h-4 mr-2" />
-                    Withdraw Funds
+                    <Download className="w-5 h-5 mr-3" />
+                    Withdraw Now
                   </>
                 )}
               </button>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <Shield className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h4 className="text-lg font-medium text-gray-500 mb-2">KYC Verification Required</h4>
-              <p className="text-gray-400 mb-4">Complete your KYC verification to withdraw funds</p>
+            <div className="text-center py-12">
+              <Shield className="w-20 h-20 text-gray-300 mx-auto mb-6" />
+              <h4 className="text-xl font-bold text-gray-600 mb-3">KYC Verification Required</h4>
+              <p className="text-gray-500 mb-6">Complete your KYC verification to withdraw funds</p>
               <button
                 onClick={() => setActiveTab('kyc')}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-3 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 font-semibold"
               >
-                Complete KYC
+                Complete KYC Now
               </button>
             </div>
           )}
         </div>
 
         {/* Recent Transactions */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold flex items-center">
-              <Clock className="w-5 h-5 mr-2 text-blue-600" />
+        <div className="bg-gradient-to-br from-white to-blue-50 p-8 rounded-2xl shadow-lg border-2 border-blue-200">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-bold flex items-center text-blue-800">
+              <Clock className="w-6 h-6 mr-3" />
               Recent Transactions
             </h3>
-            <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+            <button className="text-blue-600 hover:text-blue-800 font-semibold text-sm bg-blue-100 px-4 py-2 rounded-lg hover:bg-blue-200 transition-colors">
               View All
             </button>
           </div>
           
-          <div className="space-y-3 max-h-80 overflow-y-auto">
-            {mlmData?.recentTransactions?.length > 0 ? (
-              mlmData.recentTransactions.map((transaction, index) => (
-                <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg ${
-                      transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'
+          <div className="space-y-4 max-h-96 overflow-y-auto">
+            {transactions.length > 0 ? (
+              transactions.slice(0, 8).map((transaction) => (
+                <div key={transaction.id} className="flex justify-between items-center p-4 bg-white rounded-xl shadow-md border border-gray-100">
+                  <div className="flex items-center space-x-4">
+                    <div className={`p-3 rounded-xl ${
+                      transaction.isCredit ? 'bg-green-100' : 'bg-red-100'
                     }`}>
-                      {transaction.amount > 0 ? 
-                        <TrendingUp className="w-4 h-4 text-green-600" /> : 
-                        <TrendingDown className="w-4 h-4 text-red-600" />
+                      {transaction.isCredit ? 
+                        <TrendingUp className="w-6 h-6 text-green-600" /> : 
+                        <TrendingDown className="w-6 h-6 text-red-600" />
                       }
                     </div>
                     <div>
-                      <p className="font-medium text-gray-800">{transaction.type}</p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(transaction.date).toLocaleDateString()}
+                      <p className="font-bold text-gray-800">{transaction.type.replace('_', ' ')}</p>
+                      <p className="text-sm text-gray-600">
+                        {new Date(transaction.createdAt).toLocaleDateString()}
                       </p>
+                      {transaction.levelDepth && (
+                        <p className="text-xs text-blue-600 font-medium">Level {transaction.levelDepth}</p>
+                      )}
                     </div>
                   </div>
-                  <div className={`font-bold ${
-                    transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                  <div className={`font-bold text-lg ${
+                    transaction.isCredit ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {transaction.amount > 0 ? '+' : ''}₹{Math.abs(transaction.amount / 100).toFixed(2)}
+                    {transaction.isCredit ? '+' : ''}₹{transaction.amount.rupees?.toFixed(2) || '0.00'}
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center py-8">
-                <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500">No transactions yet</p>
-                <p className="text-sm text-gray-400">Start earning to see your transaction history</p>
+              <div className="text-center py-12">
+                <Clock className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 text-lg font-medium">No transactions yet</p>
+                <p className="text-gray-400">Start earning to see your transaction history</p>
               </div>
             )}
           </div>
@@ -789,242 +1473,200 @@ const AccountDashboard = () => {
       </div>
 
       {/* Earning Sources */}
-      <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-        <h3 className="text-xl font-semibold mb-6">Earning Sources</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg">
-            <Users className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-            <h4 className="font-semibold text-gray-800 mb-2">Referral Commissions</h4>
-            <p className="text-2xl font-bold text-blue-600">₹{((mlmData?.referralEarnings || 0) / 100).toFixed(2)}</p>
-            <p className="text-sm text-gray-600">From direct referrals</p>
-          </div>
-          
-          <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
-            <TrendingUp className="w-12 h-12 text-green-600 mx-auto mb-3" />
-            <h4 className="font-semibold text-gray-800 mb-2">Level Commissions</h4>
-            <p className="text-2xl font-bold text-green-600">₹{((mlmData?.levelEarnings || 0) / 100).toFixed(2)}</p>
-            <p className="text-sm text-gray-600">From team levels</p>
-          </div>
-          
-          <div className="text-center p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg">
-            <Award className="w-12 h-12 text-yellow-600 mx-auto mb-3" />
-            <h4 className="font-semibold text-gray-800 mb-2">Bonus Rewards</h4>
-            <p className="text-2xl font-bold text-yellow-600">₹{((mlmData?.bonusEarnings || 0) / 100).toFixed(2)}</p>
-            <p className="text-sm text-gray-600">Achievement bonuses</p>
+      {earnings.byType && (
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-8 rounded-2xl border-2 border-purple-200">
+          <h3 className="text-2xl font-bold mb-8 text-purple-800 flex items-center">
+            <Star className="w-6 h-6 mr-3" />
+            Earning Sources Breakdown
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {earnings.byType.sponsor_commission && (
+              <div className="text-center p-8 bg-white rounded-2xl shadow-lg border border-blue-200">
+                <Users className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                <h4 className="font-bold text-gray-800 mb-3 text-lg">Sponsor Commissions</h4>
+                <p className="text-3xl font-bold text-blue-600 mb-2">₹{earnings.byType.sponsor_commission.rupees?.toFixed(2) || '0.00'}</p>
+                <p className="text-gray-600">From direct referrals</p>
+              </div>
+            )}
+            
+            {earnings.byType.repurchase_commission && (
+              <div className="text-center p-8 bg-white rounded-2xl shadow-lg border border-green-200">
+                <TrendingUp className="w-16 h-16 text-green-600 mx-auto mb-4" />
+                <h4 className="font-bold text-gray-800 mb-3 text-lg">Repurchase Commissions</h4>
+                <p className="text-3xl font-bold text-green-600 mb-2">₹{earnings.byType.repurchase_commission.rupees?.toFixed(2) || '0.00'}</p>
+                <p className="text-gray-600">From team purchases</p>
+              </div>
+            )}
+            
+            {earnings.byType.self_joining_instalment && (
+              <div className="text-center p-8 bg-white rounded-2xl shadow-lg border border-yellow-200">
+                <Award className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
+                <h4 className="font-bold text-gray-800 mb-3 text-lg">Self Joining Bonus</h4>
+                <p className="text-3xl font-bold text-yellow-600 mb-2">₹{earnings.byType.self_joining_instalment.rupees?.toFixed(2) || '0.00'}</p>
+                <p className="text-gray-600">Weekly instalments</p>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      )}
     </div>
-  )
+  )}
 
-  const renderTeamTab = () => (
-    <div className="space-y-6">
+  const renderTeamTab = () => {
+    const team = teamData || {}
+    const hierarchy = team.hierarchy || {}
+    const stats = team.stats || {}
+    const directReferrals = team.directReferrals?.data || []
+    const levels = team.levels || []
+    
+    return (
+    <div className="space-y-8">
       {/* Team Header */}
-      <div className="bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 text-white p-8 rounded-2xl shadow-xl">
-        <div className="flex justify-between items-start">
+      <div className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 text-white p-8 rounded-3xl shadow-2xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
-            <h2 className="text-3xl font-bold mb-2">My Team 👥</h2>
-            <p className="text-purple-100 mb-4">Build and manage your MLM network</p>
-            <div className="flex items-center space-x-6">
-              <div>
-                <div className="text-3xl font-bold">{mlmData?.totalReferrals || 0}</div>
-                <p className="text-purple-200 text-sm">Total Members</p>
+            <h2 className="text-4xl font-bold mb-2">My Team 👥</h2>
+            <p className="text-blue-100 mb-6 text-lg">Build and grow your network</p>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center bg-white bg-opacity-20 px-4 py-3 rounded-xl">
+                <span className="text-blue-100 font-medium">Total Team Size:</span>
+                <span className="font-bold text-2xl">{stats.totalMembers || 0}</span>
               </div>
-              <div>
-                <div className="text-3xl font-bold">{mlmData?.activeReferrals || 0}</div>
-                <p className="text-purple-200 text-sm">Active Members</p>
+              <div className="flex justify-between items-center bg-white bg-opacity-20 px-4 py-3 rounded-xl">
+                <span className="text-blue-100 font-medium">Direct Referrals:</span>
+                <span className="font-bold text-2xl">{stats.directReferrals || 0}</span>
               </div>
-              <div>
-                <div className="text-3xl font-bold">Level {mlmData?.level || 1}</div>
-                <p className="text-purple-200 text-sm">Your Level</p>
+              <div className="flex justify-between items-center bg-white bg-opacity-20 px-4 py-3 rounded-xl">
+                <span className="text-blue-100 font-medium">Active Members:</span>
+                <span className="font-bold text-2xl">{stats.activeMembers || 0}</span>
               </div>
             </div>
           </div>
-          <div className="text-center">
-            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
-              <Users className="w-12 h-12 mx-auto mb-2" />
-              <p className="text-sm">Team Network</p>
+          <div className="flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-40 h-40 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <Users className="w-20 h-20" />
+              </div>
+              <p className="text-xl font-bold">Team Leader</p>
+              <p className="text-blue-200">Network Builder</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Team Stats */}
+      {/* Team Statistics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-          <div className="p-3 bg-blue-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-            <Users className="w-8 h-8 text-blue-600" />
-          </div>
-          <div className="text-3xl font-bold text-gray-800 mb-1">{mlmData?.totalReferrals || 0}</div>
-          <p className="text-gray-600 text-sm font-medium">Total Referrals</p>
-          <p className="text-xs text-blue-600 mt-1">All time referrals</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-          <div className="p-3 bg-green-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-            <CheckCircle className="w-8 h-8 text-green-600" />
-          </div>
-          <div className="text-3xl font-bold text-gray-800 mb-1">{mlmData?.activeReferrals || 0}</div>
-          <p className="text-gray-600 text-sm font-medium">Active Members</p>
-          <p className="text-xs text-green-600 mt-1">Currently active</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-          <div className="p-3 bg-purple-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-            <Award className="w-8 h-8 text-purple-600" />
-          </div>
-          <div className="text-3xl font-bold text-gray-800 mb-1">{mlmData?.level || 1}</div>
-          <p className="text-gray-600 text-sm font-medium">Current Level</p>
-          <p className="text-xs text-purple-600 mt-1">MLM hierarchy level</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
-          <div className="p-3 bg-yellow-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-            <TrendingUp className="w-8 h-8 text-yellow-600" />
-          </div>
-          <div className="text-3xl font-bold text-gray-800 mb-1">₹{((mlmData?.teamVolume || 0) / 100).toFixed(0)}</div>
-          <p className="text-gray-600 text-sm font-medium">Team Volume</p>
-          <p className="text-xs text-yellow-600 mt-1">Total team sales</p>
-        </div>
-      </div>
-
-      {/* Level-wise Team Breakdown */}
-      <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-        <h3 className="text-xl font-semibold mb-6">Level-wise Team Breakdown</h3>
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
-          {[1, 2, 3, 4, 5, 6, 7].map((level) => (
-            <div key={level} className="text-center p-4 bg-gradient-to-b from-gray-50 to-gray-100 rounded-lg">
-              <div className="text-2xl font-bold text-gray-800 mb-1">
-                {mlmData?.levelBreakdown?.[`level${level}`] || 0}
-              </div>
-              <p className="text-sm text-gray-600 font-medium">Level {level}</p>
-              <div className="mt-2 h-2 bg-gray-200 rounded-full">
-                <div 
-                  className="h-full bg-blue-500 rounded-full" 
-                  style={{ 
-                    width: `${Math.min(100, ((mlmData?.levelBreakdown?.[`level${level}`] || 0) / 10) * 100)}%` 
-                  }}
-                />
-              </div>
+        <div className="bg-gradient-to-br from-blue-400 to-indigo-500 text-white p-8 rounded-2xl shadow-lg">
+          <div className="flex items-center space-x-4">
+            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
+              <UserPlus className="w-10 h-10" />
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Team Members List */}
-      <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold">Recent Team Members</h3>
-          <div className="flex space-x-3">
-            <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-              <option>All Levels</option>
-              <option>Level 1</option>
-              <option>Level 2</option>
-              <option>Level 3</option>
-            </select>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
-              Export List
-            </button>
+            <div>
+              <p className="text-blue-100 text-sm font-medium">Direct Referrals</p>
+              <p className="text-3xl font-bold">{stats.directReferrals || 0}</p>
+              <p className="text-xs text-blue-200 font-medium">Your direct invites</p>
+            </div>
           </div>
         </div>
 
-        {mlmData?.teamMembers?.length > 0 ? (
-          <div className="space-y-3 max-h-96 overflow-y-auto">
-            {mlmData.teamMembers.map((member, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
-                    {member.name?.charAt(0)?.toUpperCase() || 'U'}
+        <div className="bg-gradient-to-br from-green-400 to-emerald-500 text-white p-8 rounded-2xl shadow-lg">
+          <div className="flex items-center space-x-4">
+            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
+              <Users className="w-10 h-10" />
+            </div>
+            <div>
+              <p className="text-green-100 text-sm font-medium">Total Team</p>
+              <p className="text-3xl font-bold">{stats.totalMembers || 0}</p>
+              <p className="text-xs text-green-200 font-medium">All levels combined</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white p-8 rounded-2xl shadow-lg">
+          <div className="flex items-center space-x-4">
+            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
+              <TrendingUp className="w-10 h-10" />
+            </div>
+            <div>
+              <p className="text-yellow-100 text-sm font-medium">Active Members</p>
+              <p className="text-3xl font-bold">{stats.activeMembers || 0}</p>
+              <p className="text-xs text-yellow-200 font-medium">Monthly active</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-400 to-pink-500 text-white p-8 rounded-2xl shadow-lg">
+          <div className="flex items-center space-x-4">
+            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
+              <Star className="w-10 h-10" />
+            </div>
+            <div>
+              <p className="text-purple-100 text-sm font-medium">Max Level</p>
+              <p className="text-3xl font-bold">{hierarchy.maxLevel || 0}</p>
+              <p className="text-xs text-purple-200 font-medium">Deepest level</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Direct Referrals Section */}
+      <div className="bg-gradient-to-br from-white to-blue-50 p-8 rounded-2xl shadow-lg border-2 border-blue-200">
+        <div className="flex justify-between items-center mb-8">
+          <h3 className="text-2xl font-bold text-blue-800 flex items-center">
+            <UserPlus className="w-7 h-7 mr-3" />
+            Direct Referrals
+          </h3>
+          <button className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 font-semibold flex items-center shadow-lg">
+            <Share2 className="w-5 h-5 mr-2" />
+            Invite Friends
+          </button>
+        </div>
+
+        {directReferrals.length > 0 ? (
+          <div className="space-y-4">
+            {directReferrals.map((member) => (
+              <div key={member.id} className="flex items-center justify-between p-6 bg-white rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+                <div className="flex items-center space-x-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    {member.name?.charAt(0).toUpperCase() || 'U'}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-800">{member.name || 'Unknown'}</h4>
-                    <p className="text-sm text-gray-600">
-                      Level {member.level || 1} • {member.email || 'No email'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Joined: {member.joinedAt ? new Date(member.joinedAt).toLocaleDateString() : 'Unknown'}
+                    <h4 className="font-bold text-gray-800 text-lg">{member.name}</h4>
+                    <p className="text-gray-600">{member.email}</p>
+                    <p className="text-sm text-gray-500">
+                      Joined: {new Date(member.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="flex items-center space-x-4">
-                    <div>
-                      <p className="font-semibold text-gray-800">₹{((member.volume || 0) / 100).toFixed(2)}</p>
-                      <p className="text-xs text-gray-500">Volume</p>
-                    </div>
-                    <div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        member.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {member.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </div>
-                  </div>
+                  <span className={`inline-block px-4 py-2 rounded-xl text-sm font-bold ${
+                    member.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
+                    {member.isActive ? '✅ Active' : '❌ Inactive'}
+                  </span>
+                  {member.totalPurchases && (
+                    <p className="text-sm text-gray-600 mt-2">
+                      Purchases: ₹{member.totalPurchases.rupees?.toFixed(2) || '0.00'}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <div className="p-4 bg-gray-100 rounded-full w-24 h-24 mx-auto mb-4 flex items-center justify-center">
-              <Users className="w-12 h-12 text-gray-400" />
-            </div>
-            <h4 className="text-lg font-medium text-gray-500 mb-2">No team members yet</h4>
-            <p className="text-gray-400 mb-6">Start referring people to build your team</p>
-            <button
-              onClick={() => setActiveTab('referral')}
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium"
-            >
-              Share Referral Link
+          <div className="text-center py-16">
+            <UserPlus className="w-20 h-20 text-gray-300 mx-auto mb-6" />
+            <h4 className="text-xl font-bold text-gray-600 mb-3">No direct referrals yet</h4>
+            <p className="text-gray-500 mb-8 text-lg">Start building your team by inviting friends and family</p>
+            <button className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 font-bold text-lg flex items-center mx-auto shadow-lg">
+              <Share2 className="w-6 h-6 mr-3" />
+              Invite Your First Referral
             </button>
           </div>
         )}
       </div>
-
-      {/* Team Performance */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <h3 className="text-lg font-semibold mb-4">Team Performance</h3>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">This Month&apos;s Sales</span>
-              <span className="font-bold text-gray-800">₹{((mlmData?.monthlyTeamSales || 0) / 100).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Total Team Earnings</span>
-              <span className="font-bold text-gray-800">₹{((mlmData?.totalTeamEarnings || 0) / 100).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Your Commission</span>
-              <span className="font-bold text-green-600">₹{((mlmData?.teamCommission || 0) / 100).toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <h3 className="text-lg font-semibold mb-4">Growth Metrics</h3>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">New Members This Month</span>
-              <span className="font-bold text-blue-600">{mlmData?.monthlyNewMembers || 0}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Active Rate</span>
-              <span className="font-bold text-green-600">
-                {mlmData?.totalReferrals ? Math.round((mlmData.activeReferrals / mlmData.totalReferrals) * 100) : 0}%
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Avg. Volume per Member</span>
-              <span className="font-bold text-purple-600">
-                ₹{mlmData?.totalReferrals ? ((mlmData.teamVolume || 0) / mlmData.totalReferrals / 100).toFixed(2) : '0.00'}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  )
+  )}
 
   const renderReferralTab = () => (
     <div className="space-y-6">
@@ -1724,13 +2366,10 @@ const AccountDashboard = () => {
   )
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: User },
-    { id: 'orders', label: 'Orders', icon: Package },
-    { id: 'wallet', label: 'Wallet', icon: Wallet },
-    { id: 'team', label: 'Team', icon: Users },
-    { id: 'referral', label: 'Referral', icon: Share2 },
-    { id: 'kyc', label: 'KYC', icon: FileText },
-    { id: 'settings', label: 'Settings', icon: Settings }
+    { id: 'wallet', label: 'Wallet', icon: Wallet, color: 'from-green-400 to-emerald-500' },
+    { id: 'team', label: 'My Team', icon: Users, color: 'from-blue-400 to-indigo-500' },
+    { id: 'referral', label: 'Referral', icon: Share2, color: 'from-purple-400 to-pink-500' },
+    { id: 'kyc', label: 'KYC Verification', icon: FileText, color: 'from-orange-400 to-red-500' }
   ]
 
   if (loading) {
@@ -1768,38 +2407,27 @@ const AccountDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-7xl mx-auto px-4">
         {/* Page Header */}
-        <div className="mb-8">
-          <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white p-8 rounded-2xl shadow-xl">
+        <div className="mb-6">
+          <div className="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
               <div>
-                <h1 className="text-4xl font-bold mb-2">
-                  Welcome back, {userData?.fullName || session?.user?.name || 'User'}! 👋
+                <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+                  Welcome back, {userData?.fullName || session?.user?.name || 'User'}!
                 </h1>
-                <p className="text-indigo-100 text-lg mb-4">
-                  {userData?.isActive ? 'Your MLM account is active' : 'Complete your first purchase to activate MLM benefits'}
+                <p className="text-gray-600">
+                  {userData?.isActive ? 'Your MLM account is active and earning!' : 'Complete your first purchase to unlock earnings'}
                 </p>
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    userData?.isActive ? 'bg-green-500 bg-opacity-80 text-white' : 'bg-yellow-500 bg-opacity-80 text-white'
-                  }`}>
-                    {userData?.isActive ? '✓ MLM Active' : '⏳ MLM Inactive'}
-                  </span>
-                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    userData?.isKycApproved ? 'bg-green-500 bg-opacity-80 text-white' : 'bg-red-500 bg-opacity-80 text-white'
-                  }`}>
-                    {userData?.isKycApproved ? '✓ KYC Verified' : '⚠ KYC Pending'}
-                  </span>
-                </div>
               </div>
-              <div className="mt-4 md:mt-0">
-                <div className="text-right">
-                  <div className="text-sm text-indigo-200 mb-1">Member Since</div>
-                  <div className="text-lg font-semibold">
-                    {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A'}
+              <div className="mt-6 md:mt-0">
+                <div className="text-center bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                  <Wallet className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+                  <div className="text-xl font-semibold text-gray-900">
+                    ₹{walletData?.balance?.rupees?.toFixed(2) || '0.00'}
                   </div>
+                  <p className="text-sm text-gray-600">Available Balance</p>
                 </div>
               </div>
             </div>
@@ -1807,39 +2435,113 @@ const AccountDashboard = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="mb-8">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-2">
-            <nav className="flex flex-wrap gap-2">
-              {tabs.map((tab) => {
-                const IconComponent = tab.icon
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-2 px-6 py-3 rounded-xl transition-all duration-200 font-medium ${
-                      activeTab === tab.id
-                        ? 'bg-blue-600 text-white shadow-lg transform scale-105'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
-                    }`}
-                  >
-                    <IconComponent size={20} />
-                    <span>{tab.label}</span>
-                  </button>
-                )
-              })}
-            </nav>
+        <div className="mb-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2">
+            <div className="flex flex-wrap gap-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center px-4 py-3 rounded-lg font-medium transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-blue-500 text-white shadow-md'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                  }`}
+                >
+                  <tab.icon className="w-4 h-4 mr-2" />
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="transition-all duration-300 ease-in-out">
-          {activeTab === 'overview' && renderOverviewTab()}
-          {activeTab === 'orders' && renderOrdersTab()}
-          {activeTab === 'wallet' && renderWalletTab()}
-          {activeTab === 'team' && renderTeamTab()}
-          {activeTab === 'referral' && renderReferralTab()}
-          {activeTab === 'kyc' && renderKYCTab()}
-          {activeTab === 'settings' && renderSettingsTab()}
+        {/* Content Area */}
+        <div className="bg-white rounded-xl shadow-sm p-8 min-h-96">
+          {activeTab === 'wallet' && (
+            <div>
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900">My Wallet</h2>
+              
+              {/* Balance Card */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 p-6 rounded-lg mb-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Available Balance</p>
+                    <p className="text-3xl font-bold text-gray-900">₹{walletData?.balance?.rupees?.toFixed(2) || '0.00'}</p>
+                  </div>
+                  <Wallet className="w-12 h-12 text-blue-500" />
+                </div>
+              </div>
+
+              {/* Wallet Options */}
+              <WalletActions walletBalance={walletData?.balance?.rupees || 0} />
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600">Total Earnings</p>
+                  <p className="text-xl font-semibold text-gray-900">₹{walletData?.earnings?.total?.rupees?.toFixed(2) || '0.00'}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600">This Month</p>
+                  <p className="text-xl font-semibold text-gray-900">₹{walletData?.earnings?.monthly?.rupees?.toFixed(2) || '0.00'}</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {activeTab === 'team' && (
+            <div>
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900">My Team</h2>
+              
+              {/* Team Data Display */}
+              <div className="bg-gray-50 border border-gray-200 p-8 rounded-lg text-center">
+                <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Team Data Available</h3>
+                <p className="text-gray-600 mb-4">When you have team members, they will be displayed here in list format.</p>
+                <p className="text-sm text-gray-500">Start referring people to build your team!</p>
+              </div>
+            </div>
+          )}
+          
+          {activeTab === 'referral' && (
+            <div>
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900">Referral Program</h2>
+              
+              {/* Referral Code Card */}
+              <ReferralSection userData={userData} />
+            </div>
+          )}
+          
+          {activeTab === 'kyc' && (
+            <div>
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900">KYC Verification</h2>
+              
+              {/* KYC Status */}
+              <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-6">
+                <div className="flex items-center gap-3">
+                  <div className={`w-4 h-4 rounded-full ${
+                    userData?.isKycApproved ? 'bg-green-500' : 
+                    kycData?.status === 'pending' ? 'bg-yellow-500' : 
+                    kycData?.status === 'rejected' ? 'bg-red-500' : 'bg-gray-400'
+                  }`}></div>
+                  <p className="font-medium">
+                    Status: {
+                      userData?.isKycApproved ? '✅ Verified' : 
+                      kycData?.status === 'pending' ? '⏳ Under Review' :
+                      kycData?.status === 'rejected' ? '❌ Rejected' : '⏳ Pending Verification'
+                    }
+                  </p>
+                </div>
+                {kycData?.status === 'rejected' && kycData?.reviewNote && (
+                  <p className="text-red-600 mt-2 text-sm">Reason: {kycData.reviewNote}</p>
+                )}
+              </div>
+
+              {/* KYC Form */}
+              <KYCForm userData={userData} kycData={kycData} onSubmit={() => fetchKycData()} />
+            </div>
+          )}
         </div>
       </div>
     </div>

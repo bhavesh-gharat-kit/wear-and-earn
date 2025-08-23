@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { PrismaClient } from '@prisma/client';
 import { handlePaidJoining } from '@/lib/mlm-commission';
-import crypto from 'crypto';
+import { generateAndAssignReferralCode } from '@/lib/referral';
 
 const prisma = new PrismaClient();
 
@@ -58,15 +58,19 @@ export async function POST(req) {
     // If user is not active but has paid orders, activate them
     if (!user.isActive || !user.referralCode) {
       await prisma.$transaction(async (tx) => {
-        // Generate referral code if not exists
-        const referralCode = user.referralCode || crypto.randomUUID().slice(0, 8).toUpperCase();
+        // Generate and assign unique referral code using robust method
+        let referralCode = user.referralCode;
+        if (!referralCode) {
+          referralCode = await generateAndAssignReferralCode(tx, userId);
+          console.log(`Generated new referral code ${referralCode} for user ${userId}`);
+        }
         
-        // Activate user
+        // Activate user (in case it wasn't active)
         await tx.user.update({
           where: { id: userId },
           data: {
             isActive: true,
-            referralCode: referralCode
+            // referralCode is already set by generateAndAssignReferralCode if it was null
           }
         });
 

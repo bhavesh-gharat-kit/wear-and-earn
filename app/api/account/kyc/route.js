@@ -87,10 +87,15 @@ export async function POST(request) {
     }
 
     return NextResponse.json({
+      success: true,
       message: 'KYC data submitted successfully',
       kycData: {
         id: kycData.id,
         status: kycData.status,
+        fullName: kycData.fullName,
+        dateOfBirth: kycData.dateOfBirth,
+        gender: kycData.gender,
+        fatherName: kycData.fatherName,
         submittedAt: kycData.submittedAt
       }
     })
@@ -126,12 +131,14 @@ export async function GET() {
 
     if (!kycData) {
       return NextResponse.json({
+        success: true,
         hasKyc: false,
         message: 'No KYC data found'
       })
     }
 
     return NextResponse.json({
+      success: true,
       hasKyc: true,
       kycData: {
         id: kycData.id,
