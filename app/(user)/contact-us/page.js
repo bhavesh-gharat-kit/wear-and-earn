@@ -1,4 +1,4 @@
-import ContactUsPage from "@/pages/user/contact-us-page/ContactUsPage"
+import ContactUsPage from "@/navigations/user/contact-us-page/ContactUsPage"
 
 
 function ContactUsRoute() {

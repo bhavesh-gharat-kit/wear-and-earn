@@ -1,4 +1,4 @@
-import ProductDetailsPage from '@/pages/product-details-page/ProductDetailsPage';
+import ProductDetailsPage from '@/navigations/product-details-page/ProductDetailsPage';
 
 
 export default function ProductDetailsRoute({ params }) {
