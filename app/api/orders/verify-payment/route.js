@@ -110,10 +110,31 @@ export async function POST(req) {
 
       console.log('🎉 Payment verification completed successfully');
 
+      // Convert BigInt values to strings for JSON serialization
+      const orderForResponse = {
+        id: updatedOrder.id,
+        status: updatedOrder.status,
+        paymentId: updatedOrder.paymentId,
+        paidAt: updatedOrder.paidAt,
+        total: updatedOrder.total,
+        userId: updatedOrder.userId,
+        user: {
+          id: updatedOrder.user.id,
+          fullName: updatedOrder.user.fullName,
+          email: updatedOrder.user.email
+        },
+        orderProducts: updatedOrder.orderProducts.map(op => ({
+          id: op.id.toString(), // Convert BigInt to string
+          title: op.title,
+          quantity: op.quantity,
+          totalPrice: op.totalPrice
+        }))
+      };
+
       return NextResponse.json({ 
         success: true, 
         message: 'Payment verified successfully',
-        order: updatedOrder
+        order: orderForResponse
       })
     } else {
       console.log('❌ Payment signature verification failed');
