@@ -8,9 +8,15 @@ const prisma = new PrismaClient();
 // Internal MLM activation API - no session required (for server-side calls)
 export async function POST(req) {
   try {
-    const { userId, orderId, amount } = await req.json();
+    console.log('🚀 MLM activation started');
+    
+    const body = await req.json();
+    const { userId, orderId, amount } = body;
+
+    console.log('MLM activation request:', { userId, orderId, amount });
 
     if (!userId) {
+      console.log('❌ Missing user ID');
       return NextResponse.json(
         { error: 'User ID required' },
         { status: 400 }
@@ -18,6 +24,14 @@ export async function POST(req) {
     }
 
     const userIdInt = parseInt(userId);
+
+    if (isNaN(userIdInt)) {
+      console.log('❌ Invalid user ID:', userId);
+      return NextResponse.json(
+        { error: 'Invalid user ID' },
+        { status: 400 }
+      );
+    }
 
     // Get user's current status
     const user = await prisma.user.findUnique({
