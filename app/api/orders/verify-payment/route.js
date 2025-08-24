@@ -57,11 +57,7 @@ export async function POST(req) {
         },
         include: {
           user: true,
-          orderProducts: {
-            include: {
-              product: true
-            }
-          }
+          orderProducts: true // Remove the nested include for product since it doesn't exist
         }
       })
 
