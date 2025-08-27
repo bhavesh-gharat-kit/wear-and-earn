@@ -1,9 +1,8 @@
 import { NextResponse as res } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-const prisma = new PrismaClient();
 
 export const GET = async (request, {params}) => {
     try {

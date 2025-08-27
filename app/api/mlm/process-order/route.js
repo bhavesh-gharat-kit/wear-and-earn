@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import prisma from "@/lib/prisma";
 import { 
   activateUserInMLM, 
   distributeJoiningCommission, 
   distributeRepurchaseCommission 
 } from '@/lib/mlm-utils'
 
-const prisma = new PrismaClient()
 
 export async function POST(request) {
   try {

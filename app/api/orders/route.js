@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]/route'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
 import Razorpay from 'razorpay'
 import crypto from 'crypto'
-
-const prisma = new PrismaClient()
 
 let razorpay;
 try {

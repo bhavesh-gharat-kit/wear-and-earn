@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from "@/lib/prisma";
 import { handlePaidJoining } from '@/lib/mlm-commission';
 import crypto from 'crypto';
 
-const prisma = new PrismaClient();
 
 export async function POST(req) {
   try {

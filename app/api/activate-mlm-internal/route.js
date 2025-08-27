@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from "@/lib/prisma";
 import { handlePaidJoining } from '@/lib/mlm-commission';
 import { generateAndAssignReferralCode } from '@/lib/referral';
 
-const prisma = new PrismaClient();
 
 // Internal MLM activation API - no session required (for server-side calls)
 export async function POST(req) {

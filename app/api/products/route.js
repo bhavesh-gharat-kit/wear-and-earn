@@ -1,8 +1,8 @@
-// app/api/seed/route.ts (or wherever you placed it)
-import { NextResponse as res } from 'next/server';
-import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+// Remove individual PrismaClient instance - use singleton
+import { NextResponse as res } from 'next/server';
 
 export const PUT = async () => {
   try {

@@ -1,11 +1,9 @@
 
 import { NextResponse as res } from "next/server"
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt"
 import { placeUserInMatrix, getGlobalRootId } from "@/lib/matrix";
 import { generateReferralCode } from "@/lib/commission";
-
-const prisma = new PrismaClient();
 
 export const GET = () => {
     return res.json({
