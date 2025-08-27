@@ -26,7 +26,7 @@ function AdminLoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+    
     try {
       const result = await signIn("admin-credentials", {
         userId: credentials.userId,
@@ -46,6 +46,7 @@ function AdminLoginPage() {
     } finally {
       setIsLoading(false);
     }
+    
   };
 
   return (
