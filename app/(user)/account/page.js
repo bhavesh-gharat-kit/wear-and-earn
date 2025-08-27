@@ -1783,10 +1783,9 @@ const AccountDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 {[
-                  { level: 1, rate: '10%', color: 'bg-green-500' },
-                  { level: 2, rate: '5%', color: 'bg-blue-500' },
-                  { level: 3, rate: '3%', color: 'bg-purple-500' },
-                  { level: 4, rate: '2%', color: 'bg-yellow-500' }
+                  { level: 1, rate: '30%', color: 'bg-green-500' },
+                  { level: 2, rate: '25%', color: 'bg-blue-500' },
+                  { level: 3, rate: '20%', color: 'bg-purple-500' }
                 ].map((item) => (
                   <div key={item.level} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
@@ -1799,9 +1798,8 @@ const AccountDashboard = () => {
               </div>
               <div className="space-y-4">
                 {[
-                  { level: 5, rate: '1%', color: 'bg-pink-500' },
-                  { level: 6, rate: '1%', color: 'bg-indigo-500' },
-                  { level: 7, rate: '1%', color: 'bg-red-500' }
+                  { level: 4, rate: '15%', color: 'bg-yellow-500' },
+                  { level: 5, rate: '10%', color: 'bg-pink-500' }
                 ].map((item) => (
                   <div key={item.level} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">

@@ -202,7 +202,7 @@ model Hierarchy {
   id           Int @id @default(autoincrement()) @db.UnsignedInt
   ancestorId   Int @db.UnsignedInt
   descendantId Int @db.UnsignedInt
-  depth        Int // 1..7
+  depth        Int // 1..5 (updated from 7 to 5-level structure)
 
   ancestor   User @relation("HierarchyAncestor", fields: [ancestorId], references: [id], onDelete: Cascade)
   descendant User @relation("HierarchyDescendant", fields: [descendantId], references: [id], onDelete: Cascade)

@@ -159,7 +159,7 @@ export default function AdminMLMPanel() {
       {/* Level Distribution */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Level Distribution</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {mlmOverview?.levelDistribution?.map((level) => (
             <div key={level.level} className="text-center p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600">Level {level.level}</p>
