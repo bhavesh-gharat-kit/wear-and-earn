@@ -37,3 +37,30 @@ app/generated/
 
 # Ignore lockfile selection noise
 package-lock.json
+
+# Prevent unwanted TypeScript files from being created
+lib/*.ts
+!lib/types.ts
+!lib/definitions.ts
+
+# Prevent test and debug files from reappearing
+app/api/debug*/
+app/api/test*/
+app/api/fix*/
+app/api/diagnose*/
+app/api/mlm-diagnostic/
+app/api/mlm/tree-management/
+app/test-*/
+test-*.js
+check_db.js
+final_verification.js
+fix_*.js
+*-requirements.md
+setup-*.sh
+update-*.sh
+scripts/test-*
+LOGIN_PAGE_IMPROVEMENTS.md
+MLM_IMPLEMENTATION_GUIDE.md
+MLM_TESTING_GUIDE.md
+QUICK_MLM_TEST.md
+REORGANIZATION_*.md
