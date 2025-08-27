@@ -71,16 +71,16 @@ export async function POST(req) {
     if (!user.isActive || !user.referralCode) {
       console.log(`Activating user ${userIdInt} who has ${deliveredOrders.length} delivered orders but no MLM activation`);
       
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (transaction) => {
         // Generate and assign unique referral code using robust method
         let referralCode = user.referralCode;
         if (!referralCode) {
-          referralCode = await generateAndAssignReferralCode(tx, userIdInt);
+          referralCode = await generateAndAssignReferralCode(transaction, userIdInt);
           console.log(`Generated new referral code ${referralCode} for user ${userIdInt}`);
         }
         
         // Activate user (in case it wasn't active)
-        await tx.user.update({
+        await transaction.user.update({
           where: { id: userIdInt },
           data: {
             isActive: true,
@@ -92,7 +92,7 @@ export async function POST(req) {
         const firstOrder = deliveredOrders[0];
         
         // Check if any order is already marked as joining order
-        const existingJoiningOrder = await tx.order.findFirst({
+        const existingJoiningOrder = await transaction.order.findFirst({
           where: { 
             userId: userIdInt,
             isJoiningOrder: true 
@@ -101,7 +101,7 @@ export async function POST(req) {
 
         // If no existing joining order, mark the first delivered order as joining order
         if (!existingJoiningOrder) {
-          await tx.order.update({
+          await transaction.order.update({
             where: { id: firstOrder.id },
             data: { 
               isJoiningOrder: true,
@@ -110,7 +110,7 @@ export async function POST(req) {
           });
 
           // Process MLM commission for the first order
-          await handlePaidJoining(tx, { 
+          await handlePaidJoining(transaction, { 
             ...firstOrder, 
             isJoiningOrder: true,
             paidAt: firstOrder.paidAt || new Date()

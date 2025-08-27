@@ -24,6 +24,29 @@ export async function POST(req) {
     
     const { event, payload } = body;
     
+    // Handle idempotency - prevent duplicate processing
+    const webhookId = payload?.payment?.entity?.id || payload?.order?.entity?.id;
+    if (webhookId) {
+      const existingWebhook = await prisma.webhookLog.findUnique({
+        where: { webhookId }
+      });
+      
+      if (existingWebhook) {
+        console.log('Webhook already processed:', webhookId);
+        return Response.json({ success: true, message: 'Already processed' });
+      }
+      
+      // Create webhook log for idempotency
+      await prisma.webhookLog.create({
+        data: {
+          webhookId,
+          event,
+          processedAt: new Date(),
+          payload: JSON.stringify(payload)
+        }
+      });
+    }
+    
     if (event === 'payment.captured') {
       const payment = payload.payment.entity;
       const gatewayOrderId = payment.order_id;
@@ -33,7 +56,12 @@ export async function POST(req) {
       // Find the order using gateway order ID
       const order = await prisma.order.findFirst({
         where: { gatewayOrderId },
-        include: { user: true }
+        include: { 
+          user: true,
+          orderProducts: {
+            include: { product: true }
+          }
+        }
       });
       
       if (!order) {
@@ -41,13 +69,19 @@ export async function POST(req) {
         return Response.json({ error: 'Order not found' }, { status: 404 });
       }
       
+      // Check if order is already marked as paid to prevent double processing
+      if (order.paidAt) {
+        console.log('Order already processed:', order.id);
+        return Response.json({ success: true, message: 'Order already processed' });
+      }
+      
       // Use transaction to ensure atomicity
       await prisma.$transaction(async (tx) => {
-        // Mark order as paid
-        await tx.order.update({
+        // Mark order as paid first
+        const updatedOrder = await tx.order.update({
           where: { id: order.id },
           data: { 
-            status: 'pending', // Set to pending when order is paid as requested
+            status: 'paid', // Set status to 'paid' when payment is captured
             paidAt: new Date()
           }
         });
@@ -62,21 +96,25 @@ export async function POST(req) {
         
         const isJoiningOrder = paidOrdersCount === 1; // This is the first paid order
         
+        console.log(`Processing ${isJoiningOrder ? 'JOINING' : 'REPURCHASE'} order for user:`, order.userId);
+        
         if (isJoiningOrder) {
+          // FIRST ORDER - JOINING LOGIC
           console.log('Processing joining order - first paid order for user:', order.userId);
           
-          // Import MLM functions
-          const { placeUserInMatrix, getGlobalRootId, bfsFindOpenSlot } = await import('@/lib/matrix');
-          const { handlePaidJoining, generateReferralCode } = await import('@/lib/commission');
+          // Import MLM functions with correct paths
+          const { placeUserInMatrix, getGlobalRootId, bfsFindOpenSlot } = await import('@/lib/mlm-matrix');
+          const { handlePaidJoining } = await import('@/lib/mlm-commission');
+          const { generateAndAssignReferralCode } = await import('@/lib/referral');
           
           // Generate referral code and activate user
-          const referralCode = await generateReferralCode();
+          const referralCode = await generateAndAssignReferralCode(tx, order.userId);
           
           await tx.user.update({
             where: { id: order.userId },
             data: { 
-              isActive: true,
-              referralCode: referralCode
+              isActive: true
+              // referralCode is already set by generateAndAssignReferralCode
             }
           });
           
@@ -87,18 +125,21 @@ export async function POST(req) {
           });
           
           // Place user in MLM matrix
-          let parentUserId;
+          let parentUserId, position;
           if (user.sponsorId) {
-            // Place under sponsor
-            parentUserId = user.sponsorId;
+            // Try to place under sponsor first
+            const slot = await bfsFindOpenSlot(tx, user.sponsorId);
+            parentUserId = slot.parentId;
+            position = slot.position;
           } else {
             // Use auto-filler from global root
             const globalRootId = await getGlobalRootId(tx);
             const slot = await bfsFindOpenSlot(tx, globalRootId);
             parentUserId = slot.parentId;
+            position = slot.position;
           }
           
-          await placeUserInMatrix(tx, order.userId, parentUserId);
+          await placeUserInMatrix(tx, order.userId, parentUserId, position);
           
           // Mark this order as joining order
           await tx.order.update({
@@ -106,37 +147,35 @@ export async function POST(req) {
             data: { isJoiningOrder: true }
           });
           
-          // Get order products for commission calculation
-          const orderProducts = await tx.orderProducts.findMany({
-            where: { orderId: order.id }
-          });
-          
-          // Process commission
+          // Process joining commission with order products
           const orderWithProducts = { 
-            ...order, 
+            ...updatedOrder, 
             isJoiningOrder: true,
-            orderProducts: orderProducts,
+            orderProducts: order.orderProducts,
             userId: order.userId
           };
           await handlePaidJoining(tx, orderWithProducts);
           
           console.log('User activated with referral code:', referralCode);
+          
         } else {
+          // REPEAT ORDER - REPURCHASE LOGIC
           console.log('Processing repurchase order for user:', order.userId);
-          const { handlePaidRepurchase } = await import('@/lib/commission');
+          const { handleRepurchaseCommission } = await import('@/lib/mlm-commission');
+          const { isRepurchaseEligible } = await import('@/lib/mlm-matrix');
           
-          // Get order products for commission calculation
-          const orderProducts = await tx.orderProducts.findMany({
-            where: { orderId: order.id }
-          });
+          // Check repurchase eligibility (3-3 rule)
+          const isEligible = await isRepurchaseEligible(tx, order.userId);
+          console.log('User repurchase eligibility:', isEligible);
           
+          // Process repurchase commission with order products
           const orderWithProducts = { 
-            ...order, 
+            ...updatedOrder, 
             isJoiningOrder: false,
-            orderProducts: orderProducts,
+            orderProducts: order.orderProducts,
             userId: order.userId
           };
-          await handlePaidRepurchase(tx, orderWithProducts);
+          await handleRepurchaseCommission(tx, orderWithProducts);
         }
         
         // Update monthly purchase amount for eligibility tracking
@@ -147,9 +186,20 @@ export async function POST(req) {
             monthlyPurchase: { increment: order.total }
           }
         });
+        
+        // Create audit ledger entry for order processing
+        await tx.ledger.create({
+          data: {
+            userId: order.userId,
+            type: 'order_processed',
+            amount: order.total,
+            ref: `order:${order.id}:${isJoiningOrder ? 'joining' : 'repurchase'}`,
+            description: `Order ${order.id} processed - ${isJoiningOrder ? 'Joining' : 'Repurchase'} order`
+          }
+        });
       });
       
-      console.log('Commission processing completed for order:', order.id);
+      console.log('MLM commission processing completed for order:', order.id);
     }
     
     return Response.json({ success: true });

@@ -55,16 +55,16 @@ export async function POST(req) {
 
     // If user is not active but has paid orders, activate them
     if (!user.isActive || !user.referralCode) {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (transaction) => {
         // Generate and assign unique referral code using robust method
         let referralCode = user.referralCode;
         if (!referralCode) {
-          referralCode = await generateAndAssignReferralCode(tx, userId);
+          referralCode = await generateAndAssignReferralCode(transaction, userId);
           console.log(`Generated new referral code ${referralCode} for user ${userId}`);
         }
         
         // Activate user (in case it wasn't active)
-        await tx.user.update({
+        await transaction.user.update({
           where: { id: userId },
           data: {
             isActive: true,
@@ -76,13 +76,13 @@ export async function POST(req) {
         const firstOrder = paidOrders[0];
         
         // Mark first order as joining order if not already marked
-        await tx.order.update({
+        await transaction.order.update({
           where: { id: firstOrder.id },
           data: { isJoiningOrder: true }
         });
 
         // Process MLM commission for the first order
-        await handlePaidJoining(tx, { ...firstOrder, isJoiningOrder: true });
+        await handlePaidJoining(transaction, { ...firstOrder, isJoiningOrder: true });
 
         console.log('Manual MLM activation completed for user:', userId, 'with referral code:', referralCode);
       });

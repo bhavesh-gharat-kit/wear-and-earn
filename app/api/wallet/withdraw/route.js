@@ -36,7 +36,7 @@ export async function POST(request) {
     }
 
     const withdrawalAmount = parseFloat(amount)
-    const minWithdrawal = 100 // Minimum withdrawal amount
+    const minWithdrawal = 500 // Minimum withdrawal amount - updated to ₹500
 
     if (withdrawalAmount < minWithdrawal) {
       return NextResponse.json(

@@ -45,6 +45,10 @@ model User {
   descendantHierarchy Hierarchy[] @relation("HierarchyDescendant")
   kycData           KycData?
   
+  // Commission relationships
+  commissions       Commission[] @relation("UserCommissions")
+  generatedCommissions Commission[] @relation("CommissionSource")
+  
   // Withdrawal relationships
   withdrawalRequests    WithdrawalRequest[] @relation("UserWithdrawals")
   processedWithdrawals  WithdrawalRequest[] @relation("ProcessedWithdrawals")
@@ -144,7 +148,7 @@ model Order {
   paymentId        String?
   total            Float
   deliveryCharges  Float           @default(0)
-  commissionAmount Float
+  commissionAmount Int             @default(0) // commission in paisa
   gstAmount        Float
   address          String          @db.Text
   orderNotice      String?
@@ -159,6 +163,7 @@ model Order {
   
   user             User?           @relation("UserOrders", fields: [userId], references: [id], onDelete: Restrict)
   orderProducts    OrderProducts[]
+  commissions      Commission[]
 
   @@index([userId], map: "order_userId_fkey")
   @@index([gatewayOrderId])
@@ -216,10 +221,11 @@ model Hierarchy {
 model Ledger {
   id           Int      @id @default(autoincrement()) @db.UnsignedInt
   userId       Int?     @db.UnsignedInt // null for company/system fund
-  type         String   // company_fund | sponsor_commission | self_joining_instalment | repurchase_commission | rollup_to_company | withdrawal_debit | reversal | WITHDRAWAL_REQUEST | WITHDRAWAL_APPROVED | WITHDRAWAL_REFUND
+  type         String   // company_fund | sponsor_commission | self_joining_instalment | repurchase_commission | rollup_to_company | withdrawal_debit | reversal | WITHDRAWAL_REQUEST | WITHDRAWAL_APPROVED | WITHDRAWAL_REFUND | order_processed
   amount       Int      // +credit, -debit in paisa
   description  String?  // human readable description
   referenceId  String?  // reference to related entity (orderId, withdrawalId, etc.)
+  ref          String?  @unique // idempotency key to prevent duplicate processing
   balanceAfter Int?     // wallet balance after this transaction
   levelDepth   Int?
   note         String?
@@ -229,23 +235,50 @@ model Ledger {
 
   @@index([userId, type])
   @@index([referenceId])
+  @@index([ref])
   @@map("ledger")
 }
 
 model SelfPayoutSchedule {
-  id        Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId    Int      @db.UnsignedInt
-  orderId   Int      @db.UnsignedInt
-  amount    Int      // this instalment amount in paisa
-  dueAt     DateTime // weekly cadence
-  status    String   @default("scheduled") // scheduled|paid|skipped
-  createdAt DateTime @default(now())
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId      Int      @db.UnsignedInt
+  orderId     Int      @db.UnsignedInt
+  amount      Int      // this instalment amount in paisa
+  dueAt       DateTime // weekly cadence
+  status      String   @default("scheduled") // scheduled|paid|skipped
+  ref         String?  // idempotency reference key
+  description String?  // description for audit trail
+  createdAt   DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
   @@index([dueAt, status])
+  @@index([ref])
   @@map("self_payout_schedule")
+}
+
+model Commission {
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId      Int      @db.UnsignedInt // user receiving commission
+  fromUserId  Int      @db.UnsignedInt // user whose action generated commission
+  orderId     Int?     @db.UnsignedInt // related order
+  amount      Int      // commission amount in paisa
+  level       Int      // 1-5 for level commissions
+  type        String   // joining|repurchase|bonus|rollup
+  description String?  // human readable description
+  isEligible  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  user     User  @relation("UserCommissions", fields: [userId], references: [id], onDelete: Cascade)
+  fromUser User  @relation("CommissionSource", fields: [fromUserId], references: [id], onDelete: Cascade)
+  order    Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId, type])
+  @@index([fromUserId])
+  @@index([orderId])
+  @@index([createdAt])
+  @@map("commissions")
 }
 
 model Config {
@@ -335,4 +368,19 @@ model WithdrawalRequest {
   @@index([status])
   @@index([requestedAt])
   @@map("withdrawal_requests")
+}
+
+// Webhook idempotency tracking
+model WebhookLog {
+  id          Int      @id @default(autoincrement())
+  webhookId   String   @unique // payment/order ID from webhook
+  event       String   // webhook event type
+  processedAt DateTime @default(now())
+  payload     String?  @db.Text // JSON payload for debugging
+  createdAt   DateTime @default(now())
+
+  @@index([webhookId])
+  @@index([event])
+  @@index([processedAt])
+  @@map("webhook_logs")
 }
