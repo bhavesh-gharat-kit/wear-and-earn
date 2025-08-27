@@ -20,6 +20,9 @@ function ProductCard({ product, variant = "default", setShowModal }) {
     categoryId 
   } = product;
   
+  // Ensure mainImage is not empty string or null
+  const validMainImage = mainImage && mainImage.trim() !== "" ? mainImage : "/images/brand-logo.png";
+  
   const { data: session } = useSession();
   const router = useRouter();
     const { addToCartList, setAddtoCartList, productList, fetchUserProductCartDetails } =
@@ -87,11 +90,8 @@ function ProductCard({ product, variant = "default", setShowModal }) {
             <Image
               width={300}
               height={300}
-              src={
-                mainImage ||
-                "https://wearearn.kumarinfotech.net/uploads/products/img_6877527ea674d5.08428911.jpg"
-              }
-              alt={title}
+              src={validMainImage}
+              alt={title || "Product image"}
               className="w-full h-56 object-cover"
               loading="lazy"
             />
@@ -164,8 +164,8 @@ function ProductCard({ product, variant = "default", setShowModal }) {
       {/* Uniform image area using aspect ratio */}
       <div className="relative w-full aspect-[4/5] overflow-hidden bg-gray-50">
         <Image
-          src={mainImage}
-          alt={title}
+          src={validMainImage}
+          alt={title || "Product image"}
           fill
           sizes="(max-width: 640px) 100vw, 288px"
           priority={false}
