@@ -174,7 +174,7 @@ export async function POST(request) {
         console.log('Processing COD joining order - activating MLM for user:', userId);
         
         // Import MLM functions
-        const { placeUserInMatrix, getGlobalRootId } = await import('@/lib/matrix');
+        const { placeUserInMatrix, getGlobalRootId } = await import('@/lib/mlm-matrix');
         const { handlePaidJoining, generateReferralCode } = await import('@/lib/commission');
         
         // Generate referral code and activate user
@@ -201,7 +201,7 @@ export async function POST(request) {
           parentUserId = user.sponsorId;
         } else {
           // Use auto-filler from global root
-          const { bfsFindOpenSlot } = await import('@/lib/matrix');
+          const { bfsFindOpenSlot } = await import('@/lib/mlm-matrix');
           const globalRootId = await getGlobalRootId(tx);
           const slot = await bfsFindOpenSlot(tx, globalRootId);
           parentUserId = slot.parentId;

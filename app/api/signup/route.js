@@ -2,7 +2,7 @@
 import { NextResponse as res } from "next/server"
 import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt"
-import { placeUserInMatrix, getGlobalRootId } from "@/lib/matrix";
+import { placeUserInMatrix, getGlobalRootId } from "@/lib/mlm-matrix";
 import { generateReferralCode } from "@/lib/commission";
 
 export const GET = () => {
