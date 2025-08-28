@@ -20,6 +20,10 @@ const AdminAddProduct = () => {
     price: "",
     overview: "",
     keyFeatures: "",
+    gst: "",
+    shipping: "",
+    mlmPrice: "",
+    productType: "REGULAR",
     thumbnailImage: null,
     productImages: [],
   };
@@ -103,6 +107,10 @@ const AdminAddProduct = () => {
     form.append("price", formData.price || formData.maxPrice);
     form.append("overview", formData.overview || "");
     form.append("keyFeatures", formData.keyFeatures || "");
+    form.append("gst", formData.gst || "0");
+    form.append("shipping", formData.shipping || "0");
+    form.append("mlmPrice", formData.mlmPrice || "0");
+    form.append("productType", formData.productType || "REGULAR");
 
     // Append thumbnail image
     if (formData.thumbnailImage) {
@@ -270,6 +278,75 @@ const AdminAddProduct = () => {
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-gray-100"
               />
             </div>
+          </div>
+
+          {/* GST, Shipping, and MLM Price */}
+          <div className="col-span-2 grid grid-cols-3 gap-x-2">
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700">
+                GST (%)
+              </label>
+              <input
+                type="number"
+                name="gst"
+                value={formData.gst}
+                onChange={handleInputChange}
+                min="0"
+                max="100"
+                step="0.01"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700">
+                Shipping Charges (₹)
+              </label>
+              <input
+                type="number"
+                name="shipping"
+                value={formData.shipping}
+                onChange={handleInputChange}
+                min="0"
+                step="0.01"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700">
+                MLM Price (₹)
+              </label>
+              <input
+                type="number"
+                name="mlmPrice"
+                value={formData.mlmPrice}
+                onChange={handleInputChange}
+                min="0"
+                step="0.01"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+              />
+            </div>
+          </div>
+
+          {/* Product Type */}
+          <div className="col-span-2">
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              Product Type
+            </label>
+            <select
+              name="productType"
+              value={formData.productType}
+              onChange={handleInputChange}
+              className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300"
+            >
+              <option value="REGULAR">Regular Product</option>
+              <option value="TRENDING">Trending Product</option>
+              <option value="MLM">MLM Product</option>
+            </select>
+            {formData.productType === "MLM" && (
+              <p className="text-xs text-blue-600 mt-1">
+                💡 MLM products require MLM Price to be set for commission calculations
+              </p>
+            )}
           </div>
 
           {/* Overview and Key Features */}

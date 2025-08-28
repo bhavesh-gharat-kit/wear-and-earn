@@ -159,8 +159,12 @@ function AdminProductsPage() {
             <tr>
               <th className="p-3 text-left">#</th>
               <th className="p-3 text-left">Product</th>
+              <th className="p-3 text-left">Type</th>
               <th className="p-3 text-left">Stock</th>
-              <th className="p-3 text-left">price</th>
+              <th className="p-3 text-left">Price</th>
+              <th className="p-3 text-left">GST %</th>
+              <th className="p-3 text-left">Shipping</th>
+              <th className="p-3 text-left">MLM Price</th>
               <th className="p-3 text-left">Status</th>
               <th className="p-3 text-left">Actions</th>
             </tr>
@@ -176,8 +180,26 @@ function AdminProductsPage() {
                 <tr key={product.id}>
                   <td className="p-3">{index + 1}</td>
                   <td className="p-3">{product.title}</td>
+                  <td className="p-3">
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      product.type === 'MLM' ? 'bg-purple-100 text-purple-800' :
+                      product.type === 'TRENDING' ? 'bg-orange-100 text-orange-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {product.type}
+                    </span>
+                  </td>
                   <td className="p-3">{product.inStock}</td>
                   <td className="p-3">₹{product.price}</td>
+                  <td className="p-3">{product.gst || 0}%</td>
+                  <td className="p-3">₹{product.homeDelivery || 0}</td>
+                  <td className="p-3">
+                    {product.type === 'MLM' ? (
+                      <span className="font-medium text-purple-600">₹{product.mlmPrice || 0}</span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
                   <td className="p-3">
                     <button
                       onClick={() => handleProductStatusToggler(product.id)}

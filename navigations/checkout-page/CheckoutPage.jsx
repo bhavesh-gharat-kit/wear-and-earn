@@ -43,8 +43,23 @@ export default function CheckoutPage() {
 
   // Calculate totals
   const subtotal = addToCartList.reduce((sum, item) => sum + (item.product.sellingPrice * item.quantity), 0);
-  const deliveryCharges = subtotal > 999 ? 0 : 50;
-  const gstAmount = subtotal * 0.18; // 18% GST
+  
+  // Calculate GST based on individual product GST rates
+  const gstAmount = addToCartList.reduce((sum, item) => {
+    const productGst = item.product.gst || 18; // Default to 18% if not set
+    const productSubtotal = item.product.sellingPrice * item.quantity;
+    return sum + (productSubtotal * productGst / 100);
+  }, 0);
+  
+  // Calculate shipping based on individual product shipping rates
+  const shippingCharges = addToCartList.reduce((sum, item) => {
+    const productShipping = item.product.homeDelivery || 0;
+    return sum + (productShipping * item.quantity);
+  }, 0);
+  
+  // Free shipping if subtotal > 999, otherwise use calculated shipping charges
+  const deliveryCharges = subtotal > 999 ? 0 : shippingCharges;
+  
   const total = subtotal + deliveryCharges + gstAmount;
 
   useEffect(() => {
@@ -101,7 +116,7 @@ export default function CheckoutPage() {
           sellingPrice: item.product.sellingPrice,
           discount: item.product.discount || 0,
           gst: item.product.gst || 18,
-          homeDelivery: deliveryCharges / addToCartList.length // Distribute delivery charges
+          homeDelivery: item.product.homeDelivery || 0
         })),
         address: `${userAddress.houseNumber || ''} ${userAddress.area}, ${userAddress.landmark || ''}, ${userAddress.villageOrCity}, ${userAddress.taluka}, ${userAddress.district}, ${userAddress.state} - ${userAddress.pinCode}`,
         deliveryCharges,
@@ -369,16 +384,32 @@ export default function CheckoutPage() {
                   <span className="text-gray-600">Subtotal ({addToCartList.length} items)</span>
                   <span className="font-medium">₹{subtotal.toLocaleString()}</span>
                 </div>
+                
+                {/* Individual GST breakdown */}
+                {addToCartList.map((item, index) => {
+                  const itemGst = item.product.gst || 18;
+                  const itemSubtotal = item.product.sellingPrice * item.quantity;
+                  const itemGstAmount = itemSubtotal * itemGst / 100;
+                  return (
+                    <div key={`gst-${item.id}`} className="flex justify-between text-sm">
+                      <span className="text-gray-500">GST ({itemGst}%) on {item.product.title}</span>
+                      <span className="text-gray-600">₹{itemGstAmount.toFixed(2)}</span>
+                    </div>
+                  );
+                })}
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total GST</span>
+                  <span className="font-medium">₹{gstAmount.toFixed(2)}</span>
+                </div>
+                
                 <div className="flex justify-between">
                   <span className="text-gray-600">Delivery Charges</span>
                   <span className={`font-medium ${deliveryCharges === 0 ? 'text-green-600' : ''}`}>
-                    {deliveryCharges === 0 ? 'FREE' : `₹${deliveryCharges}`}
+                    {deliveryCharges === 0 ? 'FREE' : `₹${deliveryCharges.toFixed(2)}`}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">GST (18%)</span>
-                  <span className="font-medium">₹{gstAmount.toFixed(2)}</span>
-                </div>
+                
                 <div className="border-t pt-3">
                   <div className="flex justify-between">
                     <span className="text-lg font-semibold">Total Amount</span>

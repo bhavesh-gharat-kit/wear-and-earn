@@ -107,8 +107,9 @@ model Product {
   manufacturer    String?
   type            ProductType    @default(REGULAR)
   
-  // MLM specific field
+  // MLM specific fields
   commissionAmount Int           @default(0) // commission in paisa per item
+  mlmPrice        Float?                     // MLM specific price for commission calculations
   createdAt       DateTime?      @default(now())
   cart            Cart[]
   images          ProductImage[]

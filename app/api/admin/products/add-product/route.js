@@ -105,9 +105,12 @@ export async function POST(req) {
                 discount: data.discount ? Number(data.discount) : 0,
                 price: data.maxPrice ? Number(data.maxPrice) : 0,
                 sellingPrice: data.price ? Number(data.price) : 0,
+                gst: data.gst ? Number(data.gst) : 0,
+                homeDelivery: data.shipping ? Number(data.shipping) : 0,
+                mlmPrice: data.mlmPrice ? Number(data.mlmPrice) : 0,
+                type: data.productType || "REGULAR", // Set product type
                 mainImage: thumbnailUrl,
                 manufacturer: data.manufacturer || null,
-                type: "REGULAR", // Explicitly set the ProductType enum
                 images: {
                     create: productImageUrls.map((url) => ({ imageUrl: url }))
                 }

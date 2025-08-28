@@ -1,238 +1,207 @@
-// Seed the database with demo categories, products (with images), and banners
-// Uses local images from /public/uploads and /public/images
-// Run with: node prisma/seed.mjs (or npm run seed if configured)
-
-import { PrismaClient } from "../app/generated/prisma/index.js";
-
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  // 1) Ensure categories exist
-  const categoryNames = ["Lehenga", "Saree", "Kurta Set", "Ethnic Wear"];
-  const categoryMap = {};
-  for (const name of categoryNames) {
-    const existing = await prisma.category.findUnique({ where: { name } });
-    const cat = existing || (await prisma.category.create({ data: { name, status: true } }));
-    categoryMap[name] = cat.id;
+  // Seed categories
+  await prisma.category.createMany({
+    data: [
+      { name: 'Men', description: 'Men clothing and accessories', status: true },
+      { name: 'Women', description: 'Women clothing and accessories', status: true },
+      { name: 'Kids', description: 'Kids clothing and accessories', status: true }
+    ],
+    skipDuplicates: true
+  });
+
+const products = [
+  {
+    title: "Classic White Tee",
+    description: "100% cotton slim-fit t-shirt",
+    longDescription: "A breathable everyday tee made from soft combed cotton. Holds shape after multiple washes.",
+    inStock: 120,
+    isActive: true,
+    price: 599,
+    sellingPrice: 499,
+    discount: 16.7,
+    gst: 5,
+    homeDelivery: 25,
+    keyFeature: "Soft & breathable",
+    mainImage: "/uploads/product-images/img-1.webp",
+    manufacturer: "Wear & Earn",
+    type: "REGULAR"
+  },
+  {
+    title: "Black Polo Shirt",
+    description: "Piqué polo with ribbed collar",
+    longDescription: "Smart-casual polo with premium piqué knit and two-button placket. Perfect for Friday fits.",
+    inStock: 80,
+    isActive: true,
+    price: 999,
+    sellingPrice: 849,
+    discount: 15,
+    gst: 5,
+    homeDelivery: 25,
+    keyFeature: "Piqué knit",
+    mainImage: "/uploads/product-images/img-1.webp",
+    manufacturer: "Wear & Earn",
+    type: "TRENDING"
+  },
+  {
+    title: "Blue Denim Jeans",
+    description: "Regular fit, mid-rise",
+    longDescription: "Classic 5-pocket denim with a durable twill weave. Slight stretch for all-day comfort.",
+    inStock: 60,
+    isActive: true,
+    price: 1799,
+    sellingPrice: 1499,
+    discount: 16.7,
+    gst: 12,
+    homeDelivery: 40,
+    keyFeature: "Stretch denim",
+    mainImage: "/uploads/product-images/img-1.webp",
+    manufacturer: "Wear & Earn",
+    type: "REGULAR"
+  },
+  {
+    title: "Slim-Fit Chinos (Khaki)",
+    description: "Cotton-blend chinos",
+    longDescription: "Clean silhouette chinos with tapered leg. Works with tees, shirts, and blazers alike.",
+    inStock: 75,
+    isActive: true,
+    price: 1499,
+    sellingPrice: 1299,
+    discount: 13.4,
+    gst: 5,
+    homeDelivery: 30,
+    keyFeature: "Tapered fit",
+    mainImage: "/uploads/product-images/img-1.webp",
+    manufacturer: "Wear & Earn",
+    type: "REGULAR"
+  },
+  {
+    title: "Athleisure Joggers (Charcoal)",
+    description: "Soft terry joggers",
+    longDescription: "Mid-weight terry fabric with drawstring waist and cuffed hems. Built for comfort days.",
+    inStock: 90,
+    isActive: true,
+    price: 1299,
+    sellingPrice: 1099,
+    discount: 15.4,
+    gst: 5,
+    homeDelivery: 25,
+    keyFeature: "Terry knit",
+    mainImage: "/uploads/product-images/img-1.webp",
+    manufacturer: "Wear & Earn",
+    type: "TRENDING"
+  },
+  {
+    title: "Zip-Up Hoodie (Grey)",
+    description: "Fleece-lined hoodie",
+    longDescription: "Cozy fleece interior, metal zipper, and kangaroo pockets. Your go-to layering piece.",
+    inStock: 50,
+    isActive: true,
+    price: 1699,
+    sellingPrice: 1399,
+    discount: 17.7,
+    gst: 5,
+    homeDelivery: 35,
+    keyFeature: "Warm fleece",
+    mainImage: "/uploads/product-images/img-1.webp",
+    manufacturer: "Wear & Earn",
+    type: "REGULAR"
+  },
+  {
+    title: "Oversized Graphic Tee",
+    description: "Streetwear graphic print",
+    longDescription: "Heavyweight cotton with drop shoulders and bold screen print. Statement essential.",
+    inStock: 110,
+    isActive: true,
+    price: 899,
+    sellingPrice: 749,
+    discount: 16.7,
+    gst: 5,
+    homeDelivery: 25,
+    keyFeature: "Heavyweight cotton",
+    mainImage: "/uploads/product-images/img-1.webp",
+    manufacturer: "Wear & Earn",
+    type: "TRENDING"
+  },
+  {
+    title: "Formal Slim Shirt (Sky Blue)",
+    description: "Wrinkle-resist formal shirt",
+    longDescription: "Slim profile, cutaway collar, and easy-care finish for crisp office days.",
+    inStock: 70,
+    isActive: true,
+    price: 1299,
+    sellingPrice: 1099,
+    discount: 15.4,
+    gst: 5,
+    homeDelivery: 25,
+    keyFeature: "Easy-care",
+    mainImage: "/uploads/product-images/img-1.webp",
+    manufacturer: "Wear & Earn",
+    type: "REGULAR"
+  },
+  {
+    title: "Summer Linen Shirt (Beige)",
+    description: "Breathable linen blend",
+    longDescription: "Relaxed fit with natural linen texture. Stays cool in hot, humid days.",
+    inStock: 55,
+    isActive: true,
+    price: 1599,
+    sellingPrice: 1399,
+    discount: 12.5,
+    gst: 5,
+    homeDelivery: 30,
+    keyFeature: "Linen blend",
+    mainImage: "/uploads/product-images/img-1.webp",
+    manufacturer: "Wear & Earn",
+    type: "REGULAR"
+  },
+  {
+    title: "Casual Twill Shorts (Navy)",
+    description: "Above-knee twill shorts",
+    longDescription: "Durable twill fabric with stretch and multiple pockets. Weekend essential.",
+    inStock: 95,
+    categoryId: 3,
+    isActive: true,
+    price: 999,
+    sellingPrice: 849,
+    discount: 15,
+    gst: 5,
+    homeDelivery: 20,
+    keyFeature: "Stretch twill",
+    mainImage: "/uploads/product-images/img-1.webp",
+    manufacturer: "Wear & Earn",
+    type: "REGULAR"
   }
+];
 
-  // 2) Products to create (use local public image paths)
-  const demoProducts = [
-    {
-      title: "Teal Blue Lehenga",
-      category: "Lehenga",
-      price: 1200,
-      sellingPrice: 1100,
-      inStock: 10,
-      isActive: true,
-      type: "TRENDING",
-      mainImage: "/uploads/product-images/1754996774590-img_68775741612128.57042302.jpg",
-      images: [
-        "/uploads/product-images/1754996774590-img_68775741612128.57042302.jpg",
-        "/uploads/product-images/1754996774582-img_6877527ea674d5.webp",
-        "/uploads/product-images/1754992980976-img_687755f3562541.webp",
-      ],
-    },
-    {
-      title: "Classic Saree Ensemble",
-      category: "Saree",
-      price: 2200,
-      sellingPrice: 1999,
-      inStock: 15,
-      isActive: true,
-  type: "TRENDING",
-      mainImage: "/uploads/product-images/1755008376465-img_68775741612128.57042302.jpg",
-      images: [
-        "/uploads/product-images/1755008376466-img_6877527ea674d5.webp",
-        "/uploads/product-images/1754992980981-img_687755f3562541.webp",
-      ],
-    },
-    {
-      title: "Festive Kurta Set",
-      category: "Kurta Set",
-      price: 1500,
-      sellingPrice: 1399,
-      inStock: 25,
-      isActive: true,
-  type: "MLM",
-      mainImage: "/uploads/product-images/1754633982127-img_68775741612128.57042302.jpg",
-      images: [
-        "/uploads/product-images/1754634091103-img_6877527ea674d5.webp",
-        "/uploads/product-images/1754992980978-img_68775741612128.57042302.jpg",
-      ],
-    },
-    {
-      title: "Everyday Ethnic Wear",
-      category: "Ethnic Wear",
-      price: 999,
-      sellingPrice: 849,
-      inStock: 30,
-      isActive: true,
-  type: "REGULAR",
-      mainImage: "/images/who-we-are-right-img.webp",
-      images: [
-        "/uploads/product-images/1754996774594-person-3.webp",
-        "/uploads/product-images/1755099467979-1.webp",
-      ],
-    },
-    {
-  title: "Royal Anarkali Gown",
-  category: "Lehenga",
-  price: 3500,
-  sellingPrice: 3299,
-  inStock: 12,
-  isActive: true,
-  type: "TRENDING",
-  mainImage: "/uploads/product-images/1755008376000-royal-anarkali.jpg",
-  images: [
-    "/uploads/product-images/1755008376000-royal-anarkali.jpg",
-    "/uploads/product-images/1755008376001-anarkali-side.webp",
-  ],
-},
-{
-  title: "Casual Cotton Kurti",
-  category: "Kurta Set",
-  price: 800,
-  sellingPrice: 699,
-  inStock: 40,
-  isActive: true,
-  type: "REGULAR",
-  mainImage: "/uploads/product-images/1755008376002-cotton-kurti.jpg",
-  images: [
-    "/uploads/product-images/1755008376002-cotton-kurti.jpg",
-    "/uploads/product-images/1755008376003-kurti-model.webp",
-  ],
-},
-{
-  title: "Designer Party Saree",
-  category: "Saree",
-  price: 2700,
-  sellingPrice: 2499,
-  inStock: 18,
-  isActive: true,
-  type: "TRENDING",
-  mainImage: "/uploads/product-images/1755008376004-designer-saree.jpg",
-  images: [
-    "/uploads/product-images/1755008376004-designer-saree.jpg",
-    "/uploads/product-images/1755008376005-saree-close.webp",
-  ],
-},
-{
-  title: "Wedding Sherwani",
-  category: "Ethnic Wear",
-  price: 5000,
-  sellingPrice: 4799,
-  inStock: 8,
-  isActive: true,
-  type: "MLM",
-  mainImage: "/uploads/product-images/1755008376006-wedding-sherwani.jpg",
-  images: [
-    "/uploads/product-images/1755008376006-wedding-sherwani.jpg",
-    "/uploads/product-images/1755008376007-sherwani-model.webp",
-  ],
-},
-{
-  title: "Casual Denim Jacket",
-  category: "Ethnic Wear",
-  price: 1800,
-  sellingPrice: 1599,
-  inStock: 22,
-  isActive: true,
-  type: "REGULAR",
-  mainImage: "/uploads/product-images/1755008376008-denim-jacket.jpg",
-  images: [
-    "/uploads/product-images/1755008376008-denim-jacket.jpg",
-    "/uploads/product-images/1755008376009-denim-side.webp",
-  ],
-},
-{
-  title: "Elegant Bridal Lehenga",
-  category: "Lehenga",
-  price: 8500,
-  sellingPrice: 7999,
-  inStock: 6,
-  isActive: true,
-  type: "TRENDING",
-  mainImage: "/uploads/product-images/1755008376010-bridal-lehenga.jpg",
-  images: [
-    "/uploads/product-images/1755008376010-bridal-lehenga.jpg",
-    "/uploads/product-images/1755008376011-bridal-detail.webp",
-  ],
-},
-
-  ];
-
-  const createdProducts = [];
-  for (const p of demoProducts) {
-    const exists = await prisma.product.findFirst({ where: { title: p.title } });
-    if (exists) {
-      // Ensure type is set/updated on existing rows
-      if (p.type && exists.type !== p.type) {
-        await prisma.product.update({ where: { id: exists.id }, data: { type: p.type } });
-        createdProducts.push({ id: exists.id, title: exists.title, updatedType: p.type });
-      } else {
-        createdProducts.push({ id: exists.id, title: exists.title, skipped: true });
-      }
-      continue;
-    }
-    const product = await prisma.product.create({
-      data: {
-        title: p.title,
-        description: `${p.title} demo description`,
-        longDescription: `${p.title} — demo long description. Locally-seeded product for UI showcasing and testing.`,
-        inStock: p.inStock,
-        categoryId: categoryMap[p.category],
-        isActive: p.isActive,
-          type: p.type,
-        discount: 0,
-        profit: 0,
-        gst: 0,
-        gatewayFee: 0,
-        homeDelivery: 0,
-        price: p.price,
-        sellingPrice: p.sellingPrice,
-        keyFeature: "Comfortable, Stylish, Durable",
-        mainImage: p.mainImage,
-        manufacturer: "WeAreArn",
-        images: {
-          create: p.images.map((url) => ({ imageUrl: url })),
-        },
-      },
-      include: { images: true },
-    });
-    createdProducts.push({ id: product.id, title: product.title });
+const banners = [
+  { 
+    title: "End of Season Sale",
+    imageUrl: "/uploads/banners/banner-1.png",
+    link: "/sale",
+    isActive: true
+  },
+  {
+    title: "New Drops Are Here",
+    imageUrl: "/uploads/banners/banner-2.png",
+    link: "/new-arrivals",
+    isActive: true
   }
+];
 
-  // 3) Banners
-  const demoBanners = [
-    { title: "Landing Banner 1", imageUrl: "/images/brand-landing-bg-banner.png", link: "/home" },
-    { title: "Landing Banner 2", imageUrl: "/images/brand-landing-bg-banner2.png", link: "/products" },
-    { title: "Promo Banner A", imageUrl: "/uploads/banners/1754918803276-MERN_Stack.webp", link: "/products" },
-    { title: "Promo Banner B", imageUrl: "/uploads/banners/1754906877742-532.png", link: "/about-us" },
-  ];
+ await prisma.banners.createMany({ data: banners, skipDuplicates: true });
 
-  const createdBanners = [];
-  for (const b of demoBanners) {
-    const existing = await prisma.banners.findFirst({ where: { title: b.title } });
-    if (existing) {
-      createdBanners.push({ id: existing.id, title: existing.title, skipped: true });
-      continue;
-    }
-    const banner = await prisma.banners.create({ data: { title: b.title, imageUrl: b.imageUrl, link: b.link, isActive: true } });
-    createdBanners.push({ id: banner.id, title: banner.title });
-  }
 
-  return { products: createdProducts, banners: createdBanners, categories: Object.keys(categoryMap).length };
+  console.log('✅ Seed data inserted successfully!');
 }
 
 main()
-  .then(async (summary) => {
-    console.log("Seed complete:", JSON.stringify(summary, null, 2));
-    await prisma.$disconnect();
-    process.exit(0);
-  })
-  .catch(async (e) => {
-    console.error("Seed failed:", e);
-    await prisma.$disconnect();
+  .catch((e) => {
+    console.error(e);
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });
