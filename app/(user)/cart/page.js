@@ -60,6 +60,17 @@ export default function CartPage() {
     ? addToCartList.reduce((total, item) => total + (item.product.sellingPrice * item.quantity), 0)
     : 0
 
+  // Calculate shipping charges based on individual product shipping rates
+  const shippingCharges = addToCartList?.length >= 1
+    ? addToCartList.reduce((sum, item) => {
+        const productShipping = item.product.homeDelivery || 0;
+        return sum + (productShipping * item.quantity);
+      }, 0)
+    : 0;
+
+  // Free shipping if subtotal > 999, otherwise use calculated shipping charges
+  const deliveryCharges = totalCartPrice > 999 ? 0 : shippingCharges;
+
   const handleProceedToCheckout = () => {
     if (!session?.user?.id) {
       toast.error("Please login first")
@@ -126,165 +137,178 @@ export default function CartPage() {
         </div>
       </div>
     )
+    
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-white rounded-xl shadow-sm p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Link 
               href="/account"
-              className="mr-4 p-2 rounded-lg hover:bg-gray-200 transition-colors"
+              className="mr-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <ArrowLeft className="h-5 w-5 text-gray-600" />
             </Link>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Cart</h1>
-              <p className="text-gray-600 mt-1">{addToCartList.length} items in your cart</p>
+              <h1 className="text-2xl font-bold text-gray-900">My Cart</h1>
+              <p className="text-gray-600 text-sm">{addToCartList.length} items</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-bold text-gray-900">₹{totalCartPrice.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-gray-900">₹{totalCartPrice.toLocaleString()}</p>
             <button
               onClick={handleProceedToCheckout}
-              className="mt-2 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors"
+              className="mt-1 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors"
             >
-              <CreditCard className="h-5 w-5 mr-2" />
-              Proceed to Checkout
+              <CreditCard className="h-4 w-4 mr-2" />
+              Checkout
             </button>
           </div>
         </div>
       </div>
 
-      {/* Cart Items */}
-      <div className="space-y-4">
-        {addToCartList.map((item) => {
-          const { id, quantity, productId, product } = item
-          const { mainImage, title, price, sellingPrice } = product
-          const itemTotal = sellingPrice * quantity
-          const savings = (price - sellingPrice) * quantity
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Cart Items */}
+        <div className="lg:col-span-2 space-y-3">
+          {addToCartList.map((item) => {
+            const { id, quantity, productId, product } = item
+            const { mainImage, title, price, sellingPrice } = product
+            const itemTotal = sellingPrice * quantity
+            const savings = (price - sellingPrice) * quantity
 
-          return (
-            <div key={id} className="bg-white shadow-sm rounded-xl overflow-hidden hover:shadow-md transition-shadow">
-              <div className="p-6">
-                <div className="flex items-start space-x-6">
-                  {/* Product Image */}
-                  <div className="flex-shrink-0">
-                    <Image 
-                      src={mainImage} 
-                      alt={title}
-                      width={96}
-                      height={96}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                  </div>
+            return (
+              <div key={id} className="bg-white shadow-sm rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                <div className="p-4">
+                  <div className="flex items-center space-x-4">
+                    {/* Product Image */}
+                    <div className="flex-shrink-0">
+                      <Image 
+                        src={mainImage} 
+                        alt={title}
+                        width={80}
+                        height={80}
+                        className="w-20 h-20 object-cover rounded-lg"
+                      />
+                    </div>
 
-                  {/* Product Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
-                        
-                        {/* Price Information */}
-                        <div className="flex items-center space-x-4 mb-4">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-2xl font-bold text-gray-900">
-                              ₹{sellingPrice.toLocaleString()}
-                            </span>
-                            {price > sellingPrice && (
-                              <span className="text-lg text-gray-500 line-through">
-                                ₹{price.toLocaleString()}
-                              </span>
-                            )}
-                          </div>
-                          {savings > 0 && (
-                            <span className="text-green-600 font-medium">
-                              Save ₹{savings.toLocaleString()}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Quantity Controls */}
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-700">Quantity:</span>
-                            <div className="flex items-center border border-gray-300 rounded-lg">
-                              <button
-                                onClick={() => handleQuantityChange(productId, quantity - 1)}
-                                disabled={quantity <= 1}
-                                className="p-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                              >
-                                <Minus className="h-4 w-4" />
-                              </button>
-                              <span className="px-4 py-2 font-medium text-gray-900 min-w-[3rem] text-center">
-                                {quantity}
-                              </span>
-                              <button
-                                onClick={() => handleQuantityChange(productId, quantity + 1)}
-                                className="p-2 hover:bg-gray-100 transition-colors"
-                              >
-                                <Plus className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                    {/* Product Details */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-2">{title}</h3>
+                      
+                      {/* Price Information */}
+                      <div className="flex items-center space-x-3 mb-2">
+                        <span className="text-lg font-bold text-gray-900">
+                          ₹{sellingPrice.toLocaleString()}
+                        </span>
+                        {price > sellingPrice && (
+                          <span className="text-sm text-gray-500 line-through">
+                            ₹{price.toLocaleString()}
+                          </span>
+                        )}
+                        {savings > 0 && (
+                          <span className="text-xs text-green-600 font-medium">
+                            Save ₹{savings.toLocaleString()}
+                          </span>
+                        )}
                       </div>
 
-                      {/* Item Total & Remove */}
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-gray-900 mb-2">
-                          ₹{itemTotal.toLocaleString()}
-                        </p>
+                      {/* Quantity Controls */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs font-medium text-gray-700">Qty:</span>
+                          <div className="flex items-center border border-gray-300 rounded">
+                            <button
+                              onClick={() => handleQuantityChange(productId, quantity - 1)}
+                              disabled={quantity <= 1}
+                              className="p-1 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="px-3 py-1 font-medium text-gray-900 text-sm min-w-[2rem] text-center">
+                              {quantity}
+                            </span>
+                            <button
+                              onClick={() => handleQuantityChange(productId, quantity + 1)}
+                              className="p-1 hover:bg-gray-100 transition-colors"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                        
                         <button
                           onClick={() => handleRemoveItemFromCart(productId)}
-                          className="inline-flex items-center px-3 py-2 border border-red-300 text-sm font-medium rounded-lg text-red-700 bg-white hover:bg-red-50 transition-colors"
+                          className="inline-flex items-center px-2 py-1 border border-red-300 text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 transition-colors"
                         >
-                          <Trash2 className="h-4 w-4 mr-1" />
+                          <Trash2 className="h-3 w-3 mr-1" />
                           Remove
                         </button>
                       </div>
                     </div>
+
+                    {/* Item Total */}
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-gray-900">
+                        ₹{itemTotal.toLocaleString()}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
 
-      {/* Cart Summary */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
-        <div className="space-y-3">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Subtotal ({addToCartList.length} items)</span>
-            <span className="font-medium">₹{totalCartPrice.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Delivery Charges</span>
-            <span className="font-medium text-green-600">FREE</span>
-          </div>
-          <div className="border-t pt-3">
-            <div className="flex justify-between">
-              <span className="text-lg font-semibold">Total Amount</span>
-              <span className="text-lg font-bold text-gray-900">₹{totalCartPrice.toLocaleString()}</span>
+        {/* Cart Summary */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-xl shadow-sm p-4 sticky top-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Subtotal ({addToCartList.length} items)</span>
+                <span className="font-medium">₹{totalCartPrice.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Delivery Charges</span>
+                <span className={`font-medium ${deliveryCharges === 0 ? 'text-green-600' : ''}`}>
+                  {deliveryCharges === 0 ? 'FREE' : `₹${deliveryCharges.toFixed(2)}`}
+                </span>
+              </div>
+              <div className="border-t pt-2">
+                <div className="flex justify-between">
+                  <span className="text-base font-semibold">Total Amount</span>
+                  <span className="text-base font-bold text-gray-900">₹{(totalCartPrice + deliveryCharges).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-4">
+              <button
+                onClick={handleProceedToCheckout}
+                className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors"
+              >
+                <CreditCard className="h-4 w-4 mr-2" />
+                Proceed to Checkout
+              </button>
+            </div>
+            
+            {/* Trust Indicators */}
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center text-xs text-gray-600">
+                <Package className="h-3 w-3 mr-2 text-green-500" />
+                {totalCartPrice > 999 ? 'Free Delivery' : 'Delivery Charges Apply'}
+              </div>
+              <div className="flex items-center text-xs text-gray-600">
+                <ShoppingCart className="h-3 w-3 mr-2 text-blue-500" />
+                Secure Checkout
+              </div>
             </div>
           </div>
         </div>
-        
-        <div className="mt-6">
-          <button
-            onClick={handleProceedToCheckout}
-            className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors"
-          >
-            <CreditCard className="h-5 w-5 mr-2" />
-            Proceed to Checkout
-          </button>
-        </div>
       </div>
-
     </div>
   )
 }

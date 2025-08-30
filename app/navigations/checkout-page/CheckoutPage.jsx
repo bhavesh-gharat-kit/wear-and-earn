@@ -105,6 +105,11 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (paymentMethod === 'cod') {
+      toast.error('Cash on Delivery is currently not available');
+      return;
+    }
+
     setIsPlacingOrder(true);
 
     try {
@@ -190,13 +195,8 @@ export default function CheckoutPage() {
 
           const paymentObject = new window.Razorpay(options);
           paymentObject.open();
-        } else if (paymentMethod === 'cod') {
-          toast.success('Order placed successfully!');
-          // Clear cart after successful order
-          await axios.delete('/api/cart/clear');
-          fetchUserProductCartDetails();
-          router.push(`/orders/${response.data.orderId}`);
         }
+        // COD option is currently disabled
       }
     } catch (error) {
       console.error('Error placing order:', error);
@@ -326,20 +326,24 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <div className="border border-gray-200 rounded-lg p-4">
+                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 opacity-75">
                   <div className="flex items-center">
                     <input
                       id="cod"
                       name="payment"
                       type="radio"
                       value="cod"
-                      checked={paymentMethod === 'cod'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                      disabled
+                      className="h-4 w-4 text-gray-400 border-gray-300 cursor-not-allowed"
                     />
-                    <label htmlFor="cod" className="ml-3 flex-1">
-                      <span className="font-medium text-gray-900">Cash on Delivery</span>
-                      <p className="text-sm text-gray-600">Pay when you receive</p>
+                    <label htmlFor="cod" className="ml-3 flex-1 cursor-not-allowed">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-gray-500">Cash on Delivery</span>
+                        <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-medium">
+                          Coming Soon
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500">This payment option will be available soon</p>
                     </label>
                   </div>
                 </div>

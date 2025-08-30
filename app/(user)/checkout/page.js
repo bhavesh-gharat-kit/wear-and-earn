@@ -1,4 +1,4 @@
-import CheckoutPage from '@/navigations/checkout-page/CheckoutPage';
+import CheckoutPage from '@/app/navigations/checkout-page/CheckoutPage';
 
 export default function CheckoutRoute() {
   return <CheckoutPage />;

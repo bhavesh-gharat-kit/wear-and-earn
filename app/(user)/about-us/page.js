@@ -1,4 +1,4 @@
-import AboutUsPage from '@/navigations/user/about-us-page/AboutUsPage'
+import AboutUsPage from '@/app/navigations/user/about-us-page/AboutUsPage'
 
 function AboutUsRoute() {
   return (

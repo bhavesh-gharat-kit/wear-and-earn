@@ -9,7 +9,7 @@ function LayoutPage({ children }) {
   return (
     <>
       <Navbar />
-      <section className="w-full px-4 sm:px-6 md:px-8 lg:px-10">
+      <section className="w-full">
         {" "}
         {children}{" "}
       </section>

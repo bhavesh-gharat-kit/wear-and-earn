@@ -1,4 +1,4 @@
-import OrderDetailsPage from '@/navigations/orders/OrderDetailsPage';
+import OrderDetailsPage from '@/app/navigations/orders/OrderDetailsPage';
 
 export default async function OrderDetailsRoute({ params }) {
   const { id } = await params;

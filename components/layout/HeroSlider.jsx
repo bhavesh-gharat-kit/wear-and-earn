@@ -40,24 +40,12 @@ export default function LandingPageSlider() {
     fetchAllBanners();
   }, []);
 
-  // Compute banner height: on desktop, fill viewport minus sticky header height
+  // Compute banner height: Make it full screen on all devices
   useEffect(() => {
     const computeHeight = () => {
-      const header = document.getElementById("header");
-      const headerH = header ? header.offsetHeight : 0;
-      const vw = window.innerWidth;
       const vh = window.innerHeight;
-      if (vw >= 1024) {
-        // desktop: fill remaining viewport height
-        const h = Math.max(vh - headerH, 420); // ensure sensible minimum
-        setBannerHeight(h);
-      } else if (vw >= 640) {
-        // tablet: tall but not full viewport
-        setBannerHeight(Math.max(Math.floor(vh * 0.6), 360));
-      } else {
-        // mobile
-        setBannerHeight(Math.max(Math.floor(vh * 0.45), 260));
-      }
+      // Set to full viewport height for true full screen experience
+      setBannerHeight(vh);
     };
     computeHeight();
     window.addEventListener("resize", computeHeight);
@@ -65,10 +53,10 @@ export default function LandingPageSlider() {
   }, []);
 
   return (
-  <section className="w-full mt-0">
+  <section className="w-full h-screen relative">
       <Swiper
         slidesPerView={1}
-        spaceBetween={30}
+        spaceBetween={0}
         loop={true}
         pagination={{
           clickable: true,
@@ -79,7 +67,7 @@ export default function LandingPageSlider() {
           disableOnInteraction: false, // Keep autoplay even after interaction
         }}
         modules={[Pagination, Navigation, Autoplay]} // Add Autoplay to modules array
-        className="mySwiper banner-swiper"
+        className="mySwiper banner-swiper h-full w-full"
       >
         {/* RENDERING THE BANNERS DETAILS HERE */}
         {allBannersData?.map((banner , index) => {
@@ -88,18 +76,14 @@ export default function LandingPageSlider() {
 
           return (
             <SwiperSlide key={id} className={isActive ? "" : "hidden"} >
-              <div
-                className="relative w-full"
-                style={{ height: bannerHeight ? `${bannerHeight}px` : undefined }}
-              >
+              <div className="relative w-full h-screen">
                 <Image
                   src={imageUrl}
                   alt={title || "banner"}
                   fill
                   priority={index === 0}
                   sizes="100vw"
-                  className="select-none"
-                  style={{ objectFit: "cover" }}
+                  className="select-none object-cover"
                 />
                 {/* subtle bottom gradient to help controls readability */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/25 to-transparent" />

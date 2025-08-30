@@ -8,37 +8,39 @@ function HomePage() {
     <>
       <HeroSlider/>
       
-      <ProductSlider />
-      
-      <div className="flex justify-center py-4">
-        <a
-          href="/products"
-          className="btn bg-amber-500 hover:bg-amber-600 text-xl text-white rounded"
-        >
-          View More
-        </a>
-      </div>
+      <div className="px-4 sm:px-6 md:px-8 lg:px-10">
+        <ProductSlider />
+        
+        <div className="flex justify-center py-4">
+          <a
+            href="/products"
+            className="btn bg-amber-500 hover:bg-amber-600 text-xl text-white rounded"
+          >
+            View More
+          </a>
+        </div>
 
-      {/* MLM Products Slider */}
-      <MLMProductSlider />
-      
-      <div className="flex justify-center py-4">
-        <a
-          href="/products?type=MLM"
-          className="btn bg-purple-500 hover:bg-purple-600 text-xl text-white rounded"
-        >
-          View All MLM Products
-        </a>
-      </div>
+        {/* MLM Products Slider */}
+        <MLMProductSlider />
+        
+        <div className="flex justify-center py-4">
+          <a
+            href="/products?type=MLM"
+            className="btn bg-purple-500 hover:bg-purple-600 text-xl text-white rounded"
+          >
+            View All MLM Products
+          </a>
+        </div>
 
-      {/* Who We Are Section - Inlined */}
-      <WhoWeAreSection />
-      
-      {/* Stats Section - Inlined */}
-      <StatsSection />
-      
-      {/* Testimonials Section - Inlined */}
-      <TestimonialsSection />
+        {/* Who We Are Section - Inlined */}
+        <WhoWeAreSection />
+        
+        {/* Stats Section - Inlined */}
+        <StatsSection />
+        
+        {/* Testimonials Section - Inlined */}
+        <TestimonialsSection />
+      </div>
     </>
   )
 }

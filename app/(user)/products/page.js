@@ -1,4 +1,4 @@
-import ProductPage from "@/navigations/product/products-page/ProductPage"
+import ProductPage from "@/app/navigations/product/products-page/ProductPage"
 
 
 function productPageRoute() {
