@@ -121,7 +121,7 @@ export async function POST() {
 
     // 3) Demo banners using local uploads and images
     const demoBanners = [
-      { title: "Landing Banner 1", imageUrl: "/images/brand-landing-bg-banner.png", link: "/home" },
+  { title: "Landing Banner 1", imageUrl: "/images/brand-landing-bg-banner.png", link: "/" },
       { title: "Landing Banner 2", imageUrl: "/images/brand-landing-bg-banner2.png", link: "/products" },
       { title: "Promo Banner A", imageUrl: "/uploads/banners/1754918803276-MERN_Stack.webp", link: "/products" },
       { title: "Promo Banner B", imageUrl: "/uploads/banners/1754906877742-532.png", link: "/about-us" },

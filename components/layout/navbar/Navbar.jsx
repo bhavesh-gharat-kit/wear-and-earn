@@ -33,7 +33,7 @@ function Navbar() {
 
   // Navigation (center) — login/account removed; use profile icon only
   const navMenus = [
-    { title: "home", path: "/home", icon: <FaHome /> },
+  { title: "home", path: "/", icon: <FaHome /> },
     { title: "our product", path: "/products", icon: <GiCardboardBox /> },
     { title: "about-us", path: "/about-us", icon: <BsExclamationCircleFill /> },
     { title: "contact-us", path: "/contact-us", icon: <IoMail /> },
