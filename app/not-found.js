@@ -24,7 +24,7 @@ export default function NotFound() {
           
           <div className="flex justify-center space-x-4 text-sm">
             <Link 
-              href="/home"
+              href="/"
               className="text-blue-600 hover:underline"
             >
               Home
