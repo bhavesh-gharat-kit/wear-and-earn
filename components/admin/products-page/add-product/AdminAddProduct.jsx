@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import ImagesUploader from "./ImagesUploader";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
