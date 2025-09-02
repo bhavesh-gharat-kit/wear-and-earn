@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '../../auth/[...nextauth]/route'
 import prisma from "@/lib/prisma";
 import { generateAndAssignReferralCode } from '@/lib/referral'
+import { generateReferralLink } from '@/lib/url-utils'
 
 
 export async function GET(request) {
@@ -85,8 +86,7 @@ export async function GET(request) {
     }
 
     // Generate referral URL
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-    const referralUrl = `${baseUrl}/login-register?spid=${user.referralCode}`
+    const referralUrl = generateReferralLink(request, user.referralCode)
 
     // Get referral stats
     const totalReferrals = await prisma.hierarchy.count({
@@ -175,8 +175,8 @@ export async function POST(request) {
       }, { status: 400 })
     }
 
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-    const referralUrl = `${baseUrl}/login-register?spid=${user.referralCode}`
+    // Generate referral URL
+    const referralUrl = generateReferralLink(request, user.referralCode)
 
     // Generate platform-specific messages
     const messages = {

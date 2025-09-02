@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '../../auth/[...nextauth]/route'
 import prisma from "@/lib/prisma"
 import { rateLimit } from '@/lib/rate-limit'
+import { generateReferralLink } from '@/lib/url-utils'
 
 // Rate limiting: 30 requests per minute per user
 const limiter = rateLimit({
@@ -116,9 +117,8 @@ export async function GET(request) {
     })
 
     // Generate referral link
-    const baseUrl = process.env.NEXTAUTH_URL || 'https://yoursite.com'
     const referralLink = user.referralCode 
-      ? `${baseUrl}/login-register?spid=${user.referralCode}`
+      ? generateReferralLink(request, user.referralCode)
       : null
 
     return NextResponse.json({

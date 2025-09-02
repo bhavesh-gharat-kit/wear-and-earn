@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]/route'
 import prisma from '@/lib/prisma'
+import { generateReferralLink } from '@/lib/url-utils'
 import { getDirectReferrals, getTotalTeamSize, getDownlines } from '@/lib/mlm-matrix'
 
 export async function GET(request) {
@@ -104,40 +105,15 @@ export async function GET(request) {
     const currentMonth = new Date().toISOString().slice(0, 7);
     const thisMonthPurchase = user.lastMonthPurchase === currentMonth ? user.monthlyPurchase : 0;
 
-  const origin = request?.nextUrl?.origin || process.env.NEXTAUTH_URL;
-  const dashboardData = {
-      user: {
-        ...user,
-        walletBalance: user.walletBalance / 100, // Convert to rupees
-        monthlyPurchase: user.monthlyPurchase / 100,
-        thisMonthPurchase: thisMonthPurchase / 100
-      },
-      matrixInfo: {
-        position: matrixPosition?.position || null,
-        parentName: matrixPosition?.parent?.user?.name || 'No Parent',
-        parentReferralCode: matrixPosition?.parent?.user?.referralCode || null
-      },
-      teamStats: {
-        directReferrals: directReferralsCount,
-        totalTeamSize,
-        level1Count: level1.length,
-        level2Count: level2.length,
-        level3Count: level3.length
-      },
-      earnings: {
-        totalSponsorCommission: (commissionSummary.find(c => c.type === 'sponsor_commission')?._sum?.amount || 0) / 100,
-        totalRepurchaseCommission: (commissionSummary.find(c => c.type === 'repurchase_commission')?._sum?.amount || 0) / 100,
-        walletBalance: user.walletBalance / 100,
-        pendingPayouts: pendingPayouts.length,
-        totalPendingAmount: totalPendingPayout / 100
-      },
-      recentTransactions: recentTransactions.map(t => ({
-        ...t,
-        amount: t.amount / 100,
-        createdAt: t.createdAt
-      })),
-  referralLink: origin ? `${origin}/signup?ref=${user.referralCode}` : null
-    };
+  const responseData = {
+  ...user,
+  teamSize,
+  totalEarnings: (ledgerSummary._sum.amount || 0),
+  directReferrals,
+  pendingCommission: (pendingCommissions._sum.amount || 0),
+  latestCommissions,
+  referralLink: user.referralCode ? generateReferralLink(request, user.referralCode) : null
+  };
 
     return NextResponse.json({
       success: true,
