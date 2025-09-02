@@ -107,29 +107,21 @@ const Register = ({ setIsLogin }) => {
   };
 
   return (
-    <>
-      <div className="flex items-center justify-center py-4 gap-4 flex-wrap">
-        <Image
-          src={"/images/brand-logo.png"}
-          className="w-6/12"
-          width={300}
-          height={300}
-          alt="brand-logo"
-        />
-        <h1 className="text-3xl font-semibold text-amber-600">Register Page</h1>
-      </div>
-      {/* REGISTER */}
-      <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md max-sm:px-2">
+    <div className="flex flex-col items-center justify-center min-h-[80vh] px-2">
+      <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center">
+        <Image src={"/images/brand-logo.png"} width={80} height={80} alt="WearEarn Logo" className="mb-4 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" />
+        <h1 className="text-3xl font-bold text-amber-600 dark:text-amber-400 mb-2 tracking-tight">Join WearEarn</h1>
+        <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">Create your account</p>
         {/* <h2 className="text-2xl font-semibold text-center mb-6">Register</h2> */}
 
         {/* FORM DETAILS INCLUDES IN USER -> FULLNAME , CONTACT , EMAIL,ADDRESS , PASSWORD , CREATED-AT, SPONSER-ID AND ID */}
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           {/* Full Name */}
-          <div className="mb-4">
+          <div className="mb-5">
             <label
               htmlFor="fullName"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
             >
               Full Name
             </label>
@@ -137,21 +129,21 @@ const Register = ({ setIsLogin }) => {
               type="text"
               id="fullName"
               {...register("fullName")}
-              className="w-full p-3 border rounded-md mt-2"
+              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your full name"
             />
             {errors.fullName && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
                 {errors.fullName.message}
               </p>
             )}
           </div>
 
           {/* Email */}
-          <div className="mb-4">
+          <div className="mb-5">
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
             >
               Email
             </label>
@@ -159,21 +151,21 @@ const Register = ({ setIsLogin }) => {
               type="email"
               id="email"
               {...register("email")}
-              className="w-full p-3 border rounded-md mt-2"
+              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your email"
             />
             {errors.email && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
                 {errors.email.message}
               </p>
             )}
           </div>
 
           {/* Referral Code */}
-          <div className="mb-4">
+          <div className="mb-5">
             <label
               htmlFor="referralCode"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
             >
               Referral Code (Optional)
             </label>
@@ -297,7 +289,7 @@ const Register = ({ setIsLogin }) => {
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 };
 

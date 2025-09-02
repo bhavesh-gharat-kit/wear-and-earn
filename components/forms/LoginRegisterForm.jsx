@@ -9,21 +9,30 @@ function LoginRegisterForm() {
   const [isLogin, setIsLogin] = useState(true); // State to toggle between Login and Register components
 
   return (
-    <div className="py-16 flex flex-col items-center w-6/12 mx-auto max-sm:w-full max-sm:px-2 min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Welcome to WearEarn</h1>
-        <button
-          className={`px-8 py-3 mr-4 cursor-pointer rounded-lg font-medium transition-all ${isLogin ? 'bg-blue-500 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-          onClick={() => setIsLogin(true)} // Show Login Component
-        >
-          Login
-        </button>
-        <button
-          className={`px-8 py-3 cursor-pointer rounded-lg font-medium transition-all ${!isLogin ? 'bg-blue-500 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-          onClick={() => setIsLogin(false)} // Show Register Component
-        >
-          Register
-        </button>
+    <div className="py-8 flex flex-col items-center w-full max-w-2xl mx-auto px-4 min-h-screen">
+      <div className="mb-8 flex flex-col items-center">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-2 mb-6 border border-gray-200 dark:border-gray-700">
+          <button
+            className={`px-6 py-3 mr-2 cursor-pointer rounded-lg font-medium transition-all ${
+              isLogin 
+                ? 'bg-blue-600 dark:bg-blue-500 text-white shadow-md' 
+                : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+            onClick={() => setIsLogin(true)}
+          >
+            Login
+          </button>
+          <button
+            className={`px-6 py-3 cursor-pointer rounded-lg font-medium transition-all ${
+              !isLogin 
+                ? 'bg-blue-600 dark:bg-blue-500 text-white shadow-md' 
+                : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+            onClick={() => setIsLogin(false)}
+          >
+            Register
+          </button>
+        </div>
       </div>
 
       {/* Show Login or Register based on state */}
