@@ -48,7 +48,7 @@ function Footer() {
                 href="index.php"
                 className="logo text-3xl font-bold text-[#f0a019]"
               >
-                wearearn
+                wearandearn
               </a>
               <p className="mt-4 text-sm">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
@@ -86,20 +86,20 @@ function Footer() {
               <h4 className="text-xl font-semibold mb-4 text-[#f0a019] ">Support</h4>
               <ul className="footer-links space-y-2">
                 <li>
-                  <a
-                    href="products.php"
+                  <Link
+                    href="/products"
                     className="text-sm hover:text-orange-500"
                   >
                     Products
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="account.php"
+                  <Link
+                    href="/orders"
                     className="text-sm hover:text-orange-500"
                   >
                     Order Status
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -109,30 +109,22 @@ function Footer() {
               <h4 className="text-xl font-semibold mb-4 text-[#f0a019] ">Company</h4>
               <ul className="footer-links space-y-2">
                 <li>
-                  <a href="about.php" className="text-sm hover:text-orange-500">
+                  <Link href="/about-us" className="text-sm hover:text-orange-500">
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="prime-membership.php"
-                    className="text-sm hover:text-orange-500"
-                  >
-                    Prime Membership
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="contact.php"
+                  <Link
+                    href="/contact-us"
                     className="text-sm hover:text-orange-500"
                   >
                     Contact Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="tos.php" className="text-sm hover:text-orange-500">
+                  <Link href="/terms-and-conditions" className="text-sm hover:text-orange-500">
                     Terms & Conditions
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -160,9 +152,9 @@ function Footer() {
         <div className="w-full px-0 flex flex-col justify-center items-center">
           {/* Legal Links */}
           <div className="legal-links text-center md:text-left mb-4">
-            <a href="tos.php" className="text-sm hover:text-orange-500">
+            <Link href="/terms-and-conditions" className="text-sm hover:text-orange-500">
               Terms and Conditions
-            </a>
+            </Link>
           </div>
 
           {/* Copyright Section */}
