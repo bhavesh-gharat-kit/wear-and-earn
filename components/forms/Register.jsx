@@ -108,7 +108,7 @@ const Register = ({ setIsLogin }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] px-2">
-      <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center">
+      <div className="w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center">
         <Image src={"/images/brand-logo.png"} width={80} height={80} alt="WearEarn Logo" className="mb-4 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" />
         <h1 className="text-3xl font-bold text-amber-600 dark:text-amber-400 mb-2 tracking-tight">Join WearEarn</h1>
         <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">Create your account</p>
