@@ -107,6 +107,17 @@ function ContactUs() {
 
             {/* Contact Form */}
             <div>
+              {/* Form Heading */}
+              <div className="text-center mb-6">
+                <h2 className="text-3xl md:text-4xl font-bold text-purple-700 dark:text-purple-400 mb-2">
+                  Share Your Feedback
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                  We'd love to hear from you! Let us know what you think.
+                </p>
+                <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-purple-700 mx-auto mt-3 rounded-full"></div>
+              </div>
+              
               <form
                 onSubmit={handleContactFormSubmit}
                 id="contactForm"

@@ -170,7 +170,7 @@ function Footer() {
             <p className="text-sm">
               © <span>Copyright</span>
               <span>{new Date().getFullYear()} </span>
-              <strong className="sitename text-purple-700">wearearn</strong>.
+              <strong className="sitename text-purple-700">wearandearn</strong>.
               All Rights Reserved.
             </p>
           </div>

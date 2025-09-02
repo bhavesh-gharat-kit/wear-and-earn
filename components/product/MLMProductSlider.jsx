@@ -52,7 +52,7 @@ export default function MLMProductSlider({ showModal, setShowModal }) {
             }}>
               Top MLM Products
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               These MLM-exclusive products are trending among members.
             </p>
             <div className="w-24 h-1 mx-auto mt-4 rounded-full" style={{
@@ -93,7 +93,7 @@ export default function MLMProductSlider({ showModal, setShowModal }) {
           </div>
           
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No MLM products available at the moment.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-lg">No MLM products available at the moment.</p>
           </div>
         </div>
       </section>
@@ -113,7 +113,7 @@ export default function MLMProductSlider({ showModal, setShowModal }) {
           }}>
             Top MLM Products
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             These MLM-exclusive products are trending among members.
           </p>
           <div className="w-24 h-1 mx-auto mt-4 rounded-full" style={{

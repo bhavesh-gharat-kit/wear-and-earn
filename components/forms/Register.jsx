@@ -173,18 +173,18 @@ const Register = ({ setIsLogin }) => {
               type="text"
               id="referralCode"
               {...register("referralCode")}
-              className="w-full p-3 border rounded-md mt-2"
+              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter referral code"
             />
             {sponsorInfo && (
-              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded">
-                <p className="text-green-800 text-sm">
+              <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded">
+                <p className="text-green-800 dark:text-green-300 text-sm">
                   ✓ Valid referral code! You will be sponsored by: <strong>{sponsorInfo.fullName}</strong>
                 </p>
               </div>
             )}
             {referralCode && referralCode.length > 3 && !sponsorInfo && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
                 Invalid referral code
               </p>
             )}
@@ -194,7 +194,7 @@ const Register = ({ setIsLogin }) => {
           <div className="mb-4">
             <label
               htmlFor="phone"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
             >
               Phone Number
             </label>
@@ -202,11 +202,11 @@ const Register = ({ setIsLogin }) => {
               type="text"
               id="phone"
               {...register("phone")}
-              className="w-full p-3 border rounded-md mt-2"
+              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your phone number"
             />
             {errors.phone && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
                 {errors.phone.message}
               </p>
             )}
@@ -216,7 +216,7 @@ const Register = ({ setIsLogin }) => {
           <div className="mb-4">
             <label
               htmlFor="address"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
             >
               Address
             </label>
@@ -224,11 +224,11 @@ const Register = ({ setIsLogin }) => {
               type="text"
               id="address"
               {...register("address")}
-              className="w-full p-3 border rounded-md mt-2"
+              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your address"
             />
             {errors.address && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
                 {errors.address.message}
               </p>
             )}
@@ -238,7 +238,7 @@ const Register = ({ setIsLogin }) => {
           <div className="mb-4">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
             >
               Password
             </label>
@@ -246,11 +246,11 @@ const Register = ({ setIsLogin }) => {
               type="password"
               id="password"
               {...register("password")}
-              className="w-full p-3 border rounded-md mt-2"
+              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your password"
             />
             {errors.password && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
                 {errors.password.message}
               </p>
             )}
@@ -260,7 +260,7 @@ const Register = ({ setIsLogin }) => {
           <div className="mb-4">
             <label
               htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
             >
               Confirm Password
             </label>
@@ -268,11 +268,11 @@ const Register = ({ setIsLogin }) => {
               type="password"
               id="confirmPassword"
               {...register("confirmPassword")}
-              className="w-full p-3 border rounded-md mt-2"
+              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Confirm your password"
             />
             {errors.confirmPassword && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
                 {errors.confirmPassword.message}
               </p>
             )}
@@ -282,7 +282,7 @@ const Register = ({ setIsLogin }) => {
           <div className="mb-4 text-left">
             <button
               type="submit"
-              className="w-fit cursor-pointer p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              className="w-fit cursor-pointer p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Register
             </button>

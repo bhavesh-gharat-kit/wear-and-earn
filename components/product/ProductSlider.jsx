@@ -39,13 +39,13 @@ export default function ProductSlider({ title = "Top Trending", showModal, setSh
       <div className="container mx-auto px-4">
         {/* Top Trending Products Header */}
         <div className="text-center mb-12 trending-header">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Top Trending Products
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Discover the most popular products customers are loving right now
           </p>
-          <div className="w-24 h-1 trending-divider mx-auto mt-4 rounded-full"></div>
+          <div className="w-24 h-1 trending-divider mx-auto mt-4 rounded-full bg-amber-500"></div>
         </div>
         
         <Swiper
