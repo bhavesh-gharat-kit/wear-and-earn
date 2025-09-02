@@ -527,10 +527,10 @@ const ReferralSection = ({ userData }) => {
   return (
     <div className="space-y-6">
       {/* Referral Code Card */}
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 p-6 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-3">Your Referral Code</h3>
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border border-purple-200 dark:border-purple-700 p-6 rounded-lg">
+        <h3 className="font-medium text-gray-900 dark:text-white mb-3">Your Referral Code</h3>
         <div className="flex items-center gap-3 mb-4">
-          <div className="bg-white border border-gray-300 px-4 py-2 rounded-lg font-mono text-lg flex-1">
+          <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg font-mono text-lg flex-1">
             {referralData.referralCode}
           </div>
           <button 
@@ -543,9 +543,9 @@ const ReferralSection = ({ userData }) => {
           </button>
         </div>
         
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-600 dark:text-gray-300">
           <p className="mb-1">Referral URL:</p>
-          <div className="bg-white border border-gray-300 px-3 py-2 rounded text-xs break-all">
+          <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-3 py-2 rounded text-xs break-all">
             {referralData.referralUrl}
           </div>
         </div>
@@ -553,43 +553,43 @@ const ReferralSection = ({ userData }) => {
 
       {/* Share Options */}
       <div>
-        <h3 className="font-medium text-gray-900 mb-3">Share Your Referral Link</h3>
+        <h3 className="font-medium text-gray-900 dark:text-white mb-3">Share Your Referral Link</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <button 
             onClick={() => generateShareMessage('whatsapp')}
-            className="bg-green-50 border border-green-200 p-3 rounded-lg hover:bg-green-100 transition-colors text-center"
+            className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 p-3 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors text-center"
           >
-            <Share2 className="w-6 h-6 text-green-600 mx-auto mb-1" />
-            <p className="text-sm font-medium text-green-700">WhatsApp</p>
+            <Share2 className="w-6 h-6 text-green-600 dark:text-green-400 mx-auto mb-1" />
+            <p className="text-sm font-medium text-green-700 dark:text-green-300">WhatsApp</p>
           </button>
           <button 
             onClick={() => generateShareMessage('email')}
-            className="bg-indigo-50 border border-indigo-200 p-3 rounded-lg hover:bg-indigo-100 transition-colors text-center"
+            className="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 p-3 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors text-center"
           >
-            <Mail className="w-6 h-6 text-indigo-600 mx-auto mb-1" />
-            <p className="text-sm font-medium text-indigo-700">Email</p>
+            <Mail className="w-6 h-6 text-indigo-600 dark:text-indigo-400 mx-auto mb-1" />
+            <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">Email</p>
           </button>
           <button 
             onClick={() => generateShareMessage('sms')}
-            className="bg-blue-50 border border-blue-200 p-3 rounded-lg hover:bg-blue-100 transition-colors text-center"
+            className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 p-3 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors text-center"
           >
-            <MessageSquare className="w-6 h-6 text-blue-600 mx-auto mb-1" />
-            <p className="text-sm font-medium text-blue-700">SMS</p>
+            <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400 mx-auto mb-1" />
+            <p className="text-sm font-medium text-blue-700 dark:text-blue-300">SMS</p>
           </button>
           <button 
             onClick={() => copyToClipboard(referralData.referralUrl)}
-            className="bg-purple-50 border border-purple-200 p-3 rounded-lg hover:bg-purple-100 transition-colors text-center"
+            className="bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700 p-3 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors text-center"
           >
-            <Copy className="w-6 h-6 text-purple-600 mx-auto mb-1" />
-            <p className="text-sm font-medium text-purple-700">Copy Link</p>
+            <Copy className="w-6 h-6 text-purple-600 dark:text-purple-400 mx-auto mb-1" />
+            <p className="text-sm font-medium text-purple-700 dark:text-purple-300">Copy Link</p>
           </button>
         </div>
       </div>
 
       {/* Referral Instructions */}
-      <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-        <h4 className="font-medium text-blue-900 mb-2">How it works:</h4>
-        <ul className="text-sm text-blue-800 space-y-1">
+      <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 p-4 rounded-lg">
+        <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">How it works:</h4>
+        <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
           <li>• Share your referral code or link with friends and family</li>
           <li>• When they register and make their first purchase, you earn commission</li>
           <li>• Build your team and earn from multiple levels</li>
