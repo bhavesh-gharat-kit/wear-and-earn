@@ -52,8 +52,8 @@ const Register = ({ setIsLogin }) => {
   const referralCode = watch("referralCode");
 
   useEffect(() => {
-    // Check for referral code in URL
-    const urlReferralCode = searchParams.get('ref');
+    // Check for referral code in URL - support both 'ref' and 'spid' parameters
+    const urlReferralCode = searchParams.get('ref') || searchParams.get('spid');
     if (urlReferralCode) {
       setValue("referralCode", urlReferralCode);
     }

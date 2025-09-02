@@ -118,7 +118,7 @@ export async function GET(request) {
     // Generate referral link
     const baseUrl = process.env.NEXTAUTH_URL || 'https://yoursite.com'
     const referralLink = user.referralCode 
-      ? `${baseUrl}/register?spid=${user.referralCode}`
+      ? `${baseUrl}/login-register?spid=${user.referralCode}`
       : null
 
     return NextResponse.json({

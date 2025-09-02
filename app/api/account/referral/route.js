@@ -86,7 +86,7 @@ export async function GET(request) {
 
     // Generate referral URL
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-    const referralUrl = `${baseUrl}/register?spid=${user.referralCode}`
+    const referralUrl = `${baseUrl}/login-register?spid=${user.referralCode}`
 
     // Get referral stats
     const totalReferrals = await prisma.hierarchy.count({
@@ -176,7 +176,7 @@ export async function POST(request) {
     }
 
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-    const referralUrl = `${baseUrl}/register?spid=${user.referralCode}`
+    const referralUrl = `${baseUrl}/login-register?spid=${user.referralCode}`
 
     // Generate platform-specific messages
     const messages = {
