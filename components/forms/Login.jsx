@@ -42,7 +42,7 @@ const Login = () => {
       mobileNo: data.mobileNo,
       password: data.password,
       redirect: true,
-      callbackUrl: "/", // Redirect to home page
+      callbackUrl: "/", // Redirect to home page with proper layout
     });
   };
 

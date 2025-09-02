@@ -32,14 +32,7 @@ const nextConfig = {
         ];
     },
     async redirects() {
-        return [
-            // Ensure old /home links continue to work by redirecting to root
-            {
-                source: '/home',
-                destination: '/',
-                permanent: false,
-            },
-        ];
+        return [];
     },
 };
 
