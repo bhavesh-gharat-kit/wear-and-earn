@@ -185,12 +185,20 @@ export default function OrdersPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                     <Calendar className="h-4 w-4 mr-2" />
-                    <span>Ordered: {new Date(order.createdAt).toLocaleDateString()}</span>
+                    <span>Ordered: {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    }) : 'N/A'}</span>
                   </div>
                   {order.deliveredAt && (
                     <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                       <CheckCircle className="h-4 w-4 mr-2" />
-                      <span>Delivered: {new Date(order.deliveredAt).toLocaleDateString()}</span>
+                      <span>Delivered: {new Date(order.deliveredAt).toLocaleDateString('en-IN', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}</span>
                     </div>
                   )}
                   {order.paymentId && (
@@ -231,10 +239,13 @@ export default function OrdersPage() {
                       <span>Note: {order.orderNotice}</span>
                     )}
                   </div>
-                  <button className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                  <Link 
+                    href={`/account/orders/${order.id}`}
+                    className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                  >
                     <Eye className="h-4 w-4 mr-2" />
                     View Details
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

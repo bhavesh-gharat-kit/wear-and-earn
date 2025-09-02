@@ -137,12 +137,12 @@ export async function POST(request) {
           gstAmount: Math.round((gstAmount || 0) * 100), // Store in paisa
           address,
           orderNotice: orderNotice || null,
-          status: paymentMethod === 'cod' ? 'inProcess' : 'pending',
+          status: 'pending', // Always start with pending status
           paymentId: null,
           isJoiningOrder,
           gatewayOrderId: razorpayOrder?.id || null,
-          // For COD orders, set paidAt immediately since they're considered paid for MLM purposes
-          paidAt: paymentMethod === 'cod' ? new Date() : null
+                    // For COD orders, we'll update status after admin confirmation
+          paidAt: null // Will be set when payment is confirmed
         }
       })
 
@@ -169,78 +169,9 @@ export async function POST(request) {
         })
       )
 
-      // Handle MLM activation for COD orders (they're considered paid immediately)
-      if (paymentMethod === 'cod' && isJoiningOrder) {
-        console.log('Processing COD joining order - activating MLM for user:', userId);
-        
-        // Import MLM functions
-        const { placeUserInMatrix, getGlobalRootId } = await import('@/lib/mlm-matrix');
-        const { handlePaidJoining, generateReferralCode } = await import('@/lib/commission');
-        
-        // Generate referral code and activate user
-        const referralCode = await generateReferralCode();
-        
-        await tx.user.update({
-          where: { id: userId },
-          data: { 
-            isActive: true,
-            referralCode: referralCode
-          }
-        });
-        
-        // Get user to check for sponsor
-        const user = await tx.user.findUnique({
-          where: { id: userId },
-          select: { sponsorId: true }
-        });
-        
-        // Place user in MLM matrix
-        let parentUserId;
-        if (user.sponsorId) {
-          // Place under sponsor
-          parentUserId = user.sponsorId;
-        } else {
-          // Use auto-filler from global root
-          const { bfsFindOpenSlot } = await import('@/lib/mlm-matrix');
-          const globalRootId = await getGlobalRootId(tx);
-          const slot = await bfsFindOpenSlot(tx, globalRootId);
-          parentUserId = slot.parentId;
-        }
-        
-        await placeUserInMatrix(tx, userId, parentUserId);
-        
-        // Process commission with order products
-        const orderWithProducts = { 
-          ...order, 
-          isJoiningOrder: true,
-          orderProducts: orderProducts,
-          userId: userId
-        };
-        await handlePaidJoining(tx, orderWithProducts);
-        
-        console.log('COD user activated with referral code:', referralCode);
-      } else if (paymentMethod === 'cod' && !isJoiningOrder) {
-        // Handle repurchase commission for COD orders
-        const { handlePaidRepurchase } = await import('@/lib/commission');
-        const orderWithProducts = { 
-          ...order, 
-          isJoiningOrder: false,
-          orderProducts: orderProducts,
-          userId: userId
-        };
-        await handlePaidRepurchase(tx, orderWithProducts);
-      }
+      // MLM activation and commission processing will be handled when payment is confirmed
+      // All orders start as 'pending' regardless of payment method
       
-      // Update monthly purchase for COD orders
-      if (paymentMethod === 'cod') {
-        await tx.user.update({
-          where: { id: userId },
-          data: {
-            monthlyPurchase: { increment: Math.round(total * 100) }
-          }
-        });
-      }
-
       return { order, orderProducts }
     })
 
