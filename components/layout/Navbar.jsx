@@ -14,6 +14,7 @@ import { FaDownload } from "react-icons/fa6";
 import { MdAccountCircle, MdLogout, MdOutlineMenuOpen } from "react-icons/md";
 import { FiUser } from "react-icons/fi";
 import { FiUserPlus } from "react-icons/fi";
+import PWAInstallButton from "../PWAInstallButton";
 import "./navbar.css";
 
 import { usePathname, useRouter } from "next/navigation";
@@ -109,15 +110,7 @@ function Navbar() {
 
           {/* Right: Download, Cart, Profile, Mobile menu button */}
           <div className="navbar-end gap-2">
-            <Link
-              href={"#"}
-              className="hidden md:flex items-center justify-center h-9 gap-1.5 bg-[#ffc107] rounded px-4 py-0.5"
-            >
-              <span className="max-sm:hidden">Dowload App</span>
-              <i>
-                <FaDownload />
-              </i>
-            </Link>
+            <PWAInstallButton />
 
             <div className="dropdown dropdown-end">
               <div

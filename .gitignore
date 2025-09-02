@@ -10,6 +10,12 @@ coverage/
 .next/
 out/
 
+# PWA
+public/sw.js
+public/workbox-*.js
+public/sw.js.map
+public/workbox-*.js.map
+
 # Logs
 npm-debug.log*
 yarn-debug.log*
