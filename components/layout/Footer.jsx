@@ -95,7 +95,7 @@ function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/orders"
+                    href="/account/orders"
                     className="text-sm hover:text-orange-500"
                   >
                     Order Status

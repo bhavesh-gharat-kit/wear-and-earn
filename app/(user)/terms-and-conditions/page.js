@@ -2,19 +2,38 @@ import Link from 'next/link';
 
 export default function TermsAndConditions() {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Terms of Service</h1>
-        
-        <nav className="flex space-x-2 text-sm text-gray-600 mb-6">
-          <Link href="/" className="hover:text-blue-600">Home</Link>
-          <span>/</span>
-          <span className="text-gray-900">ToS</span>
-        </nav>
+    <>
+      {/* page title */}
+      <div className="bg-gradient-to-r from-[#e0e7ff] to-[#f3e8ff] text-blue-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="text-center md:text-left mb-2 md:mb-0">
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">Terms of Service</h2>
+              <p className="text-lg text-blue-900 max-w-2xl">
+                Please read these terms of service carefully before using our services.
+              </p>
+            </div>
+            <div className="flex flex-col items-end">
+              <div className="flex items-center space-x-2 text-blue-900">
+                <Link
+                  href="/"
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  Home
+                </Link>
+                <span>/</span>
+                <span className="text-blue-900 font-medium">Terms of Service</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <p className="text-sm text-gray-600 mb-8">Last Updated: February 27, 2025</p>
-
-        <div className="prose max-w-none">
+      {/* Terms Content */}
+      <section className="py-16 bg-gray-50 w-full px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="prose max-w-none">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">Terms of Service</h2>
           <p className="mb-6">Please read these terms of service carefully before using our services.</p>
 
@@ -111,8 +130,10 @@ export default function TermsAndConditions() {
               By continuing to use our service after updates, you agree to the revised Terms.
             </p>
           </section>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }
