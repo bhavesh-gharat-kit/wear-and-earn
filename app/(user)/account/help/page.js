@@ -1,4 +1,6 @@
-import React from 'react';
+"use client";
+
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
   FaQuestionCircle, 
@@ -7,7 +9,7 @@ import {
   FaCreditCard, 
   FaTruck, 
   FaUndo, 
-  FaShield, 
+  FaLock, 
   FaPhone, 
   FaEnvelope, 
   FaComments,
@@ -114,7 +116,7 @@ const helpCategories = [
   {
     id: 'security',
     title: 'Security & Privacy',
-    icon: <FaShield className="text-indigo-500" />,
+    icon: <FaLock className="text-indigo-500" />,
     questions: [
       {
         question: 'Is my personal information safe?',

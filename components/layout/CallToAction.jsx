@@ -11,9 +11,9 @@ function CallToAction() {
               Do You Need Help?
             </p>
             <span className="text-lg font-semibold text-gray-800">
-              Supremesilkshub is here to assist you. Feel free to call us.
+              We're here to help you with all your fashion needs.
               <br className="hidden sm:block" />
-              Happy to help you...
+              Contact us anytime for assistance!
             </span>
           </div>
 

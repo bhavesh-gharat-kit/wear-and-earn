@@ -10,27 +10,27 @@ const socialMediaItems = [
   {
     socialMediaName  :"Facebook",
     socialMediaIcon : <FaFacebook/>,
-    socialMediaLink : ""
+    socialMediaLink : "https://facebook.com/wearandearn"
   },
   {
     socialMediaName  :"Youtube",
     socialMediaIcon : <FaYoutube/>,
-    socialMediaLink : ""
+    socialMediaLink : "https://youtube.com/@wearandearn"
   },
   {
     socialMediaName  :"Twitter",
     socialMediaIcon : <FaXTwitter/>,
-    socialMediaLink : ""
+    socialMediaLink : "https://twitter.com/wearandearn"
   },
   {
     socialMediaName  :"Instagram",
     socialMediaIcon : <FaInstagram/>,
-    socialMediaLink : ""
+    socialMediaLink : "https://instagram.com/wearandearn"
   },
   {
     socialMediaName  :"Pinterest",
     socialMediaIcon : <FaPinterest/>,
-    socialMediaLink : ""
+    socialMediaLink : "https://pinterest.com/wearandearn"
   },
 ]
 
@@ -137,7 +137,15 @@ function Footer() {
                   socialMediaItems.map( (item , i) => {
                     return (
                       <span key={i} >
-                        <Link href={""} className="text-2xl" > {item.socialMediaIcon} </Link>
+                        <Link 
+                          href={item.socialMediaLink || "#"} 
+                          className="text-2xl hover:text-orange-500 transition-colors" 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={item.socialMediaName}
+                        > 
+                          {item.socialMediaIcon} 
+                        </Link>
                       </span>
                     )
                   } )
