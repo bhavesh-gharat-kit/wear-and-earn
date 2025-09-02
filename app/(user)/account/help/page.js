@@ -173,17 +173,17 @@ function HelpPage() {
   return (
     <>
       {/* Page Header */}
-      <div className="bg-gradient-to-r from-[#e0e7ff] to-[#f3e8ff] text-blue-900">
+      <div className="bg-gradient-to-r from-[#e0e7ff] to-[#f3e8ff] dark:from-gray-800 dark:to-gray-900 text-blue-900 dark:text-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="text-center md:text-left mb-4 md:mb-0">
               <h1 className="text-3xl md:text-4xl font-bold mb-2">Help Center</h1>
-              <p className="text-lg text-blue-900 max-w-2xl">
+              <p className="text-lg text-blue-900 dark:text-gray-300 max-w-2xl">
                 Find answers to frequently asked questions and get the help you need
               </p>
             </div>
             <div className="flex flex-col items-end">
-              <div className="flex items-center space-x-2 text-blue-900">
+              <div className="flex items-center space-x-2 text-blue-900 dark:text-gray-300">
                 <Link href="/" className="hover:text-white transition-colors">
                   Home
                 </Link>
@@ -192,7 +192,7 @@ function HelpPage() {
                   Account
                 </Link>
                 <span>/</span>
-                <span className="text-blue-900 font-medium">Help</span>
+                <span className="text-blue-900 dark:text-gray-100 font-medium">Help</span>
               </div>
             </div>
           </div>
@@ -200,17 +200,17 @@ function HelpPage() {
       </div>
 
       {/* Help Content */}
-      <section className="py-12 bg-gray-50 min-h-screen">
+      <section className="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Search Bar */}
           <div className="mb-8">
             <div className="relative max-w-md mx-auto">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 placeholder="Search for help..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -219,41 +219,41 @@ function HelpPage() {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <Link href="/account/orders" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <Link href="/account/orders" className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border dark:border-gray-700">
               <FaTruck className="text-3xl text-blue-500 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Track Your Order</h3>
-              <p className="text-gray-600 text-sm">Check the status of your recent orders</p>
+              <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Track Your Order</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">Check the status of your recent orders</p>
             </Link>
             
-            <Link href="/contact-us" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <Link href="/contact-us" className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border dark:border-gray-700">
               <FaPhone className="text-3xl text-green-500 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Contact Support</h3>
-              <p className="text-gray-600 text-sm">Get in touch with our support team</p>
+              <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Contact Support</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">Get in touch with our support team</p>
             </Link>
             
-            <Link href="/account/settings" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <Link href="/account/settings" className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border dark:border-gray-700">
               <FaUser className="text-3xl text-purple-500 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Account Settings</h3>
-              <p className="text-gray-600 text-sm">Manage your profile and preferences</p>
+              <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Account Settings</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">Manage your profile and preferences</p>
             </Link>
           </div>
 
           {/* FAQ Categories */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Frequently Asked Questions</h2>
             
             {filteredCategories.map((category) => (
-              <div key={category.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div key={category.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border dark:border-gray-700">
                 <button
-                  className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   onClick={() => setActiveCategory(activeCategory === category.id ? null : category.id)}
                 >
                   <div className="flex items-center space-x-3">
                     <div className="text-2xl">{category.icon}</div>
-                    <h3 className="text-lg font-semibold text-gray-900">{category.title}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{category.title}</h3>
                   </div>
                   <FaChevronRight 
-                    className={`text-gray-400 transform transition-transform ${
+                    className={`text-gray-400 dark:text-gray-500 transform transition-transform ${
                       activeCategory === category.id ? 'rotate-90' : ''
                     }`} 
                   />
@@ -264,8 +264,8 @@ function HelpPage() {
                     <div className="space-y-4">
                       {category.questions.map((faq, index) => (
                         <div key={index} className="border-l-4 border-blue-500 pl-4">
-                          <h4 className="font-semibold text-gray-900 mb-2">{faq.question}</h4>
-                          <p className="text-gray-600 text-sm leading-relaxed">{faq.answer}</p>
+                          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{faq.question}</h4>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{faq.answer}</p>
                         </div>
                       ))}
                     </div>
@@ -277,37 +277,37 @@ function HelpPage() {
 
           {/* Contact Methods */}
           <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Still Need Help?</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">Still Need Help?</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {contactMethods.map((method, index) => (
-                <div key={index} className="bg-white p-6 rounded-lg shadow-md text-center">
+                <div key={index} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center border dark:border-gray-700">
                   <div className="text-3xl mb-4 flex justify-center">{method.icon}</div>
-                  <h3 className="text-lg font-semibold mb-2">{method.title}</h3>
-                  <p className="text-gray-600 text-sm mb-3">{method.description}</p>
-                  <p className="font-semibold text-gray-900">{method.contact}</p>
-                  <p className="text-xs text-gray-500 mt-1">{method.availability}</p>
+                  <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">{method.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">{method.description}</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-100">{method.contact}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{method.availability}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Additional Resources */}
-          <div className="mt-12 bg-blue-50 rounded-lg p-6">
-            <h3 className="text-xl font-semibold text-blue-900 mb-4">Additional Resources</h3>
+          <div className="mt-12 bg-blue-50 dark:bg-gray-800 rounded-lg p-6 border dark:border-gray-700">
+            <h3 className="text-xl font-semibold text-blue-900 dark:text-blue-400 mb-4">Additional Resources</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Link href="/terms-and-conditions" className="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+              <Link href="/terms-and-conditions" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm flex items-center">
                 <FaChevronRight className="mr-2" />
                 Terms & Conditions
               </Link>
-              <Link href="/about-us" className="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+              <Link href="/about-us" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm flex items-center">
                 <FaChevronRight className="mr-2" />
                 About Us
               </Link>
-              <Link href="/products" className="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+              <Link href="/products" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm flex items-center">
                 <FaChevronRight className="mr-2" />
                 Browse Products
               </Link>
-              <Link href="/account" className="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+              <Link href="/account" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm flex items-center">
                 <FaChevronRight className="mr-2" />
                 Account Dashboard
               </Link>

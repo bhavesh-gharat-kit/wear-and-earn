@@ -138,14 +138,14 @@ export default function OrderDetailsPage({ orderId }) {
                       <h4 className="font-medium text-gray-900">{item.title}</h4>
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
                         <span>Qty: {item.quantity}</span>
-                        <span>₹{item.sellingPrice.toLocaleString()}</span>
+                        <span>₹{(item.sellingPrice / 100).toLocaleString()}</span>
                         {item.discount > 0 && (
                           <span className="text-green-600">{item.discount}% off</span>
                         )}
                       </div>
                     </div>
                     <div className="text-lg font-semibold text-gray-900">
-                      ₹{item.totalPrice.toLocaleString()}
+                      ₹{(item.totalPrice / 100).toLocaleString()}
                     </div>
                   </div>
                 ))}
@@ -207,24 +207,24 @@ export default function OrderDetailsPage({ orderId }) {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal:</span>
                   <span className="font-medium">
-                    ₹{(order.total - order.deliveryCharges - order.gstAmount).toLocaleString()}
+                    ₹{((order.total - order.deliveryCharges - order.gstAmount) / 100).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Delivery Charges:</span>
                   <span className={`font-medium ${order.deliveryCharges === 0 ? 'text-green-600' : ''}`}>
-                    {order.deliveryCharges === 0 ? 'FREE' : `₹${order.deliveryCharges}`}
+                    {order.deliveryCharges === 0 ? 'FREE' : `₹${(order.deliveryCharges / 100).toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">GST:</span>
-                  <span className="font-medium">₹{order.gstAmount.toFixed(2)}</span>
+                  <span className="font-medium">₹{(order.gstAmount / 100).toFixed(2)}</span>
                 </div>
                 <div className="border-t pt-3">
                   <div className="flex justify-between">
                     <span className="text-lg font-semibold">Total:</span>
                     <span className="text-lg font-bold text-gray-900">
-                      ₹{order.total.toLocaleString()}
+                      ₹{(order.total / 100).toLocaleString()}
                     </span>
                   </div>
                 </div>

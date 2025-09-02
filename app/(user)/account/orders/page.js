@@ -177,7 +177,7 @@ export default function OrdersPage() {
                     </span>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-gray-900">₹{order.total.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-gray-900">₹{(order.totalInRupees || order.total / 100).toLocaleString()}</p>
                     <p className="text-sm text-gray-500">{order.itemCount} items</p>
                   </div>
                 </div>
