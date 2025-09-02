@@ -1,12 +1,17 @@
 
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Register from './Register';
 import Login from './Login';
 
 function LoginRegisterForm() {
-  const [isLogin, setIsLogin] = useState(true); // State to toggle between Login and Register components
+  const searchParams = useSearchParams();
+  
+  // Check if there's a referral code in URL - if yes, default to registration
+  const hasReferralCode = searchParams?.get('spid') || searchParams?.get('ref');
+  const [isLogin, setIsLogin] = useState(!hasReferralCode); // Default to register if referral code exists
 
   return (
     <div className="py-8 flex flex-col items-center w-full max-w-2xl mx-auto px-4 min-h-screen">
