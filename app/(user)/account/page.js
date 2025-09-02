@@ -851,7 +851,7 @@ const AccountDashboard = () => {
   }
 
   const copyReferralLink = () => {
-    const link = mlmData?.referralLink || (mlmData?.referralCode ? `${window.location.origin}/login-register?spid=${session?.user?.id}` : null)
+    const link = mlmData?.referralLink || (mlmData?.referralCode ? `${window.location.origin}/register?spid=${mlmData.referralCode}` : null)
     if (link) {
       navigator.clipboard.writeText(link)
       alert('Referral link copied to clipboard!')
@@ -1745,7 +1745,7 @@ const AccountDashboard = () => {
               <div className="flex items-center space-x-3">
                 <input
                   type="text"
-                  value={mlmData?.referralCode ? `${typeof window !== 'undefined' ? window.location.origin : ''}/login-register?ref=${mlmData.referralCode}` : 'Loading...'}
+                  value={mlmData?.referralCode ? `${typeof window !== 'undefined' ? window.location.origin : ''}/register?spid=${mlmData.referralCode}` : 'Loading...'}
                   readOnly
                   className="flex-1 bg-transparent text-sm text-gray-700 dark:text-gray-300 font-medium"
                 />
