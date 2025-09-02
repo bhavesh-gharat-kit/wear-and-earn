@@ -96,8 +96,8 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
     return (
       <div className="text-center py-12">
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">KYC Verified Successfully</h3>
-        <p className="text-gray-600">Your account has been verified and you can now access all features.</p>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">KYC Verified Successfully</h3>
+        <p className="text-gray-600 dark:text-gray-300">Your account has been verified and you can now access all features.</p>
       </div>
     )
   }
@@ -107,11 +107,11 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
     return (
       <div className="text-center py-12">
         <Clock className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">KYC Under Review</h3>
-        <p className="text-gray-600 mb-4">Your KYC documents are being reviewed by our team.</p>
-        <p className="text-sm text-gray-500">This process usually takes 24-48 hours.</p>
-        <div className="mt-6 bg-blue-50 border border-blue-200 p-4 rounded-lg">
-          <p className="text-sm text-blue-800">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">KYC Under Review</h3>
+        <p className="text-gray-600 dark:text-gray-300 mb-4">Your KYC documents are being reviewed by our team.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">This process usually takes 24-48 hours.</p>
+        <div className="mt-6 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
+          <p className="text-sm text-blue-800 dark:text-blue-300">
             <strong>Submitted on:</strong> {new Date(kycData.submittedAt).toLocaleDateString()}
           </p>
         </div>
@@ -123,9 +123,9 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
   return (
     <div>
       {kycData?.status === 'rejected' && (
-        <div className="bg-red-50 border border-red-200 p-4 rounded-lg mb-6">
-          <h4 className="font-medium text-red-900 mb-2">Resubmission Required</h4>
-          <p className="text-sm text-red-800">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-4 rounded-lg mb-6">
+          <h4 className="font-medium text-red-900 dark:text-red-300 mb-2">Resubmission Required</h4>
+          <p className="text-sm text-red-800 dark:text-red-400">
             Your previous KYC application was rejected. Please review the feedback and submit updated information.
           </p>
         </div>
@@ -133,7 +133,9 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
 
       {message && (
         <div className={`mb-6 p-4 rounded-lg ${
-          message.includes('success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+          message.includes('success') 
+            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' 
+            : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
         }`}>
           {message}
         </div>
@@ -142,39 +144,39 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Personal Information */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Personal Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
               <input 
                 type="text" 
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleInputChange}
                 required
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                 placeholder="Enter your full name" 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date of Birth</label>
               <input 
                 type="date" 
                 name="dateOfBirth"
                 value={formData.dateOfBirth}
                 onChange={handleInputChange}
                 required
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Gender</label>
               <select 
                 name="gender"
                 value={formData.gender}
                 onChange={handleInputChange}
                 required
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Select Gender</option>
                 <option value="male">Male</option>
@@ -183,13 +185,13 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Father&apos;s Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Father&apos;s Name</label>
               <input 
                 type="text" 
                 name="fatherName"
                 value={formData.fatherName}
                 onChange={handleInputChange}
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                 placeholder="Enter father's name" 
               />
             </div>
@@ -198,10 +200,10 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
 
         {/* Identity Documents */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Identity Documents</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Identity Documents</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Aadhar Number</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aadhar Number</label>
               <input 
                 type="text" 
                 name="aadharNumber"
@@ -210,12 +212,12 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
                 required
                 pattern="[0-9]{12}"
                 maxLength="12"
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                 placeholder="Enter 12-digit Aadhar number" 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">PAN Number</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">PAN Number</label>
               <input 
                 type="text" 
                 name="panNumber"
@@ -225,7 +227,7 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
                 pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
                 maxLength="10"
                 style={{ textTransform: 'uppercase' }}
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                 placeholder="Enter PAN number" 
               />
             </div>
@@ -234,22 +236,22 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
 
         {/* Bank Details */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Bank Account Details</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Bank Account Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Bank Account Number</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bank Account Number</label>
               <input 
                 type="text" 
                 name="bankAccountNumber"
                 value={formData.bankAccountNumber}
                 onChange={handleInputChange}
                 required
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                 placeholder="Enter account number" 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">IFSC Code</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">IFSC Code</label>
               <input 
                 type="text" 
                 name="ifscCode"
@@ -259,31 +261,31 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
                 pattern="[A-Z]{4}0[A-Z0-9]{6}"
                 maxLength="11"
                 style={{ textTransform: 'uppercase' }}
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                 placeholder="Enter IFSC code" 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bank Name</label>
               <input 
                 type="text" 
                 name="bankName"
                 value={formData.bankName}
                 onChange={handleInputChange}
                 required
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                 placeholder="Enter bank name" 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Branch Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Branch Name</label>
               <input 
                 type="text" 
                 name="branchName"
                 value={formData.branchName}
                 onChange={handleInputChange}
                 required
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                 placeholder="Enter branch name" 
               />
             </div>
@@ -1703,17 +1705,17 @@ const AccountDashboard = () => {
       {/* Referral Tools */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Referral Code */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <h3 className="text-xl font-semibold mb-4 flex items-center">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+          <h3 className="text-xl font-semibold mb-4 flex items-center text-gray-900 dark:text-white">
             <User className="w-5 h-5 mr-2 text-purple-600" />
             Your Referral Code
           </h3>
           <div className="space-y-4">
-            <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border-2 border-dashed border-purple-200">
+            <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg border-2 border-dashed border-purple-200 dark:border-purple-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Your unique code</p>
-                  <code className="text-3xl font-bold text-purple-600 font-mono">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Your unique code</p>
+                  <code className="text-3xl font-bold text-purple-600 dark:text-purple-400 font-mono">
                     {mlmData?.referralCode || 'LOADING...'}
                   </code>
                 </div>
@@ -1726,26 +1728,26 @@ const AccountDashboard = () => {
                 </button>
               </div>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Share this code with friends during their registration to earn rewards!
             </p>
           </div>
         </div>
 
         {/* Referral Link */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <h3 className="text-xl font-semibold mb-4 flex items-center">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+          <h3 className="text-xl font-semibold mb-4 flex items-center text-gray-900 dark:text-white">
             <Share2 className="w-5 h-5 mr-2 text-blue-600" />
             Direct Referral Link
           </h3>
           <div className="space-y-4">
-            <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-200">
+            <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
               <div className="flex items-center space-x-3">
                 <input
                   type="text"
                   value={mlmData?.referralCode ? `${typeof window !== 'undefined' ? window.location.origin : ''}/login-register?ref=${mlmData.referralCode}` : 'Loading...'}
                   readOnly
-                  className="flex-1 bg-transparent text-sm text-gray-700 font-medium"
+                  className="flex-1 bg-transparent text-sm text-gray-700 dark:text-gray-300 font-medium"
                 />
                 <button
                   onClick={copyReferralLink}
@@ -1756,7 +1758,7 @@ const AccountDashboard = () => {
                 </button>
               </div>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Send this link directly to friends for easy registration with your referral.
             </p>
           </div>
@@ -1765,10 +1767,10 @@ const AccountDashboard = () => {
 
       {/* MLM Status Check */}
       {!mlmData?.isActive ? (
-        <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100 text-center">
-          <UserPlus className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold mb-2">MLM Not Activated</h3>
-          <p className="text-gray-600 mb-6">
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 text-center">
+          <UserPlus className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">MLM Not Activated</h3>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
             Make your first purchase to activate your MLM account and start earning referral rewards.
           </p>
           <button className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
@@ -1778,8 +1780,8 @@ const AccountDashboard = () => {
       ) : (
         <>
           {/* Commission Structure */}
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-            <h3 className="text-xl font-semibold mb-6">Commission Structure</h3>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+            <h3 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">Commission Structure</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 {[
