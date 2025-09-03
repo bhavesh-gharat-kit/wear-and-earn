@@ -107,116 +107,163 @@ const Register = ({ setIsLogin }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] px-2">
-      <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center">
-        <Image src={"/images/brand-logo.png"} width={80} height={80} alt="WearEarn Logo" className="mb-4 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" />
-        <h1 className="text-3xl font-bold text-amber-600 dark:text-amber-400 mb-2 tracking-tight">Join WearEarn</h1>
-        <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">Create your account</p>
+    <div className="flex flex-col items-center justify-center min-h-[80vh] px-4">
+      <div className="w-full max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-12 flex flex-col items-center">
+        <Image src={"/images/brand-logo.png"} width={100} height={100} alt="WearEarn Logo" className="mb-6 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" />
+        <h1 className="text-4xl font-bold text-amber-600 dark:text-amber-400 mb-3 tracking-tight">Join WearEarn</h1>
+        <p className="text-gray-600 dark:text-gray-300 mb-8 text-center text-lg">Create your account</p>
         {/* <h2 className="text-2xl font-semibold text-center mb-6">Register</h2> */}
 
         {/* FORM DETAILS INCLUDES IN USER -> FULLNAME , CONTACT , EMAIL,ADDRESS , PASSWORD , CREATED-AT, SPONSER-ID AND ID */}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
-          {/* Full Name */}
-          <div className="mb-5">
-            <label
-              htmlFor="fullName"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="fullName"
-              {...register("fullName")}
-              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your full name"
-            />
-            {errors.fullName && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
-                {errors.fullName.message}
-              </p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div className="mb-5">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              {...register("email")}
-              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your email"
-            />
-            {errors.email && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-
-          {/* Referral Code */}
-          <div className="mb-5">
-            <label
-              htmlFor="referralCode"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Referral Code (Optional)
-            </label>
-            <input
-              type="text"
-              id="referralCode"
-              {...register("referralCode")}
-              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter referral code"
-            />
-            {sponsorInfo && (
-              <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded">
-                <p className="text-green-800 dark:text-green-300 text-sm">
-                  ✓ Valid referral code! You will be sponsored by: <strong>{sponsorInfo.fullName}</strong>
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-5xl">
+          {/* Grid Layout for Form Fields */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
+            {/* Full Name */}
+            <div className="mb-5">
+              <label
+                htmlFor="fullName"
+                className="block text-base font-medium text-gray-700 dark:text-gray-200 mb-2"
+              >
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="fullName"
+                {...register("fullName")}
+                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your full name"
+              />
+              {errors.fullName && (
+                <p className="text-red-500 dark:text-red-400 text-sm mt-2">
+                  {errors.fullName.message}
                 </p>
-              </div>
-            )}
-            {referralCode && referralCode.length > 3 && !sponsorInfo && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
-                Invalid referral code
-              </p>
-            )}
+              )}
+            </div>
+
+            {/* Email */}
+            <div className="mb-5">
+              <label
+                htmlFor="email"
+                className="block text-base font-medium text-gray-700 dark:text-gray-200 mb-2"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                {...register("email")}
+                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your email"
+              />
+              {errors.email && (
+                <p className="text-red-500 dark:text-red-400 text-sm mt-2">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            {/* Phone Number */}
+            <div className="mb-5">
+              <label
+                htmlFor="phone"
+                className="block text-base font-medium text-gray-700 dark:text-gray-200 mb-2"
+              >
+                Phone Number
+              </label>
+              <input
+                type="text"
+                id="phone"
+                {...register("phone")}
+                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your phone number"
+              />
+              {errors.phone && (
+                <p className="text-red-500 dark:text-red-400 text-sm mt-2">
+                  {errors.phone.message}
+                </p>
+              )}
+            </div>
+
+            {/* Referral Code */}
+            <div className="mb-5">
+              <label
+                htmlFor="referralCode"
+                className="block text-base font-medium text-gray-700 dark:text-gray-200 mb-2"
+              >
+                Referral Code (Optional)
+              </label>
+              <input
+                type="text"
+                id="referralCode"
+                {...register("referralCode")}
+                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter referral code"
+              />
+              {sponsorInfo && (
+                <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
+                  <p className="text-green-800 dark:text-green-300 text-sm">
+                    ✓ Valid referral code! You will be sponsored by: <strong>{sponsorInfo.fullName}</strong>
+                  </p>
+                </div>
+              )}
+              {referralCode && referralCode.length > 3 && !sponsorInfo && (
+                <p className="text-red-500 dark:text-red-400 text-sm mt-2">
+                  Invalid referral code
+                </p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="mb-5">
+              <label
+                htmlFor="password"
+                className="block text-base font-medium text-gray-700 dark:text-gray-200 mb-2"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                {...register("password")}
+                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your password"
+              />
+              {errors.password && (
+                <p className="text-red-500 dark:text-red-400 text-sm mt-2">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div className="mb-5">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-base font-medium text-gray-700 dark:text-gray-200 mb-2"
+              >
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                {...register("confirmPassword")}
+                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Confirm your password"
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-500 dark:text-red-400 text-sm mt-2">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Phone Number */}
-          <div className="mb-4">
-            <label
-              htmlFor="phone"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Phone Number
-            </label>
-            <input
-              type="text"
-              id="phone"
-              {...register("phone")}
-              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your phone number"
-            />
-            {errors.phone && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
-                {errors.phone.message}
-              </p>
-            )}
-          </div>
-
-          {/* Address */}
-          <div className="mb-4">
+          {/* Address - Full Width */}
+          <div className="mb-8">
             <label
               htmlFor="address"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
+              className="block text-base font-medium text-gray-700 dark:text-gray-200 mb-2"
             >
               Address
             </label>
@@ -224,67 +271,23 @@ const Register = ({ setIsLogin }) => {
               type="text"
               id="address"
               {...register("address")}
-              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter your address"
             />
             {errors.address && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
+              <p className="text-red-500 dark:text-red-400 text-sm mt-2">
                 {errors.address.message}
               </p>
             )}
           </div>
 
-          {/* Password */}
-          <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              {...register("password")}
-              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
-            />
-            {errors.password && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          {/* Confirm Password */}
-          <div className="mb-4">
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              {...register("confirmPassword")}
-              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Confirm your password"
-            />
-            {errors.confirmPassword && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
-                {errors.confirmPassword.message}
-              </p>
-            )}
-          </div>
-
           {/* Submit Button */}
-          <div className="mb-4 text-left">
+          <div className="text-center">
             <button
               type="submit"
-              className="w-fit cursor-pointer p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="px-12 py-4 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 shadow-lg"
             >
-              Register
+              Create Account
             </button>
           </div>
         </form>

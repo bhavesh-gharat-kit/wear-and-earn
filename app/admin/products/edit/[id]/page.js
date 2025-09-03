@@ -1,9 +1,9 @@
 import AdminEditProduct from '@/components/admin/products-page/edit-product/AdminEditProduct'
 import React from 'react'
 
-function page() {
+function page({ params }) {
     return (
-        <AdminEditProduct />
+        <AdminEditProduct params={params} />
     )
 }
 

@@ -3,6 +3,44 @@ import prisma from "@/lib/prisma";
 import { writeFile, unlink, mkdir } from 'fs/promises';
 import path from "path";
 
+// GET method for admin to fetch any product for editing
+export const GET = async (request, { params }) => {
+    const { id } = await params;
+
+    try {
+        const product = await prisma.product.findFirst({
+            where: {
+                id: Number(id)
+                // No status filtering - admin can edit any product
+            },
+            include: {
+                category: true,
+                images: true,
+            },
+        });
+
+        if (!product) {
+            return res.json({ 
+                success: false, 
+                message: "Product not found", 
+                product: null 
+            }, { status: 404 });
+        }
+
+        return res.json({ 
+            success: true, 
+            message: "Product fetched successfully", 
+            product: product 
+        }, { status: 200 });
+
+    } catch (error) {
+        console.error('Error fetching product for admin:', error);
+        return res.json(
+            { success: false, error: 'Failed to fetch product' },
+            { status: 500 }
+        );
+    }
+};
 
 export const PATCH = async (request, { params }) => {
 

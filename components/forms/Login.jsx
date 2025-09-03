@@ -47,24 +47,24 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] px-2">
-      <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center">
-        <Image src={"/images/brand-logo.png"} width={80} height={80} alt="WearEarn Logo" className="mb-4 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" />
-        <h1 className="text-3xl font-bold text-amber-600 dark:text-amber-400 mb-2 tracking-tight">Welcome to WearEarn</h1>
-        <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">Sign in to your account</p>
+    <div className="flex flex-col items-center justify-center min-h-[80vh] px-4">
+      <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-12 flex flex-col items-center">
+        <Image src={"/images/brand-logo.png"} width={100} height={100} alt="WearEarn Logo" className="mb-6 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" />
+        <h1 className="text-4xl font-bold text-amber-600 dark:text-amber-400 mb-3 tracking-tight">Welcome to WearEarn</h1>
+        <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 text-center">Sign in to your account</p>
 
         {error && (
-          <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-4 py-2 rounded-md mb-4 text-sm text-center font-medium">
+          <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-6 py-4 rounded-xl mb-6 text-base text-center font-medium border border-red-200 dark:border-red-800">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-2xl">
           {/* Mobile Number */}
-          <div className="mb-5">
+          <div className="mb-6">
             <label
               htmlFor="mobileNo"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
+              className="block text-base font-medium text-gray-700 dark:text-gray-200 mb-2"
             >
               Mobile Number
             </label>
@@ -72,21 +72,21 @@ const Login = () => {
               type="text"
               id="mobileNo"
               {...register("mobileNo")}
-              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter your mobile number"
             />
             {errors.mobileNo && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
+              <p className="text-red-500 dark:text-red-400 text-sm mt-2">
                 {errors.mobileNo.message}
               </p>
             )}
           </div>
 
           {/* Password */}
-          <div className="mb-5">
+          <div className="mb-8">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
+              className="block text-base font-medium text-gray-700 dark:text-gray-200 mb-2"
             >
               Password
             </label>
@@ -94,23 +94,23 @@ const Login = () => {
               type="password"
               id="password"
               {...register("password")}
-              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter your password"
             />
             {errors.password && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1">
+              <p className="text-red-500 dark:text-red-400 text-sm mt-2">
                 {errors.password.message}
               </p>
             )}
           </div>
 
           {/* Submit Button */}
-          <div className="mt-6">
+          <div className="text-center">
             <button
               type="submit"
-              className="w-full py-3 px-4 bg-blue-600 dark:bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="px-12 py-4 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 shadow-lg font-semibold"
             >
-              Login
+              Sign In
             </button>
           </div>
         </form>

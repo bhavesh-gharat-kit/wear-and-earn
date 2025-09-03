@@ -10,10 +10,11 @@ import { useParams, useRouter } from "next/navigation";
 import LoaderEffect from "@/components/ui/LoaderEffect";
 import Image from "next/image";
 
-const AdminEditProduct = () => {
+const AdminEditProduct = ({ params }) => {
   const router = useRouter();
-  const params = useParams();
-  const id = params.id;
+  
+  // Get the id from params (for server components) or useParams (for client components)
+  const id = params?.id || useParams()?.id;
 
   const formInitilizer = {
     title: "",
@@ -36,6 +37,8 @@ const AdminEditProduct = () => {
 
   const [categories, setCategories] = useState([]);
   const [productDetails, setProductDetails] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchAllCategoryDetails = async () => {
     try {
@@ -49,18 +52,29 @@ const AdminEditProduct = () => {
 
   const fetchProductDetails = async () => {
     try {
-      const response = await axios.get(`/api/product-details/${id}`);
+      setLoading(true);
+      setError(null);
+      const response = await axios.get(`/api/admin/products/${id}`);
       const productDet = response.data.product;
       setProductDetails(productDet);
     } catch (error) {
       console.log("Internal Server Error", error);
+      setError("Failed to fetch product details. Please try again.");
+      toast.error("Failed to fetch product details");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAllCategoryDetails();
-    fetchProductDetails();
-  }, []);
+    if (id) {
+      fetchAllCategoryDetails();
+      fetchProductDetails();
+    } else {
+      setError("No product ID provided");
+      setLoading(false);
+    }
+  }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -194,6 +208,40 @@ const AdminEditProduct = () => {
     );
   }, [productDetails]);
 
+  if (loading) {
+    return <LoaderEffect />;
+  }
+
+  if (error) {
+    return (
+      <section className="p-4 sm:p-8 bg-gray-50 min-h-screen">
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold text-red-600 mb-4">Error Loading Product</h2>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <div className="space-x-4">
+              <button
+                onClick={() => {
+                  setError(null);
+                  fetchProductDetails();
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              >
+                Try Again
+              </button>
+              <Link
+                href="/admin/products"
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
+              >
+                Back to Products
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   if (!productDetails) {
     return <LoaderEffect />;
   }
@@ -265,7 +313,7 @@ const AdminEditProduct = () => {
                   Select Category
                 </option>
                 {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
+                  <option key={cat.id} value={cat.name}>
                     {cat.name}
                   </option>
                 ))}
