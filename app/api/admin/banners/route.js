@@ -38,7 +38,7 @@ export async function POST(req) {
         console.log("Cloudinary upload result:", cloudinaryResult);
 
         // Store Cloudinary URL in DB
-        const banner = await prisma.banners.create({
+        const banner = await prisma.Banners.create({
             data: {
                 title,
                 imageUrl: cloudinaryResult.url,

@@ -15,7 +15,7 @@ export async function GET(req, { params }) {
             );
         }
 
-        const banner = await prisma.banners.findUnique({
+        const banner = await prisma.Banners.findUnique({
             where: { id: Number(bannerId) },
         });
 
@@ -53,7 +53,7 @@ export async function PUT(req, { params }) {
             return res.json({ success: false, message: "Title is required" }, { status: 400 });
         }
 
-        const existingBanner = await prisma.banners.findUnique({
+        const existingBanner = await prisma.Banners.findUnique({
             where: { id: bannerId },
         });
 
@@ -92,7 +92,7 @@ export async function PUT(req, { params }) {
             }
         }
 
-        const updatedBanner = await prisma.banners.update({
+        const updatedBanner = await prisma.Banners.update({
             where: { id: bannerId },
             data: {
                 title,
@@ -115,7 +115,7 @@ export async function DELETE(req, { params }) {
         const id = parseInt(await params.id);
 
         // Check if banner exists
-        const banner = await prisma.banners.findUnique({
+        const banner = await prisma.Banners.findUnique({
             where: { id },
         });
 
@@ -135,7 +135,7 @@ export async function DELETE(req, { params }) {
         }
 
         // Delete from DB
-        await prisma.banners.delete({
+        await prisma.Banners.delete({
             where: { id },
         });
 

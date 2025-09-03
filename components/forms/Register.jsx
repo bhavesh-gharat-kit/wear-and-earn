@@ -108,7 +108,7 @@ const Register = ({ setIsLogin }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] px-2">
-      <div className="w-full max-w-2xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center">
+      <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center">
         <Image src={"/images/brand-logo.png"} width={80} height={80} alt="WearEarn Logo" className="mb-4 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" />
         <h1 className="text-3xl font-bold text-amber-600 dark:text-amber-400 mb-2 tracking-tight">Join WearEarn</h1>
         <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">Create your account</p>
@@ -129,7 +129,7 @@ const Register = ({ setIsLogin }) => {
               type="text"
               id="fullName"
               {...register("fullName")}
-              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your full name"
             />
             {errors.fullName && (
@@ -151,7 +151,7 @@ const Register = ({ setIsLogin }) => {
               type="email"
               id="email"
               {...register("email")}
-              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your email"
             />
             {errors.email && (
@@ -173,7 +173,7 @@ const Register = ({ setIsLogin }) => {
               type="text"
               id="referralCode"
               {...register("referralCode")}
-              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter referral code"
             />
             {sponsorInfo && (
@@ -202,7 +202,7 @@ const Register = ({ setIsLogin }) => {
               type="text"
               id="phone"
               {...register("phone")}
-              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your phone number"
             />
             {errors.phone && (
@@ -224,7 +224,7 @@ const Register = ({ setIsLogin }) => {
               type="text"
               id="address"
               {...register("address")}
-              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your address"
             />
             {errors.address && (
@@ -246,7 +246,7 @@ const Register = ({ setIsLogin }) => {
               type="password"
               id="password"
               {...register("password")}
-              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your password"
             />
             {errors.password && (
@@ -268,7 +268,7 @@ const Register = ({ setIsLogin }) => {
               type="password"
               id="confirmPassword"
               {...register("confirmPassword")}
-              className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Confirm your password"
             />
             {errors.confirmPassword && (
