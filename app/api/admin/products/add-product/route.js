@@ -1,7 +1,6 @@
-import { writeFile, unlink } from 'fs/promises';
-import path from 'path';
 import { NextResponse } from 'next/server';
 import prisma from "@/lib/prisma";
+import { uploadImageToCloudinary } from "@/lib/cloudinary-utils";
 
 
 export async function POST(req) {
@@ -30,11 +29,16 @@ export async function POST(req) {
 
         if (thumbnail && typeof thumbnail === 'object' && thumbnail.name && thumbnail.size > 0) {
             try {
+                console.log("Uploading thumbnail to Cloudinary...");
                 const buffer = Buffer.from(await thumbnail.arrayBuffer());
-                const fileName = `${Date.now()}-${thumbnail.name}`;
-                const filePath = path.join(process.cwd(), 'public/uploads/product-images', fileName);
-                await writeFile(filePath, buffer);
-                thumbnailUrl = `/uploads/product-images/${fileName}`;
+                
+                const cloudinaryResult = await uploadImageToCloudinary(buffer, {
+                    folder: 'products/thumbnails',
+                    public_id: `thumbnail-${Date.now()}`
+                });
+                
+                thumbnailUrl = cloudinaryResult.url;
+                console.log("Thumbnail uploaded successfully:", thumbnailUrl);
             } catch (fileError) {
                 console.error("Error processing thumbnail:", fileError);
                 // Continue without thumbnail if file processing fails
@@ -45,14 +49,19 @@ export async function POST(req) {
         const productImageFiles = formData.getAll('productImages');
         const productImageUrls = [];
 
-        for (const image of productImageFiles) {
+        for (const [index, image] of productImageFiles.entries()) {
             if (!image || typeof image !== 'object' || !image.name || image.size === 0) continue;
             try {
+                console.log(`Uploading product image ${index + 1} to Cloudinary...`);
                 const buffer = Buffer.from(await image.arrayBuffer());
-                const fileName = `${Date.now()}-${image.name}`;
-                const filePath = path.join(process.cwd(), 'public/uploads/product-images', fileName);
-                await writeFile(filePath, buffer);
-                productImageUrls.push(`/uploads/product-images/${fileName}`);
+                
+                const cloudinaryResult = await uploadImageToCloudinary(buffer, {
+                    folder: 'products/images',
+                    public_id: `product-${Date.now()}-${index}`
+                });
+                
+                productImageUrls.push(cloudinaryResult.url);
+                console.log(`Product image ${index + 1} uploaded successfully`);
             } catch (fileError) {
                 console.error("Error processing product image:", fileError);
                 // Continue without this image if file processing fails

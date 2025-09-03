@@ -1,7 +1,6 @@
 import { NextResponse as res } from "next/server";
 import prisma from "@/lib/prisma";
-import fs from "fs";
-import path from "path";
+import { uploadImageToCloudinary } from "@/lib/cloudinary-utils";
 
 export async function POST(req) {
     try {
@@ -19,7 +18,7 @@ export async function POST(req) {
             }, { status: 400 });
         }
 
-        // Validate file object (Node.js compatible)
+        // Validate file object
         if (!file || typeof file !== 'object' || !file.name || file.size === 0) {
             return res.json({
                 success: false,
@@ -27,26 +26,22 @@ export async function POST(req) {
             }, { status: 400 });
         }
 
-        // Create folder if it doesn't exist
-        const uploadDir = path.join(process.cwd(), "public", "uploads", "banners");
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-
-        // Generate unique filename
-        const fileExt = file.name.split(".").pop();
-        const fileName = `${Date.now()}-${Math.floor(Math.random() * 10000)}.${fileExt}`;
-        const filePath = path.join(uploadDir, fileName);
-
-        // Save file locally
+        // Upload to Cloudinary
+        console.log("Uploading banner to Cloudinary...");
         const buffer = Buffer.from(await file.arrayBuffer());
-        fs.writeFileSync(filePath, buffer);
+        
+        const cloudinaryResult = await uploadImageToCloudinary(buffer, {
+            folder: 'banners',
+            public_id: `banner-${Date.now()}`
+        });
 
-        // Store relative path in DB (removed link field)
+        console.log("Cloudinary upload result:", cloudinaryResult);
+
+        // Store Cloudinary URL in DB
         const banner = await prisma.banners.create({
             data: {
                 title,
-                imageUrl: `/uploads/banners/${fileName}`,
+                imageUrl: cloudinaryResult.url,
             },
         });
 
