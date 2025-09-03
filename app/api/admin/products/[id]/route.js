@@ -177,7 +177,34 @@ export async function PUT(request, { params }) {
 
         const finalIncomingUrls = Array.from(new Set(incomingImageUrls.filter(Boolean)));
 
-        const updateData = { /* map fields accordingly */ };
+        // Handle thumbnail upload
+        let thumbnailImageUrl = existingProduct.mainImage; // Keep existing if no new one
+        const thumbnailFile = formData.get("thumbnailImage");
+        if (thumbnailFile && thumbnailFile instanceof File && thumbnailFile.name) {
+            thumbnailImageUrl = await saveFileToUploads(thumbnailFile);
+        }
+
+        // Map form data to update object
+        const updateData = {
+            title: data.title || existingProduct.title,
+            description: data.description || existingProduct.description,
+            longDescription: data.overview || existingProduct.longDescription,
+            price: parseFloat(data.maxPrice) || existingProduct.price,
+            sellingPrice: parseFloat(data.price) || existingProduct.sellingPrice,
+            discount: parseFloat(data.discount) || existingProduct.discount,
+            keyFeature: data.keyFeatures || existingProduct.keyFeature,
+            mainImage: thumbnailImageUrl,
+        };
+
+        // Handle category update
+        if (data.category) {
+            const category = await prisma.category.findFirst({
+                where: { name: data.category }
+            });
+            if (category) {
+                updateData.categoryId = category.id;
+            }
+        }
 
         if (rawImages !== null) {
             const existingUrls = existingProduct.images.map(img => img.imageUrl);

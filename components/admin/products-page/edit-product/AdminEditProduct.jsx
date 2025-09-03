@@ -241,7 +241,7 @@ const AdminEditProduct = ({ params }) => {
       </section>
     );
   }
-
+  
   if (!productDetails) {
     return <LoaderEffect />;
   }
