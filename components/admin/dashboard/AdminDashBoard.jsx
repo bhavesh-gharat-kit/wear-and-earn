@@ -266,36 +266,6 @@ function AdminDashBoard() {
             </div>
           </div>
 
-          {/* Delivery Charges Settings */}
-          <h2 className="text-xl font-semibold text-blue-800 my-4">
-            Delivery Charges Settings
-          </h2>
-          <div className="bg-white p-6 rounded-lg shadow max-w-md space-y-4 text-sm">
-            <div className="flex justify-between items-center">
-              <div>
-                <p>
-                  <strong>Free Delivery Above:</strong> ₹699
-                </p>
-                <p>
-                  <strong>Delivery Charge:</strong> ₹100
-                </p>
-              </div>
-              <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                Edit
-              </button>
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="mt-12">
-            <h2 className="text-2xl font-semibold mb-4">Recent Activity</h2>
-            <div className="bg-white text-gray-700 rounded-xl p-6 shadow border border-gray-100">
-              <p className="text-sm italic">
-                No recent activity available yet. Data will appear here once
-                interactions begin.
-              </p>
-            </div>
-          </div>
         </section>
       </section>
       <div className="w-full max-w-screen-xl mx-auto px-4 py-6">
