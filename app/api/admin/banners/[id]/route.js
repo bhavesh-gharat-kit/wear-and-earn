@@ -66,6 +66,11 @@ export async function PUT(req, { params }) {
         if (imageFile && typeof imageFile === "object" && imageFile.name && imageFile.size > 0) {
             console.log("Uploading new banner image to Cloudinary...");
             
+            // Check if Cloudinary is properly configured
+            if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+                throw new Error('Cloudinary environment variables not configured');
+            }
+            
             const buffer = Buffer.from(await imageFile.arrayBuffer());
             
             // Upload new image to Cloudinary
@@ -104,8 +109,12 @@ export async function PUT(req, { params }) {
 
         return res.json({ success: true, data: updatedBanner }, { status: 200 });
     } catch (error) {
-        console.error(error);
-        return res.json({ success: false, message: error.message }, { status: 500 });
+        console.error('Banner update error:', error);
+        return res.json({ 
+            success: false, 
+            message: error.message,
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        }, { status: 500 });
     }
 }
 

@@ -114,15 +114,26 @@ export const DELETE = async (request, { params }) => {
 
 async function uploadFileToCloudinary(file) {
     try {
+        console.log('Starting Cloudinary upload...');
+        
+        // Check if Cloudinary is properly configured
+        if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+            throw new Error('Cloudinary environment variables not configured');
+        }
+        
         const buffer = Buffer.from(await file.arrayBuffer());
+        console.log('File buffer created, size:', buffer.length);
+        
         const result = await uploadImageToCloudinary(buffer, {
             folder: 'wear-and-earn/products',
             public_id: `product-${Date.now()}-${Math.random().toString(36).substring(7)}`
         });
+        
+        console.log('Cloudinary upload successful:', result.url);
         return result.url;
     } catch (error) {
         console.error('Error uploading to Cloudinary:', error);
-        throw new Error('Failed to upload image to Cloudinary');
+        throw new Error(`Failed to upload image to Cloudinary: ${error.message}`);
     }
 }
 
@@ -239,7 +250,12 @@ export async function PUT(request, { params }) {
 
         return Response.json({ success: true, product: updatedProduct }, { status: 200 });
     } catch (error) {
-        return Response.json({ success: false, error: error.message }, { status: 500 });
+        console.error('Product update error:', error);
+        return Response.json({ 
+            success: false, 
+            error: error.message,
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        }, { status: 500 });
     }
 }
 
