@@ -11,16 +11,13 @@ import {
   Download,
   RefreshCw,
   UserCheck,
-  Wallet,
-  AlertTriangle,
-  Settings
+  Wallet
 } from 'lucide-react'
 
 export default function AdminMLMPanel() {
   const { data: session, status } = useSession()
   const [mlmOverview, setMlmOverview] = useState(null)
   const [commissions, setCommissions] = useState(null)
-  const [diagnostics, setDiagnostics] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
   const [filters, setFilters] = useState({
@@ -48,15 +45,6 @@ export default function AdminMLMPanel() {
             const commissionsData = await commissionsRes.json()
             setCommissions(commissionsData)
           }
-
-          // Fetch diagnostics data if on diagnostics tab
-          if (activeTab === 'diagnostics') {
-            const diagnosticsRes = await fetch('/api/admin/mlm-diagnostics')
-            if (diagnosticsRes.ok) {
-              const diagnosticsData = await diagnosticsRes.json()
-              setDiagnostics(diagnosticsData)
-            }
-          }
         } catch (error) {
           console.error('Error fetching MLM data:', error)
         } finally {
@@ -66,7 +54,7 @@ export default function AdminMLMPanel() {
     }
     
     fetchData()
-  }, [session?.user?.role, filters.page, filters.limit, filters.userFilter, activeTab])
+  }, [session?.user?.role, filters.page, filters.limit, filters.userFilter])
 
   const fetchMLMData = async () => {
     try {
@@ -156,9 +144,9 @@ export default function AdminMLMPanel() {
         </div>
       </div>
 
-      {/* Level Distribution */}
+      {/* Level Distribution - Limited to 5 levels */}
       <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Level Distribution</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Level Distribution (5 Levels)</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {mlmOverview?.levelDistribution?.map((level) => (
             <div key={level.level} className="text-center p-4 bg-gray-50 rounded-lg">
@@ -166,43 +154,6 @@ export default function AdminMLMPanel() {
               <p className="text-xl font-bold text-gray-900">{level.count}</p>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Top Performers */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Performers</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full table-auto">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">User</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Referral Code</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Total Earnings</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Direct Referrals</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {mlmOverview?.topPerformers?.map((performer) => (
-                <tr key={performer.id}>
-                  <td className="px-4 py-3 text-sm text-gray-900">{performer.fullName}</td>
-                  <td className="px-4 py-3 text-sm font-mono text-gray-600">{performer.referralCode}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">₹{performer.totalEarnings?.rupees || 0}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{performer.directReferrals}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      performer.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {performer.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
@@ -249,7 +200,7 @@ export default function AdminMLMPanel() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {mlmOverview?.users?.data?.map((user) => (
+              {mlmOverview?.users?.map((user) => (
                 <tr key={user.id}>
                   <td className="px-4 py-3">
                     <div>
@@ -259,34 +210,21 @@ export default function AdminMLMPanel() {
                   </td>
                   <td className="px-4 py-3">
                     <div>
-                      <p className="text-sm text-gray-900">{user.mobileNo}</p>
-                      <p className="text-xs text-gray-500">{user.email}</p>
+                      <p className="text-sm text-gray-900">{user.email}</p>
+                      <p className="text-xs text-gray-500">{user.phone}</p>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm font-mono text-gray-600">
-                    {user.referralCode || '-'}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    ₹{user.walletBalance?.rupees || 0}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    ₹{user.monthlyPurchase?.rupees || 0}
-                  </td>
+                  <td className="px-4 py-3 text-sm font-mono text-gray-600">{user.referralCode}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">₹{user.walletBalance?.rupees || 0}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">₹{user.monthlyPurchase?.rupees || 0}</td>
                   <td className="px-4 py-3">
-                    <div className="flex space-x-1">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        user.isActive 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {user.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                      {user.isKycApproved && (
-                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                          KYC
-                        </span>
-                      )}
-                    </div>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      user.isActive 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {user.isActive ? 'Active' : 'Inactive'}
+                    </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {new Date(user.createdAt).toLocaleDateString()}
@@ -298,242 +236,98 @@ export default function AdminMLMPanel() {
         </div>
 
         {/* Pagination */}
-        {mlmOverview?.users?.pagination && (
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-700">
-              Showing {((filters.page - 1) * filters.limit) + 1} to {Math.min(filters.page * filters.limit, mlmOverview.users.pagination.total)} of {mlmOverview.users.pagination.total} users
-            </div>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setFilters({...filters, page: Math.max(1, filters.page - 1)})}
-                disabled={filters.page === 1}
-                className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setFilters({...filters, page: filters.page + 1})}
-                disabled={filters.page >= mlmOverview.users.pagination.totalPages}
-                className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                Next
-              </button>
-            </div>
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-sm text-gray-700">
+            Showing {((filters.page - 1) * filters.limit) + 1} to {Math.min(filters.page * filters.limit, mlmOverview?.totalUsers || 0)} of {mlmOverview?.totalUsers || 0} results
           </div>
-        )}
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setFilters({...filters, page: filters.page - 1})}
+              disabled={filters.page === 1}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span className="px-3 py-2 text-sm text-gray-700">
+              Page {filters.page} of {Math.ceil(mlmOverview?.totalUsers / filters.limit) || 1}
+            </span>
+            <button
+              onClick={() => setFilters({...filters, page: filters.page + 1})}
+              disabled={filters.page >= Math.ceil(mlmOverview?.totalUsers / filters.limit)}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
 
   const renderCommissionsTab = () => (
     <div className="space-y-6">
-      {/* Commission Summary Cards */}
+      {/* Commission Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <DollarSign className="h-8 w-8 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Commissions</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                ₹{commissions?.summary?.totalCommissions?.toLocaleString() || 0}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <TrendingUp className="h-8 w-8 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">This Month</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                ₹{commissions?.summary?.thisMonth?.toLocaleString() || 0}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Users className="h-8 w-8 text-purple-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Transactions</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {commissions?.transactions?.length || 0}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Commission Transactions Table */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Recent Commission Transactions</h3>
-          <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </button>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <table className="min-w-full table-auto">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">User</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Type</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Amount</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Level</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Description</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Date</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {commissions?.transactions?.map((transaction) => (
-                <tr key={transaction.id}>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {transaction.user?.fullName || 'N/A'}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      transaction.type === 'COMMISSION' 
-                        ? 'bg-green-100 text-green-800' 
-                        : transaction.type === 'ACTIVATION'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {transaction.type}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                    ₹{transaction.amount?.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {transaction.metadata?.level || '-'}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">
-                    {transaction.description}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {new Date(transaction.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                      Completed
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Commission Analytics */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h4 className="text-md font-semibold text-gray-900 mb-3">Commission by Level</h4>
-            <div className="space-y-2">
-              {commissions?.levelStats?.map((level) => (
-                <div key={level.level} className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Level {level.level}</span>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium">₹{level.totalAmount?.toLocaleString() || 0}</span>
-                    <span className="text-xs text-gray-500">({level.count} transactions)</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h4 className="text-md font-semibold text-gray-900 mb-3">Commission Types</h4>
-            <div className="space-y-2">
-              {commissions?.typeStats?.map((type) => (
-                <div key={type.type} className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">{type.type}</span>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium">₹{type.totalAmount?.toLocaleString() || 0}</span>
-                    <span className="text-xs text-gray-500">({type.count} transactions)</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-
-  const renderDiagnosticsTab = () => (
-    <div className="space-y-6">
-      {/* Diagnostics Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center">
-            <AlertTriangle className="h-8 w-8 text-red-600 mr-4" />
-            <div>
-              <p className="text-sm text-gray-600">Users with Paid Orders</p>
-              <p className="text-2xl font-bold text-gray-900">{diagnostics?.usersWithPaidOrders || 0}</p>
-              <p className="text-xs text-red-600">{diagnostics?.inactiveWithPaidOrders || 0} not activated</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center">
-            <Users className="h-8 w-8 text-yellow-600 mr-4" />
-            <div>
-              <p className="text-sm text-gray-600">Missing Referral Code</p>
-              <p className="text-2xl font-bold text-gray-900">{diagnostics?.missingReferralCode || 0}</p>
-              <p className="text-xs text-yellow-600">Need manual fix</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center">
-            <Settings className="h-8 w-8 text-blue-600 mr-4" />
-            <div>
-              <p className="text-sm text-gray-600">Matrix Issues</p>
-              <p className="text-2xl font-bold text-gray-900">{diagnostics?.matrixIssues || 0}</p>
-              <p className="text-xs text-blue-600">Placement problems</p>
-            </div>
-          </div>
-        </div>
-
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center">
             <DollarSign className="h-8 w-8 text-green-600 mr-4" />
             <div>
-              <p className="text-sm text-gray-600">Commission Issues</p>
-              <p className="text-2xl font-bold text-gray-900">{diagnostics?.commissionIssues || 0}</p>
-              <p className="text-xs text-green-600">Unpaid commissions</p>
+              <p className="text-sm text-gray-600">Total Distributed</p>
+              <p className="text-2xl font-bold text-gray-900">₹{commissions?.summary?.totalAmount?.rupees || 0}</p>
+              <p className="text-xs text-green-600">{commissions?.pagination?.total || 0} transactions</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center">
+            <TrendingUp className="h-8 w-8 text-blue-600 mr-4" />
+            <div>
+              <p className="text-sm text-gray-600">This Month</p>
+              <p className="text-2xl font-bold text-gray-900">₹{commissions?.summary?.monthlyAmount?.rupees || 0}</p>
+              <p className="text-xs text-blue-600">{commissions?.summary?.monthlyTransactions || 0} transactions</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center">
+            <Award className="h-8 w-8 text-purple-600 mr-4" />
+            <div>
+              <p className="text-sm text-gray-600">Avg. Per Transaction</p>
+              <p className="text-2xl font-bold text-gray-900">₹{commissions?.summary?.avgAmount?.rupees || 0}</p>
+              <p className="text-xs text-purple-600">Commission rate</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Problem Users Table */}
+      {/* Commission Breakdown */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Commission Breakdown by Type</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {commissions?.summary?.byType?.map((type) => (
+            <div key={type.type} className="p-4 border border-gray-200 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-sm font-medium text-gray-900 capitalize">
+                  {type.type.replace('_', ' ')}
+                </h4>
+              </div>
+              <div className="space-y-1">
+                <span className="text-sm font-medium">₹{type.amount?.rupees?.toLocaleString() || 0}</span>
+                <span className="text-xs text-gray-500">({type.count} transactions)</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Commission Transactions */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Users Needing Attention</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Recent Commission Transactions</h3>
           <button
-            onClick={async () => {
-              setLoading(true)
-              const diagnosticsRes = await fetch('/api/admin/mlm-diagnostics')
-              if (diagnosticsRes.ok) {
-                const diagnosticsData = await diagnosticsRes.json()
-                setDiagnostics(diagnosticsData)
-              }
-              setLoading(false)
-            }}
+            onClick={fetchMLMData}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
           >
             <RefreshCw className="h-4 w-4" />
@@ -546,84 +340,30 @@ export default function AdminMLMPanel() {
             <thead>
               <tr className="bg-gray-50">
                 <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">User</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Issue</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Paid Orders</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Referral Code</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Actions</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Type</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Amount</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Reference</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Date</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {diagnostics?.problemUsers?.map((user) => (
-                <tr key={user.id}>
+              {commissions?.transactions?.map((transaction) => (
+                <tr key={transaction.id}>
                   <td className="px-4 py-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
-                      <p className="text-xs text-gray-500">ID: {user.id}</p>
-                      <p className="text-xs text-gray-500">{user.email}</p>
+                      <p className="text-sm font-medium text-gray-900">{transaction.user?.fullName}</p>
+                      <p className="text-xs text-gray-500">{transaction.user?.email}</p>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="space-y-1">
-                      {!user.isActive && user.paidOrdersCount > 0 && (
-                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                          Not Activated
-                        </span>
-                      )}
-                      {!user.referralCode && (
-                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                          No Referral Code
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {user.paidOrdersCount}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      user.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {user.isActive ? 'Active' : 'Inactive'}
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      {transaction.type?.replace('_', ' ')}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm font-mono text-gray-600">
-                    {user.referralCode || '-'}
-                  </td>
-                  <td className="px-4 py-3">
-                    {!user.isActive && user.paidOrdersCount > 0 && (
-                      <button
-                        onClick={async () => {
-                          try {
-                            const response = await fetch('/api/admin/fix-user-activation', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ userId: user.id })
-                            })
-                            const data = await response.json()
-                            if (data.success) {
-                              alert(`User ${user.fullName} activated successfully!`)
-                              // Refresh diagnostics
-                              const diagnosticsRes = await fetch('/api/admin/mlm-diagnostics')
-                              if (diagnosticsRes.ok) {
-                                const diagnosticsData = await diagnosticsRes.json()
-                                setDiagnostics(diagnosticsData)
-                              }
-                            } else {
-                              alert(`Failed to activate user: ${data.message}`)
-                            }
-                          } catch (error) {
-                            alert('Error activating user. Please try again.')
-                            console.error('Activation error:', error)
-                          }
-                        }}
-                        className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors"
-                      >
-                        Activate MLM
-                      </button>
-                    )}
+                  <td className="px-4 py-3 text-sm text-gray-900">₹{transaction.amount?.rupees || 0}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{transaction.reference || 'N/A'}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500">
+                    {new Date(transaction.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
               ))}
@@ -631,9 +371,9 @@ export default function AdminMLMPanel() {
           </table>
         </div>
 
-        {(!diagnostics?.problemUsers || diagnostics.problemUsers.length === 0) && (
+        {(!commissions?.transactions || commissions.transactions.length === 0) && (
           <div className="text-center py-8">
-            <p className="text-gray-500">No issues found! All users with paid orders are properly activated.</p>
+            <p className="text-gray-500">No commission transactions found.</p>
           </div>
         )}
       </div>
@@ -654,7 +394,7 @@ export default function AdminMLMPanel() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">MLM Management Panel</h1>
-          <p className="text-gray-600 mt-2">Monitor and manage your MLM system</p>
+          <p className="text-gray-600 mt-2">Monitor and manage your MLM system (Simplified Version)</p>
         </div>
 
         {/* Tabs */}
@@ -664,7 +404,6 @@ export default function AdminMLMPanel() {
               { id: 'overview', name: 'Overview', icon: TrendingUp },
               { id: 'users', name: 'Users', icon: Users },
               { id: 'commissions', name: 'Commissions', icon: DollarSign },
-              { id: 'diagnostics', name: 'Diagnostics', icon: AlertTriangle },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -686,7 +425,6 @@ export default function AdminMLMPanel() {
         {activeTab === 'overview' && renderOverviewTab()}
         {activeTab === 'users' && renderUsersTab()}
         {activeTab === 'commissions' && renderCommissionsTab()}
-        {activeTab === 'diagnostics' && renderDiagnosticsTab()}
       </div>
     </div>
   )

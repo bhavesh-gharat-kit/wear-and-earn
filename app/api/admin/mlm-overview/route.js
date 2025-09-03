@@ -174,8 +174,8 @@ export async function GET(request) {
 
     const totalFilteredUsers = await prisma.user.count({ where: userWhere })
 
-    // Level distribution
-    const levelDistribution = await Promise.all([1,2,3,4,5,6,7].map(async (level) => {
+    // Level distribution (reduced from 7 to 5 levels)
+    const levelDistribution = await Promise.all([1,2,3,4,5].map(async (level) => {
       const count = level === 1 
         ? await prisma.user.count({ where: { sponsorId: { not: null }}})
         : await prisma.hierarchy.count({ where: { depth: level }})

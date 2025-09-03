@@ -1,6 +1,56 @@
 import { NextResponse } from 'next/server'
 import prisma from "@/lib/prisma";
 
+/**
+ * Check if user has formed Level 1 team eligibility for self weekly income
+ * User must have:
+ * 1. 3 direct referrals (A, B, C)
+ * 2. All 3 must have made at least one purchase
+ * 3. User must have received L1 commissions from all 3
+ */
+async function checkLevel1TeamEligibility(tx, userId) {
+  console.log('Checking Level 1 team eligibility for user:', userId);
+  
+  // Get user's direct referrals
+  const directReferrals = await tx.user.findMany({
+    where: { sponsorId: userId },
+    select: { id: true, fullName: true },
+    orderBy: { createdAt: 'asc' }, // Check in order of joining
+    take: 3 // Only need to check first 3
+  });
+  
+  console.log(`User ${userId} has ${directReferrals.length} direct referrals`);
+  
+  if (directReferrals.length < 3) {
+    console.log('Not eligible: Less than 3 direct referrals');
+    return false;
+  }
+  
+  // Check if all 3 directs have made purchases
+  let qualifiedDirects = 0;
+  
+  for (const direct of directReferrals) {
+    // Check if this direct has made any paid purchase
+    const paidOrders = await tx.order.count({
+      where: { 
+        userId: direct.id,
+        paidAt: { not: null }
+      }
+    });
+    
+    if (paidOrders > 0) {
+      qualifiedDirects++;
+    }
+  }
+  
+  console.log(`User ${userId} has ${qualifiedDirects}/3 direct referrals with purchases`);
+  
+  const isEligible = qualifiedDirects >= 3;
+  console.log(`User ${userId} Level 1 team eligibility: ${isEligible}`);
+  
+  return isEligible;
+}
+
 
 /**
  * Weekly Cron Job to Release Self-Payout Income
@@ -102,7 +152,27 @@ export async function POST(request) {
             // Mark as skipped instead of paid
             await tx.selfPayoutSchedule.update({
               where: { id: payout.id },
-              data: { status: 'skipped' }
+              data: { 
+                status: 'skipped',
+                skipReason: 'User inactive' 
+              }
+            })
+            return
+          }
+
+          // Check Level 1 team eligibility (3 direct referrals who all purchased)
+          const hasLevel1Team = await checkLevel1TeamEligibility(tx, payout.userId)
+          
+          if (!hasLevel1Team) {
+            console.log(`⚠️  User ${payout.user.id} hasn't formed Level 1 team, skipping payout ${payout.id}`)
+            
+            // Mark as pending until eligibility is met
+            await tx.selfPayoutSchedule.update({
+              where: { id: payout.id },
+              data: { 
+                status: 'pending_eligibility',
+                skipReason: 'Level 1 team not formed - need 3 direct referrals who all purchased' 
+              }
             })
             return
           }

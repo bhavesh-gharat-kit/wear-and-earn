@@ -246,7 +246,7 @@ model SelfPayoutSchedule {
   orderId     Int      @db.UnsignedInt
   amount      Int      // this instalment amount in paisa
   dueAt       DateTime // weekly cadence
-  status      String   @default("scheduled") // scheduled|paid|skipped
+  status      String   @default("scheduled") // scheduled|paid|skipped|pending_eligibility
   ref         String?  // idempotency reference key
   description String?  // description for audit trail
   createdAt   DateTime @default(now())
