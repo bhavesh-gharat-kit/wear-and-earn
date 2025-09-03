@@ -1,7 +1,6 @@
 import { NextResponse as res } from "next/server";
 import prisma from "@/lib/prisma";
-import { writeFile, unlink, mkdir } from 'fs/promises';
-import path from "path";
+import { uploadImageToCloudinary, deleteImageFromCloudinary } from "@/lib/cloudinary-utils";
 
 // GET method for admin to fetch any product for editing
 export const GET = async (request, { params }) => {
@@ -113,14 +112,18 @@ export const DELETE = async (request, { params }) => {
 };
 
 
-async function saveFileToUploads(file) {
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'product-images');
-    await mkdir(uploadDir, { recursive: true });
-    const fileName = `${Date.now()}-${file.name}`;
-    const filePath = path.join(uploadDir, fileName);
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(filePath, buffer);
-    return `/uploads/product-images/${fileName}`;
+async function uploadFileToCloudinary(file) {
+    try {
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const result = await uploadImageToCloudinary(buffer, {
+            folder: 'wear-and-earn/products',
+            public_id: `product-${Date.now()}-${Math.random().toString(36).substring(7)}`
+        });
+        return result.url;
+    } catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        throw new Error('Failed to upload image to Cloudinary');
+    }
 }
 
 
@@ -158,7 +161,7 @@ export async function PUT(request, { params }) {
         if (rawImages) {
             for (const item of rawImages) {
                 if (item instanceof File && item.name) {
-                    const url = await saveFileToUploads(item);
+                    const url = await uploadFileToCloudinary(item);
                     incomingImageUrls.push(url);
                 } else if (typeof item === "string") {
                     const trimmed = item.trim();
@@ -181,7 +184,7 @@ export async function PUT(request, { params }) {
         let thumbnailImageUrl = existingProduct.mainImage; // Keep existing if no new one
         const thumbnailFile = formData.get("thumbnailImage");
         if (thumbnailFile && thumbnailFile instanceof File && thumbnailFile.name) {
-            thumbnailImageUrl = await saveFileToUploads(thumbnailFile);
+            thumbnailImageUrl = await uploadFileToCloudinary(thumbnailFile);
         }
 
         // Map form data to update object
