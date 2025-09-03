@@ -76,6 +76,15 @@ const AdminEditProduct = ({ params }) => {
     }
   }, [id]);
 
+  // Cleanup object URLs to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(thumbnailPreview);
+      }
+    };
+  }, [thumbnailPreview]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -100,9 +109,14 @@ const AdminEditProduct = ({ params }) => {
     const file = e.target.files[0];
     setFormData((prev) => ({ ...prev, thumbnailImage: file }));
 
-    if (file) {
-      const preview = URL.createObjectURL(file);
-      setThumbnailPreview(preview);
+    if (file && file instanceof File) {
+      try {
+        const preview = URL.createObjectURL(file);
+        setThumbnailPreview(preview);
+      } catch (error) {
+        console.error("Error creating object URL:", error);
+        toast.error("Error processing image file");
+      }
     }
   };
 

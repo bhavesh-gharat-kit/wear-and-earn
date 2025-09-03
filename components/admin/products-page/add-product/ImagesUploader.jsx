@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import LoaderEffect from "@/components/ui/LoaderEffect";
@@ -13,6 +13,23 @@ const allowedImageTypes = [
 ];
 
 const ImagesUploader = ({ label, maxFiles, images, setImages }) => {
+
+  // Cleanup effect to revoke object URLs and prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (images && Array.isArray(images)) {
+        images.forEach(image => {
+          if (image instanceof File) {
+            // Find any blob URLs that might have been created for this file
+            const blobUrls = document.querySelectorAll('img[src^="blob:"]');
+            blobUrls.forEach(img => {
+              URL.revokeObjectURL(img.src);
+            });
+          }
+        });
+      }
+    };
+  }, [images]);
 
   const handleImageChange = (event) => {
     const files = Array.from(event.target.files);
@@ -54,19 +71,35 @@ const ImagesUploader = ({ label, maxFiles, images, setImages }) => {
       />
       <div className="flex flex-wrap gap-2 mt-2">
         {images?.map((file, index) => {
+          // Safe URL creation function
+          const getSafeImageUrl = (file) => {
+            if (file.imageUrl) {
+              return file.imageUrl;
+            }
+            if (file instanceof File) {
+              try {
+                return URL.createObjectURL(file);
+              } catch (error) {
+                console.error("Error creating object URL:", error);
+                return null;
+              }
+            }
+            return null;
+          };
+
+          const imageUrl = getSafeImageUrl(file);
+          
           return (
             <div key={index} className="relative">
-              <Image
-                height={256}
-                width={256}
-                src={
-                  file.imageUrl
-                    ? file.imageUrl
-                    : URL.createObjectURL(file) || file.imageUrl
-                }
-                alt="Preview"
-                className="w-24 h-24 rounded-lg border"
-              />
+              {imageUrl && (
+                <Image
+                  height={256}
+                  width={256}
+                  src={imageUrl}
+                  alt="Preview"
+                  className="w-24 h-24 rounded-lg border object-cover"
+                />
+              )}
               <button
                 type="button"
                 onClick={() => removeImage(index)}
