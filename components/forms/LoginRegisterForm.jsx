@@ -21,7 +21,7 @@ function LoginRegisterForm() {
   }, [searchParams]);
 
   return (
-    <div className="py-8 flex flex-col items-center w-full max-w-2xl mx-auto px-4 min-h-screen">
+    <div className="py-8 flex flex-col items-center w-full max-w-4xl mx-auto px-4 min-h-screen">
       <div className="mb-8 flex flex-col items-center">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-2 mb-6 border border-gray-200 dark:border-gray-700">
           <button
