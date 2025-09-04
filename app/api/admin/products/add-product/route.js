@@ -29,19 +29,35 @@ export async function POST(req) {
 
         if (thumbnail && typeof thumbnail === 'object' && thumbnail.name && thumbnail.size > 0) {
             try {
-                console.log("Uploading thumbnail to Cloudinary...");
-                const buffer = Buffer.from(await thumbnail.arrayBuffer());
+                console.log("Processing thumbnail image:", {
+                    name: thumbnail.name,
+                    size: thumbnail.size,
+                    type: thumbnail.type
+                });
                 
+                console.log("Converting thumbnail to buffer...");
+                const buffer = Buffer.from(await thumbnail.arrayBuffer());
+                console.log("Buffer created, size:", buffer.length, "bytes");
+                
+                console.log("Uploading thumbnail to Cloudinary...");
                 const cloudinaryResult = await uploadImageToCloudinary(buffer, {
                     folder: 'products/thumbnails',
-                    public_id: `thumbnail-${Date.now()}`
+                    public_id: `thumbnail-${Date.now()}-${Math.random().toString(36).substring(2)}`
                 });
                 
                 thumbnailUrl = cloudinaryResult.url;
-                console.log("Thumbnail uploaded successfully:", thumbnailUrl);
+                console.log("✅ Thumbnail uploaded successfully:", thumbnailUrl);
             } catch (fileError) {
-                console.error("Error processing thumbnail:", fileError);
-                // Continue without thumbnail if file processing fails
+                console.error("❌ Error processing thumbnail:", fileError);
+                console.error("Thumbnail error details:", {
+                    message: fileError.message,
+                    stack: fileError.stack
+                });
+                // Return error instead of continuing without thumbnail
+                return NextResponse.json({
+                    success: false,
+                    message: `Failed to upload thumbnail: ${fileError.message}`
+                }, { status: 500 });
             }
         }
 
@@ -49,22 +65,44 @@ export async function POST(req) {
         const productImageFiles = formData.getAll('productImages');
         const productImageUrls = [];
 
+        console.log(`Processing ${productImageFiles.length} product images...`);
+
         for (const [index, image] of productImageFiles.entries()) {
-            if (!image || typeof image !== 'object' || !image.name || image.size === 0) continue;
+            if (!image || typeof image !== 'object' || !image.name || image.size === 0) {
+                console.log(`Skipping empty image at index ${index}`);
+                continue;
+            }
+            
             try {
-                console.log(`Uploading product image ${index + 1} to Cloudinary...`);
-                const buffer = Buffer.from(await image.arrayBuffer());
+                console.log(`Processing product image ${index + 1}:`, {
+                    name: image.name,
+                    size: image.size,
+                    type: image.type
+                });
                 
+                console.log(`Converting image ${index + 1} to buffer...`);
+                const buffer = Buffer.from(await image.arrayBuffer());
+                console.log(`Buffer created for image ${index + 1}, size:`, buffer.length, "bytes");
+                
+                console.log(`Uploading product image ${index + 1} to Cloudinary...`);
                 const cloudinaryResult = await uploadImageToCloudinary(buffer, {
                     folder: 'products/images',
-                    public_id: `product-${Date.now()}-${index}`
+                    public_id: `product-${Date.now()}-${index}-${Math.random().toString(36).substring(2)}`
                 });
                 
                 productImageUrls.push(cloudinaryResult.url);
-                console.log(`Product image ${index + 1} uploaded successfully`);
+                console.log(`✅ Product image ${index + 1} uploaded successfully:`, cloudinaryResult.url);
             } catch (fileError) {
-                console.error("Error processing product image:", fileError);
-                // Continue without this image if file processing fails
+                console.error(`❌ Error processing product image ${index + 1}:`, fileError);
+                console.error(`Image ${index + 1} error details:`, {
+                    message: fileError.message,
+                    stack: fileError.stack
+                });
+                // Return error instead of continuing without this image
+                return NextResponse.json({
+                    success: false,
+                    message: `Failed to upload product image ${index + 1}: ${fileError.message}`
+                }, { status: 500 });
             }
         }
 
