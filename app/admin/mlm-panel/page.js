@@ -148,7 +148,7 @@ export default function AdminMLMPanel() {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Level Distribution (5 Levels)</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {mlmOverview?.levelDistribution?.map((level) => (
+          {(mlmOverview?.levelDistribution || []).map((level) => (
             <div key={level.level} className="text-center p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600">Level {level.level}</p>
               <p className="text-xl font-bold text-gray-900">{level.count}</p>
@@ -200,7 +200,7 @@ export default function AdminMLMPanel() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {mlmOverview?.users?.map((user) => (
+              {(mlmOverview?.users?.data || []).map((user) => (
                 <tr key={user.id}>
                   <td className="px-4 py-3">
                     <div>
@@ -211,7 +211,7 @@ export default function AdminMLMPanel() {
                   <td className="px-4 py-3">
                     <div>
                       <p className="text-sm text-gray-900">{user.email}</p>
-                      <p className="text-xs text-gray-500">{user.phone}</p>
+                      <p className="text-xs text-gray-500">{user.mobileNo}</p>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-sm font-mono text-gray-600">{user.referralCode}</td>
@@ -306,7 +306,7 @@ export default function AdminMLMPanel() {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Commission Breakdown by Type</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {commissions?.summary?.byType?.map((type) => (
+          {(commissions?.summary?.byType || []).map((type) => (
             <div key={type.type} className="p-4 border border-gray-200 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-sm font-medium text-gray-900 capitalize">
@@ -347,7 +347,7 @@ export default function AdminMLMPanel() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {commissions?.transactions?.map((transaction) => (
+              {(commissions?.transactions || []).map((transaction) => (
                 <tr key={transaction.id}>
                   <td className="px-4 py-3">
                     <div>
