@@ -105,6 +105,20 @@ export async function POST(req) {
         }
       } else {
         console.log('ℹ️ User', updatedOrder.userId, 'already has MLM activated with referral code:', user.referralCode);
+        
+        // Process commission for already active users
+        console.log('💰 Processing commission for existing active user:', updatedOrder.userId);
+        try {
+          const { handlePaidRepurchase } = await import('@/lib/mlm-commission');
+          
+          await prisma.$transaction(async (tx) => {
+            await handlePaidRepurchase(tx, updatedOrder);
+          });
+          
+          console.log('✅ Commission processing completed for user:', updatedOrder.userId);
+        } catch (error) {
+          console.error('❌ Error processing commission:', error.message);
+        }
       }
 
       console.log('🎉 Payment verification completed successfully');
