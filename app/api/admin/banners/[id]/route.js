@@ -130,32 +130,55 @@ export async function DELETE(req, { params }) {
 
         if (!banner) {
             return res.json(
-                { message: "Banner not found" },
+                { success: false, message: "Banner not found" },
                 { status: 404 }
             );
         }
 
-        // Delete local image file if exists
-        if (banner.imageUrl) {
-            const imagePath = path.join(process.cwd(), "public", banner.imageUrl);
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
+        console.log(`Deleting banner ${id} with image: ${banner.imageUrl}`);
+
+        // Delete image from Cloudinary if it exists
+        if (banner.imageUrl && banner.imageUrl.includes('cloudinary.com')) {
+            try {
+                // Extract public_id from Cloudinary URL
+                // URL format: https://res.cloudinary.com/cloud_name/image/upload/v1234567890/folder/image_name.ext
+                const urlParts = banner.imageUrl.split('/');
+                const publicIdWithExt = urlParts[urlParts.length - 1];
+                const folder = urlParts[urlParts.length - 2];
+                const publicId = `${folder}/${publicIdWithExt.split('.')[0]}`;
+                
+                console.log(`Deleting image from Cloudinary with public_id: ${publicId}`);
+                await deleteImageFromCloudinary(publicId);
+                console.log("Banner image deleted from Cloudinary successfully");
+            } catch (deleteError) {
+                console.warn("Could not delete banner image from Cloudinary:", deleteError.message);
+                // Continue with banner deletion even if image deletion fails
             }
         }
 
-        // Delete from DB
+        // Delete banner from database
         await prisma.Banners.delete({
             where: { id },
         });
 
+        console.log(`Banner ${id} deleted successfully`);
+
         return res.json(
-            { message: "Banner deleted successfully" },
+            { success: true, message: "Banner deleted successfully" },
             { status: 200 }
         );
     } catch (error) {
         console.error("Error deleting banner:", error);
+        
+        if (error.code === 'P2025') {
+            return res.json(
+                { success: false, message: "Banner not found" },
+                { status: 404 }
+            );
+        }
+        
         return res.json(
-            { message: "Internal Server Error" },
+            { success: false, message: "Failed to delete banner", error: error.message },
             { status: 500 }
         );
     }
