@@ -44,13 +44,13 @@ export async function POST(req) {
     console.log('🔐 Payment signature verification:', isAuthentic ? 'PASSED' : 'FAILED');
 
     if (isAuthentic) {
-      console.log('📝 Updating order status to delivered');
+      console.log('📝 Updating order status to inProcess');
       
-      // Update order status to delivered
+      // Update order status to inProcess (payment confirmed, awaiting fulfillment)
       const updatedOrder = await prisma.order.update({
         where: { id: parseInt(orderId) },
         data: {
-          status: 'delivered',
+          status: 'inProcess', // Changed from 'confirmed' to 'inProcess' (valid enum value)
           paymentId: razorpay_payment_id,
           paidAt: new Date() // Set paidAt when payment is verified
         },
