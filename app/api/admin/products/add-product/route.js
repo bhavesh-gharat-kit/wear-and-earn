@@ -145,25 +145,26 @@ export async function POST(req) {
                 title: data.title,
                 description: data.description,
                 longDescription: data.overview || "",
-                inStock: 0,
+                inStock: data.inStock ? Number(data.inStock) : 1, // Set default stock
                 categoryId: Number(data.category),
-                isActive: false,
+                isActive: true, // Make products active by default
                 keyFeature: data.keyFeatures || "",
                 discount: data.discount ? Number(data.discount) : 0,
                 price: data.maxPrice ? Number(data.maxPrice) : 0,
                 sellingPrice: data.price ? Number(data.price) : 0,
-                gst: data.gst ? Number(data.gst) : 0,
-                homeDelivery: data.shipping ? Number(data.shipping) : 0,
+                gst: data.gst ? Number(data.gst) : 18, // Default GST
+                homeDelivery: data.shipping ? Number(data.shipping) : 50, // Default delivery
                 mlmPrice: data.mlmPrice ? Number(data.mlmPrice) : 0,
                 type: data.productType || "REGULAR", // Set product type
                 mainImage: thumbnailUrl,
-                manufacturer: data.manufacturer || null,
+                manufacturer: data.manufacturer || "WeArEarn", // Default manufacturer
                 images: {
                     create: productImageUrls.map((url) => ({ imageUrl: url }))
                 }
             },
             include: {
-                images: true
+                images: true,
+                category: true
             }
         });
 
