@@ -46,80 +46,84 @@ export async function POST(req) {
     if (isAuthentic) {
       console.log('📝 Updating order status to inProcess');
       
-      // Update order status to inProcess (payment confirmed, awaiting fulfillment)
-      const updatedOrder = await prisma.order.update({
-        where: { id: parseInt(orderId) },
-        data: {
-          status: 'inProcess', // Changed from 'confirmed' to 'inProcess' (valid enum value)
-          paymentId: razorpay_payment_id,
-          paidAt: new Date() // Set paidAt when payment is verified
-        },
-        include: {
-          user: true,
-          orderProducts: true // Remove the nested include for product since it doesn't exist
-        }
-      })
+      // Process everything in a single transaction
+      const result = await prisma.$transaction(async (tx) => {
+        // Update order status to inProcess (payment confirmed, awaiting fulfillment)  
+        const updatedOrder = await tx.order.update({
+          where: { id: parseInt(orderId) },
+          data: {
+            status: 'inProcess', // Changed from 'confirmed' to 'inProcess' (valid enum value)
+            paymentId: razorpay_payment_id,
+            paidAt: new Date() // Set paidAt when payment is verified
+          },
+          include: {
+            user: true,
+            orderProducts: true // Remove the nested include for product since it doesn't exist
+          }
+        });
 
-      console.log('✅ Order updated successfully:', updatedOrder.id);
+        console.log('✅ Order updated successfully:', updatedOrder.id);
 
-      // Check if user needs MLM activation (regardless of order count)
-      const user = await prisma.user.findUnique({
-        where: { id: updatedOrder.userId },
-        select: {
-          isActive: true,
-          referralCode: true
+        // Check if user needs MLM activation (regardless of order count)
+        const user = await tx.user.findUnique({
+          where: { id: updatedOrder.userId },
+          select: {
+            isActive: true,
+            referralCode: true
+          }
+        });
+
+        console.log('👤 User status - Active:', user.isActive, 'Has referral code:', !!user.referralCode);
+
+        // Trigger MLM activation if user is not active or has no referral code
+        if (!user.isActive || !user.referralCode) {
+          console.log('🚀 Triggering MLM activation for user:', updatedOrder.userId);
+          
+          try {
+            const origin = req?.headers?.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3000';
+            console.log('🌐 Using origin:', origin);
+            
+            const activateResponse = await fetch(`${origin}/api/activate-mlm-internal`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userId: updatedOrder.userId,
+                amount: updatedOrder.total,
+                orderId: updatedOrder.id
+              })
+            })
+
+            if (!activateResponse.ok) {
+              const errorText = await activateResponse.text();
+              console.error('❌ Failed to activate MLM for user:', updatedOrder.userId, 'Status:', activateResponse.status, 'Error:', errorText);
+            } else {
+              const result = await activateResponse.json();
+              console.log('✅ MLM activation successful for user:', updatedOrder.userId, 'Result:', result.success);
+            }
+          } catch (error) {
+            console.error('❌ Error activating MLM:', error.message);
+          }
+        } else {
+          console.log('ℹ️ User', updatedOrder.userId, 'already has MLM activated with referral code:', user.referralCode);
+          
+          // Process commission for already active users within the same transaction
+          console.log('💰 Processing commission for existing active user:', updatedOrder.userId);
+          try {
+            const { handlePaidRepurchase } = await import('@/lib/mlm-commission');
+            await handlePaidRepurchase(tx, updatedOrder);
+            console.log('✅ Commission processing completed for user:', updatedOrder.userId);
+          } catch (error) {
+            console.error('❌ Error processing commission:', error.message);
+            throw error; // Re-throw to rollback transaction
+          }
         }
+
+        return updatedOrder;
       });
 
-      console.log('👤 User status - Active:', user.isActive, 'Has referral code:', !!user.referralCode);
-
-      // Trigger MLM activation if user is not active or has no referral code
-      if (!user.isActive || !user.referralCode) {
-        console.log('🚀 Triggering MLM activation for user:', updatedOrder.userId);
-        
-        try {
-          const origin = req?.headers?.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3000';
-          console.log('🌐 Using origin:', origin);
-          
-          const activateResponse = await fetch(`${origin}/api/activate-mlm-internal`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userId: updatedOrder.userId,
-              amount: updatedOrder.total,
-              orderId: updatedOrder.id
-            })
-          })
-
-          if (!activateResponse.ok) {
-            const errorText = await activateResponse.text();
-            console.error('❌ Failed to activate MLM for user:', updatedOrder.userId, 'Status:', activateResponse.status, 'Error:', errorText);
-          } else {
-            const result = await activateResponse.json();
-            console.log('✅ MLM activation successful for user:', updatedOrder.userId, 'Result:', result.success);
-          }
-        } catch (error) {
-          console.error('❌ Error activating MLM:', error.message);
-        }
-      } else {
-        console.log('ℹ️ User', updatedOrder.userId, 'already has MLM activated with referral code:', user.referralCode);
-        
-        // Process commission for already active users
-        console.log('💰 Processing commission for existing active user:', updatedOrder.userId);
-        try {
-          const { handlePaidRepurchase } = await import('@/lib/mlm-commission');
-          
-          await prisma.$transaction(async (tx) => {
-            await handlePaidRepurchase(tx, updatedOrder);
-          });
-          
-          console.log('✅ Commission processing completed for user:', updatedOrder.userId);
-        } catch (error) {
-          console.error('❌ Error processing commission:', error.message);
-        }
-      }
+      const updatedOrder = result;
 
       console.log('🎉 Payment verification completed successfully');
 
