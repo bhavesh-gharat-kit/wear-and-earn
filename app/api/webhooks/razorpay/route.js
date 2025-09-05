@@ -1,6 +1,17 @@
 import prisma from "@/lib/prisma";
 import crypto from 'crypto';
 
+/*
+ * DEPRECATED WEBHOOK - USING OLD MLM SYSTEM
+ * 
+ * This webhook still uses the old matrix-based MLM system.
+ * The new pool-based MLM system is implemented in:
+ * - /api/orders/verify-payment (for order verification and MLM processing)
+ * 
+ * This webhook can be disabled in Razorpay dashboard if no longer needed,
+ * or updated to use the new pool system from lib/pool-mlm-system.js
+ */
+
 
 export async function POST(req) {
   try {
@@ -103,8 +114,11 @@ export async function POST(req) {
           console.log('Processing joining order - first paid order for user:', order.userId);
           
           // Import MLM functions with correct paths
-          const { placeUserInMatrix, getGlobalRootId, bfsFindOpenSlot } = await import('@/lib/mlm-matrix');
-          const { handlePaidJoining } = await import('@/lib/mlm-commission');
+          // OLD MLM SYSTEM - DISABLED
+          // const { placeUserInMatrix, getGlobalRootId, bfsFindOpenSlot } = await import('@/lib/mlm-matrix');
+          // const { handlePaidJoining } = await import('@/lib/mlm-commission');
+          
+          console.log('Razorpay webhook received but old MLM processing is disabled. Use /api/orders/verify-payment instead.');
           const { generateAndAssignReferralCode } = await import('@/lib/referral');
           
           // Generate referral code and activate user
@@ -161,8 +175,11 @@ export async function POST(req) {
         } else {
           // REPEAT ORDER - REPURCHASE LOGIC
           console.log('Processing repurchase order for user:', order.userId);
-          const { handleRepurchaseCommission } = await import('@/lib/mlm-commission');
-          const { isRepurchaseEligible } = await import('@/lib/mlm-matrix');
+          // OLD MLM SYSTEM - DISABLED
+          // const { handleRepurchaseCommission } = await import('@/lib/mlm-commission');
+          // const { isRepurchaseEligible } = await import('@/lib/mlm-matrix');
+          
+          console.log('Razorpay webhook received but old MLM processing is disabled. Use /api/orders/verify-payment instead.');
           
           // Check repurchase eligibility (3-3 rule)
           const isEligible = await isRepurchaseEligible(tx, order.userId);

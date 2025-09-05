@@ -13,20 +13,47 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const { poolId } = await request.json()
+    const { action, poolId } = await request.json()
     
-    if (!poolId) {
-      return NextResponse.json({ error: 'poolId required' }, { status: 400 })
+    if (action === 'distribute') {
+      // Distribute all available pools
+      const availablePools = await prisma.turnoverPool.findMany({
+        where: { distributed: false },
+        orderBy: { createdAt: 'asc' }
+      });
+
+      if (availablePools.length === 0) {
+        return NextResponse.json({ error: 'No pools available for distribution' }, { status: 400 });
+      }
+
+      let totalDistributions = 0;
+
+      // Distribute each pool
+      for (const pool of availablePools) {
+        const result = await distributeTurnoverPool(pool.id);
+        totalDistributions += result.distributionsCount || 0;
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'All pools distributed successfully',
+        distributions: totalDistributions,
+        poolsDistributed: availablePools.length
+      });
+    }
+    
+    if (poolId) {
+      // Distribute specific pool (legacy support)
+      const result = await distributeTurnoverPool(parseInt(poolId));
+
+      return NextResponse.json({
+        success: true,
+        message: 'Pool distributed successfully',
+        data: result
+      });
     }
 
-    // Distribute the pool
-    const result = await distributeTurnoverPool(parseInt(poolId));
-
-    return NextResponse.json({
-      success: true,
-      message: 'Pool distributed successfully',
-      data: result
-    });
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 
   } catch (error) {
     console.error('Pool distribution error:', error);
@@ -50,55 +77,75 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    // Get undistributed pools
-    const pools = await prisma.turnoverPool.findMany({
-      where: { distributed: false },
-      orderBy: { createdAt: 'desc' }
+    // Get total undistributed pool amount
+    const totalPoolAmount = await prisma.turnoverPool.aggregate({
+      _sum: { totalAmount: true },
+      where: { distributed: false }
     });
 
-    // Get recently distributed pools
-    const distributedPools = await prisma.turnoverPool.findMany({
+    // Get count of eligible users by level
+    const eligibleUsersByLevel = await prisma.user.groupBy({
+      by: ['level'],
+      _count: { level: true },
+      where: {
+        isActive: true,
+        level: { gte: 1, lte: 5 }
+      }
+    });
+
+    // Calculate level breakdown
+    const levelBreakdown = {};
+    const totalAmount = totalPoolAmount._sum.totalAmount || 0;
+    
+    eligibleUsersByLevel.forEach(levelData => {
+      const level = levelData.level;
+      const userCount = levelData._count.level;
+      
+      // Calculate percentage based on pool distribution config
+      const percentages = { 1: 0.30, 2: 0.20, 3: 0.20, 4: 0.15, 5: 0.15 };
+      const levelAmount = Math.floor(totalAmount * percentages[level]);
+      
+      levelBreakdown[level] = {
+        users: userCount,
+        amount: levelAmount
+      };
+    });
+
+    // Get last distribution date
+    const lastDistribution = await prisma.turnoverPool.findFirst({
+      where: { distributed: true },
+      orderBy: { distributedAt: 'desc' },
+      select: { distributedAt: true }
+    });
+
+    // Get recent distributions
+    const recentDistributions = await prisma.turnoverPool.findMany({
       where: { distributed: true },
       orderBy: { distributedAt: 'desc' },
       take: 10,
       include: {
         distributions: {
-          include: {
-            user: { select: { fullName: true, level: true } }
+          select: {
+            amount: true,
+            user: { select: { id: true } }
           }
         }
       }
     });
 
+    const formattedRecentDistributions = recentDistributions.map(pool => ({
+      createdAt: pool.distributedAt,
+      amount: pool.totalAmount,
+      userCount: pool.distributions.length
+    }));
+
     return NextResponse.json({
       success: true,
-      data: {
-        availablePools: pools.map(pool => ({
-          id: pool.id,
-          totalAmount: pool.totalAmount,
-          totalAmountRs: pool.totalAmount / 100,
-          l1Amount: pool.l1Amount,
-          l2Amount: pool.l2Amount,
-          l3Amount: pool.l3Amount,
-          l4Amount: pool.l4Amount,
-          l5Amount: pool.l5Amount,
-          createdAt: pool.createdAt
-        })),
-        recentDistributions: distributedPools.map(pool => ({
-          id: pool.id,
-          totalAmount: pool.totalAmount,
-          totalAmountRs: pool.totalAmount / 100,
-          distributedAt: pool.distributedAt,
-          distributionCount: pool.distributions.length,
-          distributions: pool.distributions.map(d => ({
-            userId: d.userId,
-            userName: d.user.fullName,
-            level: d.level,
-            amount: d.amount,
-            amountRs: d.amount / 100
-          }))
-        }))
-      }
+      totalAmount: totalAmount,
+      eligibleUsers: eligibleUsersByLevel.reduce((sum, level) => sum + level._count.level, 0),
+      lastDistribution: lastDistribution?.distributedAt || null,
+      levelBreakdown: levelBreakdown,
+      recentDistributions: formattedRecentDistributions
     });
 
   } catch (error) {

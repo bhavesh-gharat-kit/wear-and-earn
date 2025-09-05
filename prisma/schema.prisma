@@ -5,68 +5,63 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-} 
+}
 
 model User {
-  id               Int       @id @default(autoincrement()) @db.UnsignedInt
-  sponsorId        Int?      @db.UnsignedInt
-  fullName         String
-  email            String?   @unique(map: "User_email_key")
-  mobileNo         String    @unique(map: "User_mobileNo_key")
-  password         String?
-  role             String?   @default("user")
-  createdAt        DateTime? @default(now())
-  isVerified       Boolean   @default(false)
-  verifyCode       String?
-  verifyCodeExpiry DateTime?
-  isBlocked        Boolean   @default(false)
-  gender           String?
-
-  // MLM specific fields - NEW POOL SYSTEM
-  referralCode           String?  @unique
-  isActive               Boolean  @default(false)
-  level                  Int      @default(0)    // 0=none, 1=L1, 2=L2, 3=L3, 4=L4, 5=L5
-  teamCount              Int      @default(0)    // Total teams formed (direct + cascaded)
-  directTeams            Int      @default(0)    // Direct teams formed
-  kycStatus              Boolean  @default(false) // KYC approval status
-  walletBalance          Int      @default(0)    // paisa
+  id                     Int                     @id @default(autoincrement()) @db.UnsignedInt
+  sponsorId              Int?                    @db.UnsignedInt
+  fullName               String
+  email                  String?                 @unique(map: "User_email_key")
+  mobileNo               String                  @unique(map: "User_mobileNo_key")
+  password               String?
+  role                   String?                 @default("user")
+  createdAt              DateTime?               @default(now())
+  isVerified             Boolean                 @default(false)
+  verifyCode             String?
+  verifyCodeExpiry       DateTime?
+  isBlocked              Boolean                 @default(false)
+  gender                 String?
+  referralCode           String?                 @unique
+  isActive               Boolean                 @default(false)
+  isKycApproved          Boolean                 @default(false)
+  lastMonthPurchase      Int                     @default(0)
+  monthlyPurchase        Int                     @default(0)
+  isEligibleRepurchase   Boolean                 @default(false)
+  walletBalance          Int                     @default(0)
+  directTeams            Int                     @default(0)
+  kycStatus              Boolean                 @default(false)
+  level                  Int                     @default(0)
+  teamCount              Int                     @default(0)
+  kycData                KycData?
+  address                Address?
+  cart                   Cart[]
   
-  // Legacy fields (keep for backward compatibility)
-  isKycApproved          Boolean  @default(false)
-  lastMonthPurchase      Int      @default(0) // paisa
-  monthlyPurchase        Int      @default(0) // paisa
-  isEligibleRepurchase   Boolean  @default(false)
-
-  cart      Cart[]
-  address   Address?
-  orders    Order[]  @relation("UserOrders")
-  sponsor   User?    @relation("UserSponsor", fields: [sponsorId], references: [id])
-  referrals User[]   @relation("UserSponsor")
-
   // NEW POOL MLM SYSTEM relationships
-  purchases         Purchase[]
-  walletTransactions Wallet[]
-  poolDistributions PoolDistribution[]
+  newWithdrawals         NewWithdrawal[]
+  orders                 Order[]                 @relation("UserOrders")
+  poolDistributions      PoolDistribution[]
+  purchases              Purchase[]
   selfIncomeInstallments SelfIncomeInstallment[]
-  newWithdrawals    NewWithdrawal[]
-  teams             Team[]
-  teamMemberships   TeamMember[]
+  teamMemberships        TeamMember[]
+  teams                  Team[]
+  walletTransactions     Wallet[]
+  payoutSchedules        SelfPayoutSchedule[]
+  
+  // Referral relationships
+  sponsor                User?                   @relation("UserSponsor", fields: [sponsorId], references: [id])
+  referrals              User[]                  @relation("UserSponsor")
+  
+  // Keep withdrawal system
+  processedWithdrawals   WithdrawalRequest[]     @relation("ProcessedWithdrawals")
+  withdrawalRequests     WithdrawalRequest[]     @relation("UserWithdrawals")
 
-  // Legacy MLM relationships (keep for backward compatibility)
-  node              MatrixNode?
-  ledgerEntries     Ledger[]
-  payoutSchedules   SelfPayoutSchedule[]
-  ancestorHierarchy Hierarchy[] @relation("HierarchyAncestor")
-  descendantHierarchy Hierarchy[] @relation("HierarchyDescendant")
-  kycData           KycData?
-  
-  // Commission relationships
-  commissions       Commission[] @relation("UserCommissions")
-  generatedCommissions Commission[] @relation("CommissionSource")
-  
-  // Withdrawal relationships
-  withdrawalRequests    WithdrawalRequest[] @relation("UserWithdrawals")
-  processedWithdrawals  WithdrawalRequest[] @relation("ProcessedWithdrawals")
+  // OLD MLM SYSTEM (commented out - will be removed after full migration)
+  // generatedCommissions   Commission[]            @relation("CommissionSource")
+  // commissions            Commission[]            @relation("UserCommissions")
+  // ancestorHierarchy      Hierarchy[]             @relation("HierarchyAncestor")
+  // descendantHierarchy    Hierarchy[]             @relation("HierarchyDescendant")
+  // ledgerEntries          Ledger[]
+  // node                   MatrixNode?
 
   @@index([sponsorId], map: "users_sponsorId_fkey")
   @@index([referralCode])
@@ -85,56 +80,48 @@ model Address {
   district      String
   pinCode       Int
   state         String
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade, map: "address_userId_fkey")
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade, map: "address_userId_fkey")
 
   @@map("address")
 }
 
 model Category {
-  id          Int     @id @default(autoincrement()) @db.UnsignedInt
-  name        String  @unique(map: "Category_name_key")
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  name        String    @unique(map: "Category_name_key")
   description String?
-  status      Boolean @default(true)
-
-  products Product[]
+  status      Boolean   @default(true)
+  products    Product[]
 
   @@map("category")
 }
 
 model Product {
-  id              Int            @id @default(autoincrement()) @db.UnsignedInt
-  title           String
-  description     String
-  longDescription String         @db.Text
-  inStock         Int            @default(1)
-  categoryId      Int?           @db.UnsignedInt
-  isActive        Boolean        @default(false)
-  discount        Float?
-  profit          Float?
-  gst             Float?
-  gatewayFee      Float?
-  homeDelivery    Float?
-  price           Float
-  sellingPrice    Float
-  keyFeature      String?
-  mainImage       String?
-  manufacturer    String?
-  type            ProductType    @default(REGULAR)
-  
-  // NEW MLM SYSTEM - Pool based
-  productPrice    Float?         // Normal product cost
-  mlmPrice        Float?         // MLM amount for pool system
-  
-  // Legacy MLM fields (keep for backward compatibility)
-  commissionAmount Int           @default(0) // commission in paisa per item
-  createdAt       DateTime?      @default(now())
-  
-  // Relationships
-  cart            Cart[]
-  images          ProductImage[]
-  category        Category?      @relation(fields: [categoryId], references: [id])
-  purchases       Purchase[]     // NEW: MLM purchase tracking
+  id               Int            @id @default(autoincrement()) @db.UnsignedInt
+  title            String
+  description      String
+  longDescription  String         @db.Text
+  inStock          Int            @default(1)
+  categoryId       Int?           @db.UnsignedInt
+  isActive         Boolean        @default(false)
+  discount         Float?
+  profit           Float?
+  gst              Float?
+  gatewayFee       Float?
+  homeDelivery     Float?
+  price            Float
+  sellingPrice     Float
+  keyFeature       String?
+  mainImage        String?
+  manufacturer     String?
+  type             ProductType    @default(REGULAR)
+  commissionAmount Int            @default(0)
+  createdAt        DateTime?      @default(now())
+  mlmPrice         Float?
+  productPrice     Float?
+  cart             Cart[]
+  images           ProductImage[]
+  category         Category?      @relation(fields: [categoryId], references: [id])
+  purchases        Purchase[]
 
   @@index([categoryId], map: "Product_categoryId_fkey")
   @@map("products")
@@ -170,23 +157,24 @@ model Order {
   paymentId        String?
   total            Float
   deliveryCharges  Float           @default(0)
-  commissionAmount Int             @default(0) // commission in paisa
+  commissionAmount Int             @default(0)
   gstAmount        Float
   address          String          @db.Text
   orderNotice      String?
   status           OrderStatus
   createdAt        DateTime        @default(now())
   deliveredAt      DateTime?
-  
-  // MLM specific fields
-  isJoiningOrder   Boolean         @default(false) // true if first ever paid order for this user
-  gatewayOrderId   String?         @unique // razorpay order id
+  isJoiningOrder   Boolean         @default(false)
+  gatewayOrderId   String?         @unique
   paidAt           DateTime?
   
+  // NEW POOL MLM SYSTEM relationships
   user             User?           @relation("UserOrders", fields: [userId], references: [id], onDelete: Restrict)
   orderProducts    OrderProducts[]
-  commissions      Commission[]
-  purchases        Purchase[]      // NEW: MLM purchase tracking
+  purchases        Purchase[]      // Pool MLM purchase tracking
+  
+  // OLD MLM SYSTEM (commented out)
+  // commissions      Commission[]
 
   @@index([userId], map: "order_userId_fkey")
   @@index([gatewayOrderId])
@@ -213,67 +201,64 @@ model OrderProducts {
   @@map("orderproducts")
 }
 
-// MLM specific models
-model MatrixNode {
-  userId   Int  @id @db.UnsignedInt
-  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parentId Int? @db.UnsignedInt
-  parent   MatrixNode? @relation("MatrixParent", fields: [parentId], references: [userId])
-  children MatrixNode[] @relation("MatrixParent")
-  position Int? // 1..3 relative to parent (tri-matrix width)
+// Old MLM system - commented out
+// model MatrixNode {
+//   userId   Int          @id @db.UnsignedInt
+//   parentId Int?         @db.UnsignedInt
+//   position Int?
+//   parent   MatrixNode?  @relation("MatrixParent", fields: [parentId], references: [userId])
+//   children MatrixNode[] @relation("MatrixParent")
+//   user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+// 
+//   @@index([parentId])
+//   @@map("matrix_nodes")
+// }
 
-  @@index([parentId])
-  @@map("matrix_nodes")
-}
+// model Hierarchy {
+//   id           Int  @id @default(autoincrement()) @db.UnsignedInt
+//   ancestorId   Int  @db.UnsignedInt
+//   descendantId Int  @db.UnsignedInt
+//   depth        Int
+//   ancestor     User @relation("HierarchyAncestor", fields: [ancestorId], references: [id], onDelete: Cascade)
+//   descendant   User @relation("HierarchyDescendant", fields: [descendantId], references: [id], onDelete: Cascade)
+// 
+//   @@unique([ancestorId, descendantId])
+//   @@index([descendantId, depth])
+//   @@index([ancestorId, depth])
+//   @@map("hierarchy")
+// }
 
-model Hierarchy {
-  id           Int @id @default(autoincrement()) @db.UnsignedInt
-  ancestorId   Int @db.UnsignedInt
-  descendantId Int @db.UnsignedInt
-  depth        Int // 1..5 (updated from 7 to 5-level structure)
-
-  ancestor   User @relation("HierarchyAncestor", fields: [ancestorId], references: [id], onDelete: Cascade)
-  descendant User @relation("HierarchyDescendant", fields: [descendantId], references: [id], onDelete: Cascade)
-
-  @@unique([ancestorId, descendantId])
-  @@index([descendantId, depth])
-  @@index([ancestorId, depth])
-  @@map("hierarchy")
-}
-
-model Ledger {
-  id           Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId       Int?     @db.UnsignedInt // null for company/system fund
-  type         String   // company_fund | sponsor_commission | self_joining_instalment | repurchase_commission | rollup_to_company | withdrawal_debit | reversal | WITHDRAWAL_REQUEST | WITHDRAWAL_APPROVED | WITHDRAWAL_REFUND | order_processed
-  amount       Int      // +credit, -debit in paisa
-  description  String?  // human readable description
-  referenceId  String?  // reference to related entity (orderId, withdrawalId, etc.)
-  ref          String?  @unique // idempotency key to prevent duplicate processing
-  balanceAfter Int?     // wallet balance after this transaction
-  levelDepth   Int?
-  note         String?
-  createdAt    DateTime @default(now())
-
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, type])
-  @@index([referenceId])
-  @@index([ref])
-  @@map("ledger")
-}
+// model Ledger {
+//   id           Int      @id @default(autoincrement()) @db.UnsignedInt
+//   userId       Int?     @db.UnsignedInt
+//   type         String
+//   amount       Int
+//   description  String?
+//   referenceId  String?
+//   balanceAfter Int?
+//   levelDepth   Int?
+//   note         String?
+//   createdAt    DateTime @default(now())
+//   ref          String?  @unique
+//   user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+// 
+//   @@index([userId, type])
+//   @@index([referenceId])
+//   @@index([ref])
+//   @@map("ledger")
+// }
 
 model SelfPayoutSchedule {
   id          Int      @id @default(autoincrement()) @db.UnsignedInt
   userId      Int      @db.UnsignedInt
   orderId     Int      @db.UnsignedInt
-  amount      Int      // this instalment amount in paisa
-  dueAt       DateTime // weekly cadence
-  status      String   @default("scheduled") // scheduled|paid|skipped|pending_eligibility
-  ref         String?  // idempotency reference key
-  description String?  // description for audit trail
+  amount      Int
+  dueAt       DateTime
+  status      String   @default("scheduled")
   createdAt   DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  description String?
+  ref         String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
   @@index([dueAt, status])
@@ -281,46 +266,33 @@ model SelfPayoutSchedule {
   @@map("self_payout_schedule")
 }
 
-model Commission {
-  id          Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId      Int      @db.UnsignedInt // user receiving commission
-  fromUserId  Int      @db.UnsignedInt // user whose action generated commission
-  orderId     Int?     @db.UnsignedInt // related order
-  amount      Int      // commission amount in paisa
-  level       Int      // 1-5 for level commissions
-  type        String   // joining|repurchase|bonus|rollup
-  description String?  // human readable description
-  isEligible  Boolean  @default(true)
-  createdAt   DateTime @default(now())
-
-  user     User  @relation("UserCommissions", fields: [userId], references: [id], onDelete: Cascade)
-  fromUser User  @relation("CommissionSource", fields: [fromUserId], references: [id], onDelete: Cascade)
-  order    Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
-
-  @@index([userId, type])
-  @@index([fromUserId])
-  @@index([orderId])
-  @@index([createdAt])
-  @@map("commissions")
-}
+// model Commission {
+//   id          Int      @id @default(autoincrement()) @db.UnsignedInt
+//   userId      Int      @db.UnsignedInt
+//   fromUserId  Int      @db.UnsignedInt
+//   orderId     Int?     @db.UnsignedInt
+//   amount      Int
+//   level       Int
+//   type        String
+//   description String?
+//   isEligible  Boolean  @default(true)
+//   createdAt   DateTime @default(now())
+//   fromUser    User     @relation("CommissionSource", fields: [fromUserId], references: [id], onDelete: Cascade)
+//   order       Order?   @relation(fields: [orderId], references: [id])
+//   user        User     @relation("UserCommissions", fields: [userId], references: [id], onDelete: Cascade)
+// 
+//   @@index([userId, type])
+//   @@index([fromUserId])
+//   @@index([orderId])
+//   @@index([createdAt])
+//   @@map("commissions")
+// }
 
 model Config {
   key   String @id
   value Json
 
   @@map("config")
-}
-
-enum OrderStatus {
-  inProcess
-  pending
-  delivered
-}
-
-enum ProductType {
-  REGULAR
-  TRENDING
-  MLM
 }
 
 model ContactForm {
@@ -342,64 +314,62 @@ model Banners {
 }
 
 model KycData {
-  id               Int      @id @default(autoincrement())
-  userId           Int      @unique @db.UnsignedInt
-  fullName         String
-  dateOfBirth      DateTime
-  gender           String
-  fatherName       String?
-  aadharNumber     String
-  panNumber        String
+  id                Int       @id @default(autoincrement())
+  userId            Int       @unique @db.UnsignedInt
+  fullName          String
+  dateOfBirth       DateTime
+  gender            String
+  fatherName        String?
+  aadharNumber      String
+  panNumber         String
   bankAccountNumber String
-  ifscCode         String
-  bankName         String?
-  branchName       String?
-  nomineeName      String?
-  nomineeRelation  String?
-  status           String   @default("pending") // pending, approved, rejected
-  submittedAt      DateTime @default(now())
-  reviewedAt       DateTime?
-  reviewNote       String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ifscCode          String
+  bankName          String?
+  branchName        String?
+  nomineeName       String?
+  nomineeRelation   String?
+  status            String    @default("pending")
+  submittedAt       DateTime  @default(now())
+  reviewedAt        DateTime?
+  reviewNote        String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
 }
 
 model WithdrawalRequest {
-  id            Int       @id @default(autoincrement())
-  userId        Int       @db.UnsignedInt
-  amount        Float     // withdrawal amount
-  method        String    // bank_transfer, upi, paytm
-  details       Json?     // method-specific details (account info, etc.)
-  status        String    @default("pending") // pending, approved, rejected
-  requestedAt   DateTime  @default(now())
-  processedAt   DateTime?
-  processedBy   Int?      @db.UnsignedInt // admin user id
-  adminNotes    String?
-  transactionId String?   // bank transaction reference
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  user            User  @relation("UserWithdrawals", fields: [userId], references: [id], onDelete: Cascade)
-  processedByUser User? @relation("ProcessedWithdrawals", fields: [processedBy], references: [id])
+  id              Int       @id @default(autoincrement())
+  userId          Int       @db.UnsignedInt
+  amount          Float
+  method          String
+  details         Json?
+  status          String    @default("pending")
+  requestedAt     DateTime  @default(now())
+  processedAt     DateTime?
+  processedBy     Int?      @db.UnsignedInt
+  adminNotes      String?
+  transactionId   String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  processedByUser User?     @relation("ProcessedWithdrawals", fields: [processedBy], references: [id])
+  user            User      @relation("UserWithdrawals", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
   @@index([requestedAt])
+  @@index([processedBy], map: "withdrawal_requests_processedBy_fkey")
   @@map("withdrawal_requests")
 }
 
-// Webhook idempotency tracking
 model WebhookLog {
   id          Int      @id @default(autoincrement())
-  webhookId   String   @unique // payment/order ID from webhook
-  event       String   // webhook event type
+  webhookId   String   @unique
+  event       String
   processedAt DateTime @default(now())
-  payload     String?  @db.Text // JSON payload for debugging
+  payload     String?  @db.Text
   createdAt   DateTime @default(now())
 
   @@index([webhookId])
@@ -408,44 +378,38 @@ model WebhookLog {
   @@map("webhook_logs")
 }
 
-// ================================
-// NEW POOL-BASED MLM SYSTEM MODELS
-// ================================
-
-// MLM Purchase tracking
 model Purchase {
-  id         Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId     Int      @db.UnsignedInt
-  productId  Int      @db.UnsignedInt
-  orderId    Int      @db.UnsignedInt
-  type       String   // "first" | "repurchase"
-  mlmAmount  Int      // MLM amount in paisa (from product.mlmPrice)
-  createdAt  DateTime @default(now())
-
-  user       User     @relation(fields: [userId], references: [id])
-  product    Product  @relation(fields: [productId], references: [id])
-  order      Order    @relation(fields: [orderId], references: [id])
+  id                     Int                     @id @default(autoincrement()) @db.UnsignedInt
+  userId                 Int                     @db.UnsignedInt
+  productId              Int                     @db.UnsignedInt
+  orderId                Int                     @db.UnsignedInt
+  type                   String
+  mlmAmount              Int
+  createdAt              DateTime                @default(now())
+  order                  Order                   @relation(fields: [orderId], references: [id])
+  product                Product                 @relation(fields: [productId], references: [id])
+  user                   User                    @relation(fields: [userId], references: [id])
   selfIncomeInstallments SelfIncomeInstallment[]
 
   @@index([userId])
   @@index([type])
   @@index([createdAt])
+  @@index([orderId], map: "purchases_orderId_fkey")
+  @@index([productId], map: "purchases_productId_fkey")
   @@map("purchases")
 }
 
-// Wallet transactions for all MLM earnings
 model Wallet {
-  id         Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId     Int      @db.UnsignedInt
-  type       String   // "self_income" | "pool_distribution" | "withdrawal"
-  amount     Int      // Amount in paisa
-  status     String   // "pending" | "completed" | "cancelled"
-  reference  String?  // Reference for tracking (purchase_id, pool_id, etc.)
-  description String? // Human readable description
-  createdAt  DateTime @default(now())
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  userId      Int       @db.UnsignedInt
+  type        String
+  amount      Int
+  status      String
+  reference   String?
+  description String?
+  createdAt   DateTime  @default(now())
   processedAt DateTime?
-
-  user       User     @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([type])
@@ -454,19 +418,17 @@ model Wallet {
   @@map("wallet_transactions")
 }
 
-// Global Turnover Pool
 model TurnoverPool {
-  id          Int      @id @default(autoincrement()) @db.UnsignedInt
-  totalAmount Int      @default(0) // Total pool amount in paisa
-  l1Amount    Int      @default(0) // 30% for L1 users
-  l2Amount    Int      @default(0) // 20% for L2 users
-  l3Amount    Int      @default(0) // 20% for L3 users
-  l4Amount    Int      @default(0) // 15% for L4 users
-  l5Amount    Int      @default(0) // 15% for L5 users
-  distributed Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  id            Int                @id @default(autoincrement()) @db.UnsignedInt
+  totalAmount   Int                @default(0)
+  l1Amount      Int                @default(0)
+  l2Amount      Int                @default(0)
+  l3Amount      Int                @default(0)
+  l4Amount      Int                @default(0)
+  l5Amount      Int                @default(0)
+  distributed   Boolean            @default(false)
+  createdAt     DateTime           @default(now())
   distributedAt DateTime?
-
   distributions PoolDistribution[]
 
   @@index([distributed])
@@ -474,17 +436,15 @@ model TurnoverPool {
   @@map("turnover_pool")
 }
 
-// Pool distribution records
 model PoolDistribution {
-  id         Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId     Int      @db.UnsignedInt
-  level      Int      // 1-5
-  amount     Int      // Amount received in paisa
-  poolId     Int      @db.UnsignedInt
-  createdAt  DateTime @default(now())
-
-  user       User          @relation(fields: [userId], references: [id])
-  pool       TurnoverPool  @relation(fields: [poolId], references: [id])
+  id        Int          @id @default(autoincrement()) @db.UnsignedInt
+  userId    Int          @db.UnsignedInt
+  level     Int
+  amount    Int
+  poolId    Int          @db.UnsignedInt
+  createdAt DateTime     @default(now())
+  pool      TurnoverPool @relation(fields: [poolId], references: [id])
+  user      User         @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([level])
@@ -492,39 +452,36 @@ model PoolDistribution {
   @@map("pool_distributions")
 }
 
-// Self income installments (4 weekly payments)
 model SelfIncomeInstallment {
-  id         Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId     Int      @db.UnsignedInt
-  purchaseId Int      @db.UnsignedInt
-  amount     Int      // Weekly installment amount in paisa
-  weekNumber Int      // 1-4
-  status     String   @default("scheduled") // "scheduled" | "paid" | "cancelled"
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  userId     Int       @db.UnsignedInt
+  purchaseId Int       @db.UnsignedInt
+  amount     Int
+  weekNumber Int
+  status     String    @default("scheduled")
   dueDate    DateTime
   paidAt     DateTime?
-  createdAt  DateTime @default(now())
-
-  user       User     @relation(fields: [userId], references: [id])
-  purchase   Purchase @relation(fields: [purchaseId], references: [id])
+  createdAt  DateTime  @default(now())
+  purchase   Purchase  @relation(fields: [purchaseId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([status])
   @@index([dueDate])
+  @@index([purchaseId], map: "self_income_installments_purchaseId_fkey")
   @@map("self_income_installments")
 }
 
-// Withdrawal requests (updated for new system)
 model NewWithdrawal {
-  id         Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId     Int      @db.UnsignedInt
-  amount     Int      // Withdrawal amount in paisa
-  status     String   @default("requested") // "requested" | "approved" | "rejected" | "paid"
-  bankDetails String? @db.Text // JSON string with bank details
-  adminNotes String?  @db.Text
-  createdAt  DateTime @default(now())
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  userId      Int       @db.UnsignedInt
+  amount      Int
+  status      String    @default("requested")
+  bankDetails String?   @db.Text
+  adminNotes  String?   @db.Text
+  createdAt   DateTime  @default(now())
   processedAt DateTime?
-
-  user       User     @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([status])
@@ -532,34 +489,42 @@ model NewWithdrawal {
   @@map("new_withdrawals")
 }
 
-// Team tracking for cascading teams
 model Team {
-  id         Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId     Int      @db.UnsignedInt // Team owner
-  teamSize   Int      @default(0)     // Number of first purchases in this team
-  isComplete Boolean  @default(false) // True when team reaches 3 members
-  createdAt  DateTime @default(now())
+  id          Int          @id @default(autoincrement()) @db.UnsignedInt
+  userId      Int          @db.UnsignedInt
+  teamSize    Int          @default(0)
+  isComplete  Boolean      @default(false)
+  createdAt   DateTime     @default(now())
   completedAt DateTime?
-
-  user       User     @relation(fields: [userId], references: [id])
-  members    TeamMember[]
+  members     TeamMember[]
+  user        User         @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([isComplete])
   @@map("teams")
 }
 
-// Team members tracking
 model TeamMember {
-  id         Int      @id @default(autoincrement()) @db.UnsignedInt
-  teamId     Int      @db.UnsignedInt
-  userId     Int      @db.UnsignedInt // Member who made first purchase
-  joinedAt   DateTime @default(now())
-
-  team       Team     @relation(fields: [teamId], references: [id])
-  user       User     @relation(fields: [userId], references: [id])
+  id       Int      @id @default(autoincrement()) @db.UnsignedInt
+  teamId   Int      @db.UnsignedInt
+  userId   Int      @db.UnsignedInt
+  joinedAt DateTime @default(now())
+  team     Team     @relation(fields: [teamId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
 
   @@index([teamId])
   @@index([userId])
   @@map("team_members")
+}
+
+enum OrderStatus {
+  inProcess
+  pending
+  delivered
+}
+
+enum ProductType {
+  REGULAR
+  TRENDING
+  MLM
 }

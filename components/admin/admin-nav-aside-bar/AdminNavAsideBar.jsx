@@ -13,6 +13,7 @@ import {
   FaPhoneVolume,
   FaNetworkWired,
   FaWallet,
+  FaUsers,
 } from "react-icons/fa";
 import { MdCategory, MdLogout, MdOutlineMenu } from "react-icons/md";
 import { PiUsersFill } from "react-icons/pi";
@@ -62,7 +63,10 @@ function AdminNavAsideBar({ showMenus, setShowMenus }) {
     { title: "Products", path: "/admin/products", icon: <BsBoxSeamFill /> },
     { title: "Stock", path: "/admin/stock", icon: <RiStackFill /> },
     { title: "Users", path: "/admin/users", icon: <PiUsersFill /> },
-    { title: "MLM Management", path: "/admin/mlm-panel", icon: <FaNetworkWired /> },
+    { title: "Pool Management", path: "/admin/pool-management", icon: <FaNetworkWired /> },
+    { title: "Team Management", path: "/admin/team-management", icon: <FaUsers /> },
+    { title: "MLM (Legacy)", path: "/admin/mlm-panel", icon: <FaNetworkWired /> },
+    { title: "Pool Withdrawals", path: "/admin/pool-withdrawals", icon: <FaWallet /> },
     { title: "Withdrawals", path: "/admin/withdrawals", icon: <FaWallet /> },
     { title: "Contact Us", path: "/admin/contact-us", icon: <FaPhoneVolume /> },
     { title: "Banners", path: "/admin/banners", icon: <MdOutlineMenu /> },

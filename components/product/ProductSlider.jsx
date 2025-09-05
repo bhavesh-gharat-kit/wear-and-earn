@@ -10,7 +10,7 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "./ProductSlider.css"; // Custom styles
 
-import ProductCard from "./ProductCard";
+import ProductCard from "../product-card/ProductCard";
 import CreateContext from "../context/createContext";
 
 // Product slider component using Swiper.js
