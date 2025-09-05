@@ -1,0 +1,146 @@
+// Updated Prisma schema for new pool-based MLM system
+
+// Add these new models and update existing User model
+
+// Update Product model to include mlmPrice
+model Product {
+  id           Int           @id @default(autoincrement()) @db.UnsignedInt
+  title        String
+  description  String        @db.Text
+  productPrice Int           // Normal product cost in paisa
+  mlmPrice     Int           // MLM amount in paisa (new field)
+  totalPrice   Int           // Computed: productPrice + mlmPrice
+  images       String?       @db.Text
+  categoryId   Int?          @db.UnsignedInt
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  category     Category?     @relation(fields: [categoryId], references: [id])
+  orderProducts OrderProduct[]
+  cartItems    Cart[]
+  purchases    Purchase[]    // New relation for MLM purchases
+}
+
+// New Purchase model for MLM tracking
+model Purchase {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId     Int      @db.UnsignedInt
+  productId  Int      @db.UnsignedInt
+  orderId    Int      @db.UnsignedInt
+  type       String   // "first" | "repurchase"
+  mlmAmount  Int      // MLM amount in paisa
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
+  order      Order    @relation(fields: [orderId], references: [id])
+}
+
+// Update User model with new MLM fields
+// Add these fields to existing User model:
+/*
+  level         Int       @default(0)    // 0=none, 1=L1, 2=L2, 3=L3, 4=L4, 5=L5
+  teamCount     Int       @default(0)    // Total teams formed (direct + cascaded)
+  directTeams   Int       @default(0)    // Direct teams formed
+  kycStatus     Boolean   @default(false) // KYC approval status
+  
+  purchases     Purchase[]
+  walletEntries Wallet[]
+  withdrawals   Withdrawal[]
+*/
+
+// New Wallet model for earnings tracking
+model Wallet {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId     Int      @db.UnsignedInt
+  type       String   // "self_income" | "pool_distribution" | "withdrawal"
+  amount     Int      // Amount in paisa
+  status     String   // "pending" | "completed" | "cancelled"
+  reference  String?  // Reference for tracking
+  createdAt  DateTime @default(now())
+  processedAt DateTime?
+
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+// Global Turnover Pool model
+model TurnoverPool {
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  totalAmount Int      @default(0) // Total pool amount in paisa
+  l1Amount    Int      @default(0) // 30% for L1 users
+  l2Amount    Int      @default(0) // 20% for L2 users
+  l3Amount    Int      @default(0) // 20% for L3 users
+  l4Amount    Int      @default(0) // 15% for L4 users
+  l5Amount    Int      @default(0) // 15% for L5 users
+  distributed Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  distributedAt DateTime?
+}
+
+// Pool distribution records
+model PoolDistribution {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId     Int      @db.UnsignedInt
+  level      Int      // 1-5
+  amount     Int      // Amount received in paisa
+  poolId     Int      @db.UnsignedInt
+  createdAt  DateTime @default(now())
+
+  user       User          @relation(fields: [userId], references: [id])
+  pool       TurnoverPool  @relation(fields: [poolId], references: [id])
+}
+
+// Self income installments
+model SelfIncomeInstallment {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId     Int      @db.UnsignedInt
+  purchaseId Int      @db.UnsignedInt
+  amount     Int      // Weekly installment amount in paisa
+  weekNumber Int      // 1-4
+  status     String   @default("scheduled") // "scheduled" | "paid" | "cancelled"
+  dueDate    DateTime
+  paidAt     DateTime?
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  purchase   Purchase @relation(fields: [purchaseId], references: [id])
+}
+
+// Withdrawal requests
+model Withdrawal {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId     Int      @db.UnsignedInt
+  amount     Int      // Withdrawal amount in paisa
+  status     String   @default("requested") // "requested" | "approved" | "rejected" | "paid"
+  bankDetails String? @db.Text // JSON string with bank details
+  adminNotes String?  @db.Text
+  createdAt  DateTime @default(now())
+  processedAt DateTime?
+
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+// Team tracking for cascading teams
+model Team {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId     Int      @db.UnsignedInt // Team owner
+  teamSize   Int      @default(0)     // Number of first purchases in this team
+  isComplete Boolean  @default(false) // True when team reaches 3 members
+  createdAt  DateTime @default(now())
+  completedAt DateTime?
+
+  user       User     @relation(fields: [userId], references: [id])
+  members    TeamMember[]
+}
+
+// Team members tracking
+model TeamMember {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  teamId     Int      @db.UnsignedInt
+  userId     Int      @db.UnsignedInt // Member who made first purchase
+  joinedAt   DateTime @default(now())
+
+  team       Team     @relation(fields: [teamId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+}

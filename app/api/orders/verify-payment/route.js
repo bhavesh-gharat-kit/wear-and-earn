@@ -77,45 +77,27 @@ export async function POST(req) {
 
         // Trigger MLM activation if user is not active or has no referral code
         if (!user.isActive || !user.referralCode) {
-          console.log('🚀 Triggering MLM activation for user:', updatedOrder.userId);
+          console.log('🚀 Triggering NEW POOL MLM activation for user:', updatedOrder.userId);
           
           try {
-            const origin = req?.headers?.get('origin') || process.env.NEXTAUTH_URL || 'http://localhost:3000';
-            console.log('🌐 Using origin:', origin);
-            
-            const activateResponse = await fetch(`${origin}/api/activate-mlm-internal`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                userId: updatedOrder.userId,
-                amount: updatedOrder.total,
-                orderId: updatedOrder.id
-              })
-            })
-
-            if (!activateResponse.ok) {
-              const errorText = await activateResponse.text();
-              console.error('❌ Failed to activate MLM for user:', updatedOrder.userId, 'Status:', activateResponse.status, 'Error:', errorText);
-            } else {
-              const result = await activateResponse.json();
-              console.log('✅ MLM activation successful for user:', updatedOrder.userId, 'Result:', result.success);
-            }
+            const { processPoolMLMOrder } = await import('@/lib/pool-mlm-system');
+            const mlmResult = await processPoolMLMOrder(tx, updatedOrder);
+            console.log('✅ Pool MLM activation successful for user:', updatedOrder.userId, mlmResult);
           } catch (error) {
-            console.error('❌ Error activating MLM:', error.message);
+            console.error('❌ Error in Pool MLM activation:', error.message);
+            throw error; // Re-throw to rollback transaction
           }
         } else {
           console.log('ℹ️ User', updatedOrder.userId, 'already has MLM activated with referral code:', user.referralCode);
           
-          // Process commission for already active users within the same transaction
-          console.log('💰 Processing commission for existing active user:', updatedOrder.userId);
+          // Process with NEW POOL SYSTEM for existing users
+          console.log('🏊 Processing with new Pool MLM system for user:', updatedOrder.userId);
           try {
-            const { handlePaidRepurchase } = await import('@/lib/mlm-commission');
-            await handlePaidRepurchase(tx, updatedOrder);
-            console.log('✅ Commission processing completed for user:', updatedOrder.userId);
+            const { processPoolMLMOrder } = await import('@/lib/pool-mlm-system');
+            const mlmResult = await processPoolMLMOrder(tx, updatedOrder);
+            console.log('✅ Pool MLM processing completed:', mlmResult);
           } catch (error) {
-            console.error('❌ Error processing commission:', error.message);
+            console.error('❌ Error processing Pool MLM:', error.message);
             throw error; // Re-throw to rollback transaction
           }
         }
