@@ -114,11 +114,8 @@ export async function POST(req) {
           console.log('Processing joining order - first paid order for user:', order.userId);
           
           // Import MLM functions with correct paths
-          // OLD MLM SYSTEM - DISABLED
-          // const { placeUserInMatrix, getGlobalRootId, bfsFindOpenSlot } = await import('@/lib/mlm-matrix');
-          // const { handlePaidJoining } = await import('@/lib/mlm-commission');
-          
-          console.log('Razorpay webhook received but old MLM processing is disabled. Use /api/orders/verify-payment instead.');
+          const { placeUserInMatrix, getGlobalRootId, bfsFindOpenSlot } = await import('@/lib/mlm-matrix');
+          const { handlePaidJoining } = await import('@/lib/mlm-commission');
           const { generateAndAssignReferralCode } = await import('@/lib/referral');
           
           // Generate referral code and activate user
@@ -175,11 +172,8 @@ export async function POST(req) {
         } else {
           // REPEAT ORDER - REPURCHASE LOGIC
           console.log('Processing repurchase order for user:', order.userId);
-          // OLD MLM SYSTEM - DISABLED
-          // const { handleRepurchaseCommission } = await import('@/lib/mlm-commission');
-          // const { isRepurchaseEligible } = await import('@/lib/mlm-matrix');
-          
-          console.log('Razorpay webhook received but old MLM processing is disabled. Use /api/orders/verify-payment instead.');
+          const { handleRepurchaseCommission } = await import('@/lib/mlm-commission');
+          const { isRepurchaseEligible } = await import('@/lib/mlm-matrix');
           
           // Check repurchase eligibility (3-3 rule)
           const isEligible = await isRepurchaseEligible(tx, order.userId);

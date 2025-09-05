@@ -10,7 +10,7 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "./ProductSlider.css"; // Reuse the same custom styles
 
-import ProductCard from "../product-card/ProductCard";
+import ProductCard from "./ProductCard";
 import CreateContext from "../context/createContext";
 
 // MLM Product slider component using Swiper.js
