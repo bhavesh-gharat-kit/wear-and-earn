@@ -32,18 +32,31 @@ export async function GET(request) {
 
     // Check if user is activated (has made first paid order)
     if (!user.isActive || !user.referralCode) {
-      // Before returning error, check if user has any delivered orders
-      const deliveredOrders = await prisma.order.count({
+      // Check if user has any paid orders (inProcess or delivered status with payment confirmation)
+      const paidOrders = await prisma.order.count({
         where: {
           userId: userId,
-          status: 'delivered'
+          AND: [
+            {
+              OR: [
+                { status: 'delivered' },
+                { status: 'inProcess' }
+              ]
+            },
+            {
+              NOT: { paymentId: null } // Must have a payment ID (payment confirmed)
+            },
+            {
+              NOT: { paidAt: null } // Must have been paid
+            }
+          ]
         }
       });
 
-      if (deliveredOrders > 0) {
+      if (paidOrders > 0) {
         // User has purchases but isn't activated - activate them directly
         try {
-          console.log(`Auto-activating user ${userId} who has ${deliveredOrders} delivered orders but no MLM activation`);
+          console.log(`Auto-activating user ${userId} who has ${paidOrders} paid orders but no MLM activation`);
           
           // Activate user directly in the same transaction
           const activatedUser = await prisma.$transaction(async (tx) => {
@@ -76,11 +89,11 @@ export async function GET(request) {
       if (!user.isActive || !user.referralCode) {
         return NextResponse.json({
           error: 'Referral link not available',
-          message: deliveredOrders > 0 ? 
+          message: paidOrders > 0 ? 
             'Your account is being activated. Please refresh the page in a few moments.' :
             'You need to make your first purchase to get your referral link',
           isActive: false,
-          hasOrders: deliveredOrders > 0
+          hasOrders: paidOrders > 0
         }, { status: 400 });
       }
     }
