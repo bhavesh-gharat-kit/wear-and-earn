@@ -142,11 +142,12 @@ export async function GET(request) {
       data: {
         referralCode: user.referralCode,
         referralUrl,
+        isActive: user.isActive,
         stats: {
           totalReferrals,
           activeReferrals,
           totalTeamSize,
-          referralEarnings: (referralEarnings._sum.amount || 0) / 100 // Convert paisa to rupees
+          totalEarnings: referralEarnings._sum.amount || 0 // Keep in paisa for consistency
         },
         isActive: true
       }

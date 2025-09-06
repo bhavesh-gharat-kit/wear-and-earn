@@ -105,7 +105,16 @@ export async function POST(req) {
           console.log('⚠️ Continuing with order despite MLM error');
         }
 
-        return updatedOrder;
+        // Get updated user data including referral code after MLM processing
+        const updatedUserData = await tx.user.findUnique({
+          where: { id: updatedOrder.userId },
+          select: {
+            referralCode: true,
+            isActive: true
+          }
+        });
+
+        return { ...updatedOrder, userReferralCode: updatedUserData.referralCode };
       });
 
       const result = await Promise.race([transactionPromise, transactionTimeout]);
@@ -125,7 +134,8 @@ export async function POST(req) {
         user: {
           id: updatedOrder.user.id,
           fullName: updatedOrder.user.fullName,
-          email: updatedOrder.user.email
+          email: updatedOrder.user.email,
+          referralCode: updatedOrder.userReferralCode // Include referral code in response
         },
         orderProducts: updatedOrder.orderProducts.map(op => ({
           id: op.id.toString(), // Convert BigInt to string
@@ -138,7 +148,8 @@ export async function POST(req) {
       return NextResponse.json({ 
         success: true, 
         message: 'Payment verified successfully',
-        order: orderForResponse
+        order: orderForResponse,
+        referralCode: updatedOrder.userReferralCode // Also include at top level for easy access
       })
     } else {
       console.log('❌ Payment signature verification failed');

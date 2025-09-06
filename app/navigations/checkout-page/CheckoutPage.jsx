@@ -18,6 +18,7 @@ import {
 import CreateContext from '@/components/context/createContext';
 import AddressForm from '@/components/forms/AddressForm';
 import LoaderEffect from '@/components/ui/LoaderEffect';
+import PaymentSuccessModal from '@/components/checkout/PaymentSuccessModal';
 
 export default function CheckoutPage() {
   const { data: session } = useSession();
@@ -29,6 +30,23 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('online');
+  
+  // Payment success modal state
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successOrderData, setSuccessOrderData] = useState(null);
+  const [userReferralCode, setUserReferralCode] = useState(null);
+
+  // Modal handlers
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+  };
+
+  const handleGoToOrder = () => {
+    setShowSuccessModal(false);
+    if (successOrderData) {
+      router.push(`/orders/${successOrderData.id}`);
+    }
+  };
 
   // Load Razorpay script
   const loadRazorpayScript = () => {
@@ -167,11 +185,28 @@ export default function CheckoutPage() {
                 console.log('✅ Payment verification response:', verifyResponse.data);
 
                 if (verifyResponse.data.success) {
-                  toast.success('Payment successful! Order placed.');
+                  // Store success data for modal
+                  setSuccessOrderData(verifyResponse.data.order);
+                  setUserReferralCode(verifyResponse.data.referralCode);
+                  
+                  // Show success message
+                  const successMessage = verifyResponse.data.referralCode ? 
+                    `Payment successful! Your referral code: ${verifyResponse.data.referralCode}` :
+                    'Payment successful! Order placed.';
+                  
+                  toast.success(successMessage, { duration: 3000 });
+                  
+                  // Log referral code for immediate access
+                  if (verifyResponse.data.referralCode) {
+                    console.log('🎟️ User referral code:', verifyResponse.data.referralCode);
+                  }
+                  
                   // Clear cart after successful payment
                   await axios.delete('/api/cart/clear');
                   fetchUserProductCartDetails();
-                  router.push(`/orders/${response.data.orderId}`);
+                  
+                  // Show success modal instead of immediate redirect
+                  setShowSuccessModal(true);
                 } else {
                   console.error('❌ Payment verification failed:', verifyResponse.data);
                   toast.error(`Payment verification failed: ${verifyResponse.data.message || 'Unknown error'}`);
@@ -473,6 +508,15 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+      
+      {/* Payment Success Modal */}
+      <PaymentSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleCloseSuccessModal}
+        orderData={successOrderData}
+        referralCode={userReferralCode}
+        onGoToOrder={handleGoToOrder}
+      />
     </div>
   );
 }

@@ -527,16 +527,25 @@ const ReferralSection = ({ userData }) => {
   return (
     <div className="space-y-6">
       {/* Referral Code Card */}
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border border-purple-200 dark:border-purple-700 p-6 rounded-lg">
-        <h3 className="font-medium text-gray-900 dark:text-white mb-3">Your Referral Code</h3>
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border-2 border-purple-200 dark:border-purple-700 p-6 rounded-lg mb-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-2 rounded-lg font-mono text-lg flex-1">
+          <div className="bg-purple-500 p-2 rounded-full">
+            <Share2 className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Your Referral Code</h3>
+            <p className="text-purple-700 dark:text-purple-300 text-sm">Share this code to start earning!</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-white dark:bg-gray-800 border-2 border-purple-300 dark:border-purple-600 text-purple-900 dark:text-purple-100 px-6 py-3 rounded-lg font-mono text-2xl font-bold flex-1 text-center">
             {referralData.referralCode}
           </div>
           <button 
             onClick={() => copyToClipboard(referralData.referralCode)}
             disabled={copying}
-            className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2 disabled:opacity-50"
+            className="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2 disabled:opacity-50 min-w-[100px] justify-center"
           >
             <Copy className="w-4 h-4" />
             {copying ? 'Copied!' : 'Copy'}
@@ -544,12 +553,30 @@ const ReferralSection = ({ userData }) => {
         </div>
         
         <div className="text-sm text-gray-600 dark:text-gray-300">
-          <p className="mb-1">Referral URL:</p>
+          <p className="mb-2 font-medium">Share this URL:</p>
           <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-3 py-2 rounded text-xs break-all">
             {referralData.referralUrl}
           </div>
         </div>
       </div>
+
+      {/* Referral Stats */}
+      {referralData.stats && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white border border-gray-200 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-blue-600">{referralData.stats.totalReferrals || 0}</div>
+            <div className="text-sm text-gray-600">Total Referrals</div>
+          </div>
+          <div className="bg-white border border-gray-200 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-green-600">{referralData.stats.activeReferrals || 0}</div>
+            <div className="text-sm text-gray-600">Active Members</div>
+          </div>
+          <div className="bg-white border border-gray-200 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-purple-600">₹{((referralData.stats.totalEarnings || 0) / 100).toFixed(0)}</div>
+            <div className="text-sm text-gray-600">Total Earned</div>
+          </div>
+        </div>
+      )}
 
       {/* Share Options */}
       <div>
@@ -2505,8 +2532,11 @@ const AccountDashboard = () => {
           )}
           
           {activeTab === 'referral' && (
-            <div>
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900">Referral Program</h2>
+            <div id="referral">
+              <div className="mb-6">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">🎯 Referral Program</h2>
+                <p className="text-gray-600">Share your referral code and earn commissions from your network!</p>
+              </div>
               
               {/* Referral Code Card */}
               <ReferralSection userData={userData} />
