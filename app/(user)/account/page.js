@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { 
   User, 
   Package, 
@@ -429,6 +430,7 @@ const WalletActions = ({ walletBalance }) => {
 
 // Referral Section Component
 const ReferralSection = ({ userData }) => {
+  const router = useRouter()
   const [referralData, setReferralData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [copying, setCopying] = useState(false)
@@ -449,10 +451,19 @@ const ReferralSection = ({ userData }) => {
           }, 3000)
           return
         }
+        // Set referralData to indicate not active
+        setReferralData({
+          isActive: false,
+          message: data.message || 'You need to make your first purchase to get your referral link'
+        })
         console.error('Referral data error:', data.message)
       }
     } catch (error) {
       console.error('Error fetching referral data:', error)
+      setReferralData({
+        isActive: false,
+        message: 'Error loading referral data'
+      })
     } finally {
       setLoading(false)
     }
@@ -511,13 +522,18 @@ const ReferralSection = ({ userData }) => {
     )
   }
 
-  if (!referralData?.isActive) {
+  if (!referralData || !referralData.isActive) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 p-6 rounded-lg text-center">
         <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Referral Link Not Available</h3>
-        <p className="text-gray-600 mb-4">You need to make your first purchase to get your referral link and start earning commissions.</p>
-        <button className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+        <p className="text-gray-600 mb-4">
+          {referralData?.message || 'You need to make your first purchase to get your referral link and start earning commissions.'}
+        </p>
+        <button 
+          onClick={() => router.push('/products')}
+          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+        >
           Shop Now
         </button>
       </div>
