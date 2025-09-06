@@ -10,8 +10,19 @@ export async function GET(request) {
   try {
     const session = await getServerSession(authOptions)
     
+    console.log('🔍 Session check:', {
+      hasSession: !!session,
+      userId: session?.user?.id,
+      userEmail: session?.user?.email
+    })
+    
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      console.log('❌ No session or user ID found')
+      return NextResponse.json({ 
+        success: false,
+        error: 'Unauthorized',
+        message: 'Please log in to view your referral data'
+      }, { status: 401 })
     }
 
     const userId = parseInt(session.user.id)
@@ -144,11 +155,12 @@ export async function GET(request) {
     })
 
   } catch (error) {
-    console.error('Error fetching referral data:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('❌ Referral API Error:', error)
+    return NextResponse.json({
+      success: false,
+      error: 'Internal server error',
+      message: 'Failed to load referral data'
+    }, { status: 500 })
   }
 }
 

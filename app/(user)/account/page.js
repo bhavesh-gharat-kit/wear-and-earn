@@ -438,9 +438,21 @@ const ReferralSection = ({ userData }) => {
   const fetchReferralData = useCallback(async (retryCount = 0) => {
     try {
       const response = await fetch('/api/account/referral')
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          console.log('❌ User not authenticated, redirecting to login')
+          router.push('/login')
+          return
+        }
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
       const data = await response.json()
+      console.log('🔍 API Response:', data)
       
       if (data.success) {
+        console.log('✅ Referral data received:', data.data)
         setReferralData(data.data)
       } else {
         // Check if this is an activation-in-progress error
@@ -452,22 +464,30 @@ const ReferralSection = ({ userData }) => {
           return
         }
         // Set referralData to indicate not active
+        console.log('⚠️ Referral not available:', data.message || 'Unknown error')
         setReferralData({
           isActive: false,
-          message: data.message || 'You need to make your first purchase to get your referral link'
+          message: data.message || data.error || 'You need to make your first purchase to get your referral link'
         })
-        console.error('Referral data error:', data.message)
       }
     } catch (error) {
-      console.error('Error fetching referral data:', error)
+      console.error('❌ Error fetching referral data:', error)
+      
+      // Check if it's a network error or auth error
+      if (error.message.includes('401')) {
+        console.log('❌ Authentication error, redirecting to login')
+        router.push('/login')
+        return
+      }
+      
       setReferralData({
         isActive: false,
-        message: 'Error loading referral data'
+        message: 'Please log in to view your referral data'
       })
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [router])
 
   useEffect(() => {
     fetchReferralData()
@@ -530,12 +550,20 @@ const ReferralSection = ({ userData }) => {
         <p className="text-gray-600 mb-4">
           {referralData?.message || 'You need to make your first purchase to get your referral link and start earning commissions.'}
         </p>
-        <button 
-          onClick={() => router.push('/products')}
-          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-        >
-          Shop Now
-        </button>
+        <div className="flex gap-3 justify-center">
+          <button 
+            onClick={() => router.push('/products')}
+            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Shop Now
+          </button>
+          <button 
+            onClick={() => router.push('/login')}
+            className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+          >
+            Login
+          </button>
+        </div>
       </div>
     )
   }
