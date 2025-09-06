@@ -522,7 +522,7 @@ const ReferralSection = ({ userData }) => {
     )
   }
 
-  if (!referralData || !referralData.isActive) {
+  if (!referralData || !referralData.referralCode) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 p-6 rounded-lg text-center">
         <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />

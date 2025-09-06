@@ -168,11 +168,7 @@ export default function CheckoutPage() {
 
                 if (verifyResponse.data.success) {
                   // Show success message
-                  const successMessage = verifyResponse.data.referralCode ? 
-                    `Payment successful! Your referral code: ${verifyResponse.data.referralCode}` :
-                    'Payment successful! Order placed.';
-                  
-                  toast.success(successMessage, { duration: 3000 });
+                  toast.success('Payment successful! Order placed.', { duration: 3000 });
                   
                   // Log referral code for immediate access
                   if (verifyResponse.data.referralCode) {
@@ -183,8 +179,10 @@ export default function CheckoutPage() {
                   await axios.delete('/api/cart/clear');
                   fetchUserProductCartDetails();
                   
-                  // Redirect to account page to see referral code
-                  router.push('/account');
+                  // Redirect to account page with a small delay to ensure MLM processing is complete
+                  setTimeout(() => {
+                    router.push('/account');
+                  }, 1500);
                 } else {
                   console.error('❌ Payment verification failed:', verifyResponse.data);
                   toast.error(`Payment verification failed: ${verifyResponse.data.message || 'Unknown error'}`);

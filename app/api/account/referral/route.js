@@ -30,8 +30,14 @@ export async function GET(request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
+    console.log(`🔍 Referral check for user ${userId}:`, {
+      isActive: user.isActive,
+      hasReferralCode: !!user.referralCode,
+      referralCode: user.referralCode
+    });
+
     // Check if user is activated (has made first paid order)
-    if (!user.isActive || !user.referralCode) {
+    if (!user.referralCode) {
       // Check if user has any paid orders (inProcess or delivered status with payment confirmation)
       const paidOrders = await prisma.order.count({
         where: {
@@ -54,39 +60,28 @@ export async function GET(request) {
       });
 
       if (paidOrders > 0) {
-        // User has purchases but isn't activated - activate them directly
+        // User has purchases but no referral code - generate one
         try {
-          console.log(`Auto-activating user ${userId} who has ${paidOrders} paid orders but no MLM activation`);
+          console.log(`Auto-generating referral code for user ${userId} who has ${paidOrders} paid orders`);
           
-          // Activate user directly in the same transaction
-          const activatedUser = await prisma.$transaction(async (tx) => {
-            // Generate and assign referral code
-            let referralCode = user.referralCode;
-            if (!referralCode) {
-              referralCode = await generateAndAssignReferralCode(tx, userId);
-            }
-            
-            // Activate user
-            const updatedUser = await tx.user.update({
-              where: { id: userId },
-              data: { isActive: true }
-            });
-            
-            return { ...updatedUser, referralCode };
+          const referralCode = await generateAndAssignReferralCode(prisma, userId);
+          user.referralCode = referralCode;
+          
+          // Also activate the user
+          await prisma.user.update({
+            where: { id: userId },
+            data: { isActive: true }
           });
-
-          // Update local user object
-          user.isActive = activatedUser.isActive;
-          user.referralCode = activatedUser.referralCode;
+          user.isActive = true;
           
-          console.log(`Successfully auto-activated user ${userId} with referral code ${user.referralCode}`);
+          console.log(`Successfully generated referral code ${referralCode} for user ${userId}`);
         } catch (activationError) {
-          console.error(`Failed to auto-activate user ${userId}:`, activationError);
+          console.error(`Failed to generate referral code for user ${userId}:`, activationError);
         }
       }
 
-      // If still not activated after auto-activation attempt
-      if (!user.isActive || !user.referralCode) {
+      // If still no referral code after generation attempt
+      if (!user.referralCode) {
         return NextResponse.json({
           error: 'Referral link not available',
           message: paidOrders > 0 ? 
