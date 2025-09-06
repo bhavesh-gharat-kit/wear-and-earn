@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 // Ensure this route runs on the Node.js runtime and is always dynamic.
 // This avoids edge-runtime incompatibilities (e.g., bcrypt) and caching issues for auth.

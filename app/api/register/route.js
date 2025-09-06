@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from "@/lib/prisma"
-import bcrypt from "bcrypt"
+import bcrypt from "bcryptjs"
 import { rateLimit } from '@/lib/rate-limit'
 
 // Rate limiting for registration
@@ -241,8 +241,18 @@ export async function POST(request) {
 
     // Start transaction for user creation
     const result = await prisma.$transaction(async (tx) => {
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10)
+      // Hash password with error handling
+      let hashedPassword;
+      try {
+        if (!password || typeof password !== 'string') {
+          throw new Error('Invalid password format');
+        }
+        hashedPassword = await bcrypt.hash(password, 10);
+        console.log('✅ Password hashed successfully');
+      } catch (hashError) {
+        console.error('❌ Password hashing error:', hashError);
+        throw new Error('Error processing password');
+      }
 
       // Create user
       const newUser = await tx.user.create({
@@ -331,6 +341,14 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Registration error:', error)
+    
+    // Handle specific password processing errors
+    if (error.message === 'Error processing password') {
+      return NextResponse.json(
+        { error: 'Error processing password. Please ensure your password is valid.' },
+        { status: 400 }
+      )
+    }
     
     // Handle specific database errors
     if (error.code === 'P2002') {
