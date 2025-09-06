@@ -30,12 +30,6 @@ export async function GET(request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    console.log(`🔍 Referral check for user ${userId}:`, {
-      isActive: user.isActive,
-      hasReferralCode: !!user.referralCode,
-      referralCode: user.referralCode
-    });
-
     // Check if user is activated (has made first paid order)
     if (!user.referralCode) {
       // Check if user has any paid orders (inProcess or delivered status with payment confirmation)
@@ -83,13 +77,14 @@ export async function GET(request) {
       // If still no referral code after generation attempt
       if (!user.referralCode) {
         return NextResponse.json({
+          success: false,
           error: 'Referral link not available',
           message: paidOrders > 0 ? 
             'Your account is being activated. Please refresh the page in a few moments.' :
             'You need to make your first purchase to get your referral link',
           isActive: false,
           hasOrders: paidOrders > 0
-        }, { status: 400 });
+        }, { status: 200 }); // Changed to 200 so frontend handles it properly
       }
     }
 
