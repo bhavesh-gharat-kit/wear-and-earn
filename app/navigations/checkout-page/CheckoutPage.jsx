@@ -152,13 +152,19 @@ export default function CheckoutPage() {
             order_id: response.data.razorpayOrder.id,
             handler: async (razorpayResponse) => {
               try {
-                // Verify payment
+                console.log('💳 Payment successful on Razorpay, verifying...', razorpayResponse);
+                
+                // Verify payment with timeout
                 const verifyResponse = await axios.post('/api/orders/verify-payment', {
                   razorpay_order_id: razorpayResponse.razorpay_order_id,
                   razorpay_payment_id: razorpayResponse.razorpay_payment_id,
                   razorpay_signature: razorpayResponse.razorpay_signature,
                   orderId: response.data.orderId
+                }, {
+                  timeout: 30000 // 30 second timeout
                 });
+
+                console.log('✅ Payment verification response:', verifyResponse.data);
 
                 if (verifyResponse.data.success) {
                   toast.success('Payment successful! Order placed.');
@@ -167,11 +173,22 @@ export default function CheckoutPage() {
                   fetchUserProductCartDetails();
                   router.push(`/orders/${response.data.orderId}`);
                 } else {
-                  toast.error('Payment verification failed');
+                  console.error('❌ Payment verification failed:', verifyResponse.data);
+                  toast.error(`Payment verification failed: ${verifyResponse.data.message || 'Unknown error'}`);
+                  // Don't redirect, let user try again
                 }
               } catch (error) {
-                console.error('Payment verification error:', error);
-                toast.error('Payment verification failed');
+                console.error('💥 Payment verification error:', error);
+                
+                if (error.code === 'ECONNABORTED') {
+                  toast.error('Payment verification timed out. Please check your order status or contact support.');
+                } else if (error.response?.status === 500) {
+                  toast.error('Payment successful but processing failed. Please check your order status.');
+                } else {
+                  toast.error(`Payment verification failed: ${error.response?.data?.message || error.message}`);
+                }
+              } finally {
+                setIsPlacingOrder(false);
               }
             },
             prefill: {
@@ -190,6 +207,12 @@ export default function CheckoutPage() {
                 toast.error('Payment cancelled');
                 setIsPlacingOrder(false);
               },
+            },
+            // Add payment failure handler
+            'payment.failed': (response) => {
+              console.error('💥 Razorpay payment failed:', response.error);
+              toast.error(`Payment failed: ${response.error.description || 'Unknown error'}`);
+              setIsPlacingOrder(false);
             },
           };
 

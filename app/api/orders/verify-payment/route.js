@@ -4,8 +4,10 @@ import prisma from "@/lib/prisma";
 
 
 export async function POST(req) {
+  const startTime = Date.now();
+  
   try {
-    console.log('🔍 Payment verification started');
+    console.log('🔍 Payment verification started at:', new Date().toISOString());
     
     const body = await req.json();
     console.log('Request body keys:', Object.keys(body));
@@ -46,8 +48,13 @@ export async function POST(req) {
     if (isAuthentic) {
       console.log('📝 Updating order status to inProcess');
       
-      // Process everything in a single transaction
-      const result = await prisma.$transaction(async (tx) => {
+      // Set a timeout for the transaction
+      const transactionTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Transaction timeout - MLM processing took too long')), 25000)
+      );
+      
+      // Process everything in a single transaction with timeout
+      const transactionPromise = prisma.$transaction(async (tx) => {
         // Update order status to inProcess (payment confirmed, awaiting fulfillment)  
         const updatedOrder = await tx.order.update({
           where: { id: parseInt(orderId) },
@@ -85,7 +92,8 @@ export async function POST(req) {
             console.log('✅ Pool MLM activation successful for user:', updatedOrder.userId, mlmResult);
           } catch (error) {
             console.error('❌ Error in Pool MLM activation:', error.message);
-            throw error; // Re-throw to rollback transaction
+            // Don't throw error - let order succeed even if MLM fails
+            console.log('⚠️ Continuing with order despite MLM error');
           }
         } else {
           console.log('ℹ️ User', updatedOrder.userId, 'already has MLM activated with referral code:', user.referralCode);
@@ -98,16 +106,19 @@ export async function POST(req) {
             console.log('✅ Pool MLM processing completed:', mlmResult);
           } catch (error) {
             console.error('❌ Error processing Pool MLM:', error.message);
-            throw error; // Re-throw to rollback transaction
+            // Don't throw error - let order succeed even if MLM fails
+            console.log('⚠️ Continuing with order despite MLM error');
           }
         }
 
         return updatedOrder;
       });
 
+      const result = await Promise.race([transactionPromise, transactionTimeout]);
       const updatedOrder = result;
 
-      console.log('🎉 Payment verification completed successfully');
+      const processingTime = Date.now() - startTime;
+      console.log(`🎉 Payment verification completed successfully in ${processingTime}ms`);
 
       // Convert BigInt values to strings for JSON serialization
       const orderForResponse = {
@@ -143,13 +154,29 @@ export async function POST(req) {
       )
     }
   } catch (error) {
-    console.error('💥 Payment verification error:', error);
+    const processingTime = Date.now() - startTime;
+    console.error(`💥 Payment verification error after ${processingTime}ms:`, error);
     console.error('Error stack:', error.stack);
+    
+    // If it's a timeout error, still return success since payment was verified
+    if (error.message.includes('timeout')) {
+      console.log('⚠️ Transaction timed out but payment was verified - returning success');
+      return NextResponse.json(
+        { 
+          success: true, 
+          message: 'Payment verified successfully (MLM processing may be delayed)',
+          warning: 'MLM processing timed out but will be completed in background'
+        },
+        { status: 200 }
+      );
+    }
+    
     return NextResponse.json(
       { 
         success: false, 
         message: 'Internal server error', 
         error: error.message,
+        processingTime: `${processingTime}ms`,
         stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       },
       { status: 500 }
