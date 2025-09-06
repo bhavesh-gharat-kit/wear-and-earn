@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { 
   Users, 
@@ -27,7 +27,7 @@ export default function TeamManagementPage() {
   const [pagination, setPagination] = useState({})
   const [expandedTeams, setExpandedTeams] = useState(new Set())
 
-  const fetchTeams = async () => {
+  const fetchTeams = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch(`/api/admin/teams?level=${filters.level}&status=${filters.status}&page=${filters.page}&limit=${filters.limit}`)
@@ -42,13 +42,13 @@ export default function TeamManagementPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filters.level, filters.status, filters.page, filters.limit])
 
   useEffect(() => {
     if (status !== 'loading' && session?.user?.role === 'admin') {
       fetchTeams()
     }
-  }, [session, status, filters])
+  }, [session, status, filters, fetchTeams])
 
   const toggleTeamExpansion = (teamId) => {
     const newExpanded = new Set(expandedTeams)

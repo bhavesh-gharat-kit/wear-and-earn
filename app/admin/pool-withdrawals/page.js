@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { 
   Wallet,
@@ -26,7 +26,7 @@ export default function PoolWithdrawalsPage() {
   const [pagination, setPagination] = useState({})
   const [processing, setProcessing] = useState(false)
 
-  const fetchWithdrawals = async () => {
+  const fetchWithdrawals = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch(`/api/admin/pool-withdrawals?status=${filters.status}&method=${filters.method}&page=${filters.page}&limit=${filters.limit}`)
@@ -41,13 +41,13 @@ export default function PoolWithdrawalsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filters.status, filters.method, filters.page, filters.limit])
 
   useEffect(() => {
     if (status !== 'loading' && session?.user?.role === 'admin') {
       fetchWithdrawals()
     }
-  }, [session, status, filters])
+  }, [session, status, filters, fetchWithdrawals])
 
   const handleWithdrawalAction = async (withdrawalId, action, remarks = '') => {
     if (!confirm(`Are you sure you want to ${action} this withdrawal request?`)) {

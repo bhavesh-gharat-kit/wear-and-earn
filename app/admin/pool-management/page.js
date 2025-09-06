@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { 
   Users, 
@@ -68,7 +68,7 @@ export default function PoolManagementPanel() {
     fetchPoolData()
   }, [session, status])
 
-  const fetchTeams = async () => {
+  const fetchTeams = useCallback(async () => {
     try {
       const response = await fetch(`/api/admin/teams?level=${filters.level}&status=${filters.status}&page=${filters.page}&limit=${filters.limit}`)
       
@@ -79,13 +79,13 @@ export default function PoolManagementPanel() {
     } catch (error) {
       console.error('Error fetching teams:', error)
     }
-  }
+  }, [filters.level, filters.status, filters.page, filters.limit])
 
   useEffect(() => {
     if (activeTab === 'teams') {
       fetchTeams()
     }
-  }, [activeTab, filters])
+  }, [activeTab, filters, fetchTeams])
 
   const handleDistributePool = async () => {
     if (!confirm('Are you sure you want to distribute the current pool to all eligible users?')) {
