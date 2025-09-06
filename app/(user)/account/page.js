@@ -437,26 +437,10 @@ const ReferralSection = ({ userData }) => {
 
   const fetchReferralData = useCallback(async (retryCount = 0) => {
     try {
-      // If userData already contains referral info, use it directly
-      if (userData?.referralCode) {
-        console.log('✅ Using referral data from userData:', userData.referralCode)
-        const referralUrl = `${window.location.origin}/register?ref=${userData.referralCode}`
-        setReferralData({
-          referralCode: userData.referralCode,
-          referralUrl,
-          isActive: userData.isActive || true,
-          stats: {
-            totalReferrals: 0,
-            activeReferrals: 0,
-            totalTeamSize: 0,
-            totalEarnings: 0
-          }
-        })
-        setLoading(false)
-        return
-      }
-
+      console.log('🔍 Fetching referral data...')
       const response = await fetch('/api/account/referral')
+      
+      console.log('🔍 Response status:', response.status)
       
       if (!response.ok) {
         if (response.status === 401) {
@@ -474,84 +458,22 @@ const ReferralSection = ({ userData }) => {
         console.log('✅ Referral data received:', data.data)
         setReferralData(data.data)
       } else {
-        // Check if this is an activation-in-progress error
-        if (data.hasOrders && retryCount < 2) {
-          console.log('Account activation in progress, retrying in 3 seconds...')
-          setTimeout(() => {
-            fetchReferralData(retryCount + 1)
-          }, 3000)
-          return
-        }
-        // Set referralData to indicate not active
-        console.log('⚠️ Referral not available:', data.message || 'Unknown error')
+        console.log('⚠️ Referral not available:', data.message)
         setReferralData({
           isActive: false,
-          message: data.message || data.error || 'You need to make your first purchase to get your referral link'
+          message: data.message || 'You need to make your first purchase to get your referral link'
         })
       }
     } catch (error) {
       console.error('❌ Error fetching referral data:', error)
-      
-      // Check if it's a network error or auth error
-      if (error.message.includes('401')) {
-        console.log('❌ Authentication error, redirecting to login')
-        router.push('/login')
-        return
-      }
-      
-      // Fallback: Check if user has made purchases and create basic referral data
-      if (userData?.email) {
-        console.log('🔄 API failed, trying hardcoded referral data for user:', userData.email)
-        
-        // Import hardcoded data
-        const { getTempReferralData } = await import('@/lib/temp-referral-data')
-        const tempData = getTempReferralData(userData.email)
-        
-        if (tempData) {
-          console.log('✅ Found hardcoded referral data:', tempData.referralCode)
-          const referralUrl = `${window.location.origin}/register?ref=${tempData.referralCode}`
-          
-          setReferralData({
-            referralCode: tempData.referralCode,
-            referralUrl,
-            isActive: tempData.isActive,
-            stats: {
-              totalReferrals: 0,
-              activeReferrals: 0,
-              totalTeamSize: 0,
-              totalEarnings: 0
-            },
-            isHardcoded: true
-          })
-          return
-        }
-        
-        // Create a simple referral code from user data if API fails
-        const fallbackCode = `REF${userData.id || Math.random().toString(36).substr(2, 5).toUpperCase()}`
-        const referralUrl = `${window.location.origin}/register?ref=${fallbackCode}`
-        
-        setReferralData({
-          referralCode: fallbackCode,
-          referralUrl,
-          isActive: true,
-          stats: {
-            totalReferrals: 0,
-            activeReferrals: 0,
-            totalTeamSize: 0,
-            totalEarnings: 0
-          },
-          isFallback: true
-        })
-      } else {
-        setReferralData({
-          isActive: false,
-          message: 'Please log in to view your referral data'
-        })
-      }
+      setReferralData({
+        isActive: false,
+        message: 'Unable to load referral data. Please try again.'
+      })
     } finally {
       setLoading(false)
     }
-  }, [router, userData])
+  }, [router])
 
   useEffect(() => {
     fetchReferralData()
@@ -634,18 +556,6 @@ const ReferralSection = ({ userData }) => {
 
   return (
     <div className="space-y-6">
-      {/* Show fallback notice if using fallback data */}
-      {(referralData.isFallback || referralData.isHardcoded) && (
-        <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
-          <p className="text-amber-800 text-sm">
-            {referralData.isHardcoded 
-              ? '✅ Using your actual referral code from backup system.'
-              : '⚠️ Using temporary referral code. Your actual referral code will be available once the system is fully operational.'
-            }
-          </p>
-        </div>
-      )}
-      
       {/* Referral Code Card */}
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border-2 border-purple-200 dark:border-purple-700 p-6 rounded-lg mb-6">
         <div className="flex items-center gap-3 mb-4">

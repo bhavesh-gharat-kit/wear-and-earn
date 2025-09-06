@@ -2,22 +2,16 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../auth/[...nextauth]/route'
 import prisma from "@/lib/prisma";
-import { generateAndAssignReferralCode } from '@/lib/referral'
-import { generateReferralLink } from '@/lib/url-utils'
-
 
 export async function GET(request) {
   try {
-    const session = await getServerSession(authOptions)
+    console.log('🔍 Referral API called')
     
-    console.log('🔍 Session check:', {
-      hasSession: !!session,
-      userId: session?.user?.id,
-      userEmail: session?.user?.email
-    })
+    const session = await getServerSession(authOptions)
+    console.log('🔍 Session:', !!session, session?.user?.id)
     
     if (!session?.user?.id) {
-      console.log('❌ No session or user ID found')
+      console.log('❌ No session')
       return NextResponse.json({ 
         success: false,
         error: 'Unauthorized',
@@ -26,6 +20,7 @@ export async function GET(request) {
     }
 
     const userId = parseInt(session.user.id)
+    console.log('🔍 Looking for user:', userId)
     
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -33,110 +28,35 @@ export async function GET(request) {
         id: true,
         referralCode: true,
         isActive: true,
-        fullName: true
+        fullName: true,
+        email: true
       }
     })
+
+    console.log('🔍 Found user:', user)
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      console.log('❌ User not found')
+      return NextResponse.json({ 
+        success: false,
+        error: 'User not found' 
+      }, { status: 404 })
     }
 
-    // Check if user is activated (has made first paid order)
     if (!user.referralCode) {
-      // Check if user has any paid orders (inProcess or delivered status with payment confirmation)
-      const paidOrders = await prisma.order.count({
-        where: {
-          userId: userId,
-          AND: [
-            {
-              OR: [
-                { status: 'delivered' },
-                { status: 'inProcess' }
-              ]
-            },
-            {
-              NOT: { paymentId: null } // Must have a payment ID (payment confirmed)
-            },
-            {
-              NOT: { paidAt: null } // Must have been paid
-            }
-          ]
-        }
-      });
-
-      if (paidOrders > 0) {
-        // User has purchases but no referral code - generate one
-        try {
-          console.log(`Auto-generating referral code for user ${userId} who has ${paidOrders} paid orders`);
-          
-          const referralCode = await generateAndAssignReferralCode(prisma, userId);
-          user.referralCode = referralCode;
-          
-          // Also activate the user
-          await prisma.user.update({
-            where: { id: userId },
-            data: { isActive: true }
-          });
-          user.isActive = true;
-          
-          console.log(`Successfully generated referral code ${referralCode} for user ${userId}`);
-        } catch (activationError) {
-          console.error(`Failed to generate referral code for user ${userId}:`, activationError);
-        }
-      }
-
-      // If still no referral code after generation attempt
-      if (!user.referralCode) {
-        return NextResponse.json({
-          success: false,
-          error: 'Referral link not available',
-          message: paidOrders > 0 ? 
-            'Your account is being activated. Please refresh the page in a few moments.' :
-            'You need to make your first purchase to get your referral link',
-          isActive: false,
-          hasOrders: paidOrders > 0
-        }, { status: 200 }); // Changed to 200 so frontend handles it properly
-      }
+      console.log('❌ User has no referral code')
+      return NextResponse.json({
+        success: false,
+        message: 'You need to make your first purchase to get your referral link',
+        isActive: false
+      })
     }
 
-    // Generate referral URL
-    const referralUrl = generateReferralLink(request, user.referralCode)
+    // Generate referral URL - simple version
+    const baseUrl = process.env.NEXTAUTH_URL || 'https://wearandearn.vercel.app'
+    const referralUrl = `${baseUrl}/register?ref=${user.referralCode}`
 
-    // Get referral stats
-    const totalReferrals = await prisma.hierarchy.count({
-      where: {
-        ancestorId: userId,
-        depth: 1
-      }
-    })
-
-    const activeReferrals = await prisma.hierarchy.count({
-      where: {
-        ancestorId: userId,
-        depth: 1,
-        descendant: { isActive: true }
-      }
-    })
-
-    // Get total team size
-    const totalTeamSize = await prisma.hierarchy.count({
-      where: {
-        ancestorId: userId
-      }
-    })
-
-    // Get referral earnings from ledger
-    const referralEarnings = await prisma.ledger.aggregate({
-      where: {
-        userId: userId,
-        type: {
-          in: ['sponsor_commission', 'repurchase_commission']
-        }
-      },
-      _sum: {
-        amount: true
-      }
-    })
+    console.log('✅ Returning referral data:', user.referralCode)
 
     return NextResponse.json({
       success: true,
@@ -145,12 +65,11 @@ export async function GET(request) {
         referralUrl,
         isActive: user.isActive,
         stats: {
-          totalReferrals,
-          activeReferrals,
-          totalTeamSize,
-          totalEarnings: referralEarnings._sum.amount || 0 // Keep in paisa for consistency
-        },
-        isActive: true
+          totalReferrals: 0,
+          activeReferrals: 0,
+          totalTeamSize: 0,
+          totalEarnings: 0
+        }
       }
     })
 
@@ -159,7 +78,7 @@ export async function GET(request) {
     return NextResponse.json({
       success: false,
       error: 'Internal server error',
-      message: 'Failed to load referral data'
+      message: error.message
     }, { status: 500 })
   }
 }
