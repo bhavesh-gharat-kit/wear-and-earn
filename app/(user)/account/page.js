@@ -590,24 +590,6 @@ const ReferralSection = ({ userData }) => {
         </div>
       </div>
 
-      {/* Referral Stats */}
-      {referralData.stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white border border-gray-200 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-blue-600">{referralData.stats.totalReferrals || 0}</div>
-            <div className="text-sm text-gray-600">Total Referrals</div>
-          </div>
-          <div className="bg-white border border-gray-200 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-green-600">{referralData.stats.activeReferrals || 0}</div>
-            <div className="text-sm text-gray-600">Active Members</div>
-          </div>
-          <div className="bg-white border border-gray-200 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-purple-600">₹{((referralData.stats.totalEarnings || 0) / 100).toFixed(0)}</div>
-            <div className="text-sm text-gray-600">Total Earned</div>
-          </div>
-        </div>
-      )}
-
       {/* Share Options */}
       <div>
         <h3 className="font-medium text-gray-900 dark:text-white mb-3">Share Your Referral Link</h3>

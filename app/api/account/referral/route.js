@@ -63,13 +63,7 @@ export async function GET(request) {
       data: {
         referralCode: user.referralCode,
         referralUrl,
-        isActive: user.isActive,
-        stats: {
-          totalReferrals: 0,
-          activeReferrals: 0,
-          totalTeamSize: 0,
-          totalEarnings: 0
-        }
+        isActive: user.isActive
       }
     })
 
