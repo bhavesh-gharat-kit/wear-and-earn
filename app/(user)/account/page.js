@@ -2533,11 +2533,6 @@ const AccountDashboard = () => {
           
           {activeTab === 'referral' && (
             <div id="referral">
-              <div className="mb-6">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-2">🎯 Referral Program</h2>
-                <p className="text-gray-600">Share your referral code and earn commissions from your network!</p>
-              </div>
-              
               {/* Referral Code Card */}
               <ReferralSection userData={userData} />
             </div>
