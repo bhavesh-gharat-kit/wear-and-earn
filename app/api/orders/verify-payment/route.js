@@ -82,33 +82,27 @@ export async function POST(req) {
 
         console.log('👤 User status - Active:', user.isActive, 'Has referral code:', !!user.referralCode);
 
-        // Trigger MLM activation if user is not active or has no referral code
-        if (!user.isActive || !user.referralCode) {
-          console.log('🚀 Triggering NEW POOL MLM activation for user:', updatedOrder.userId);
+        // Always process with Pool MLM system for all orders
+        console.log('🏊 Processing with Pool MLM system for user:', updatedOrder.userId);
+        
+        try {
+          const { processPoolMLMOrder } = await import('@/lib/pool-mlm-system');
+          const mlmResult = await processPoolMLMOrder(tx, updatedOrder);
+          console.log('✅ Pool MLM processing completed:', mlmResult);
           
-          try {
-            const { processPoolMLMOrder } = await import('@/lib/pool-mlm-system');
-            const mlmResult = await processPoolMLMOrder(tx, updatedOrder);
-            console.log('✅ Pool MLM activation successful for user:', updatedOrder.userId, mlmResult);
-          } catch (error) {
-            console.error('❌ Error in Pool MLM activation:', error.message);
-            // Don't throw error - let order succeed even if MLM fails
-            console.log('⚠️ Continuing with order despite MLM error');
+          // Ensure user activation if this was their first MLM purchase
+          if (!user.isActive) {
+            await tx.user.update({
+              where: { id: updatedOrder.userId },
+              data: { isActive: true }
+            });
+            console.log('✅ User activated:', updatedOrder.userId);
           }
-        } else {
-          console.log('ℹ️ User', updatedOrder.userId, 'already has MLM activated with referral code:', user.referralCode);
           
-          // Process with NEW POOL SYSTEM for existing users
-          console.log('🏊 Processing with new Pool MLM system for user:', updatedOrder.userId);
-          try {
-            const { processPoolMLMOrder } = await import('@/lib/pool-mlm-system');
-            const mlmResult = await processPoolMLMOrder(tx, updatedOrder);
-            console.log('✅ Pool MLM processing completed:', mlmResult);
-          } catch (error) {
-            console.error('❌ Error processing Pool MLM:', error.message);
-            // Don't throw error - let order succeed even if MLM fails
-            console.log('⚠️ Continuing with order despite MLM error');
-          }
+        } catch (error) {
+          console.error('❌ Error processing Pool MLM:', error.message);
+          // Don't throw error - let order succeed even if MLM fails
+          console.log('⚠️ Continuing with order despite MLM error');
         }
 
         return updatedOrder;
