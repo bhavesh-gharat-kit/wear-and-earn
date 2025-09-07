@@ -1,5 +1,4 @@
 import ProductSlider from '@/components/product/ProductSlider'
-import MLMProductSlider from '@/components/product/MLMProductSlider'
 import HeroSlider from '@/components/layout/HeroSlider'
 import React from 'react'
 
@@ -20,17 +19,6 @@ function HomePage() {
           </a>
         </div>
 
-        {/* MLM Products Slider */}
-        <MLMProductSlider />
-        
-        <div className="flex justify-center py-4">
-          <a
-            href="/products?type=MLM"
-            className="btn bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-xl text-white rounded transition-colors"
-          >
-            View All MLM Products
-          </a>
-        </div>
 
         {/* Who We Are Section - Inlined */}
         <WhoWeAreSection />
