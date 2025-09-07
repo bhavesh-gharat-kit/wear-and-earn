@@ -182,7 +182,6 @@ const AdminEditProduct = ({ params }) => {
       discount,
       keyFeature,
       category,
-      mainImage,
       images,
       productPrice,
       mlmPrice,
@@ -220,11 +219,9 @@ const AdminEditProduct = ({ params }) => {
       return updatedData;
     });
     
-    // Handle images - use images array or fallback to mainImage
+    // Handle images from ProductImage table
     if (images && images.length > 0) {
       setMultipleImages([...images]);
-    } else if (mainImage) {
-      setMultipleImages([{ imageUrl: mainImage }]);
     } else {
       setMultipleImages([]);
     }

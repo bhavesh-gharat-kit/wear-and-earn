@@ -7,6 +7,7 @@ import { IoMdSearch } from "react-icons/io";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import Image from "next/image";
 import PaginationComponent from "@/components/ui/PaginationComponent";
 
 function AdminProductsPage() {
@@ -158,6 +159,7 @@ function AdminProductsPage() {
           <thead className="bg-indigo-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
             <tr>
               <th className="p-3 text-left">#</th>
+              <th className="p-3 text-left">Image</th>
               <th className="p-3 text-left">Product</th>
               <th className="p-3 text-left">Type</th>
               <th className="p-3 text-left">Stock</th>
@@ -179,6 +181,21 @@ function AdminProductsPage() {
               .map((product, index) => (
                 <tr key={product.id}>
                   <td className="p-3">{index + 1}</td>
+                  <td className="p-3">
+                    {product.images && product.images.length > 0 ? (
+                      <Image
+                        src={product.images[0].imageUrl}
+                        alt={product.title}
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 rounded-md object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center text-xs text-gray-500">
+                        No Image
+                      </div>
+                    )}
+                  </td>
                   <td className="p-3">{product.title}</td>
                   <td className="p-3">
                     <span className={`px-2 py-1 rounded text-xs ${

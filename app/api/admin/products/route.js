@@ -20,7 +20,7 @@ export const GET = async (request) => {
             skip,
             include: {
                 category: true,       // include category info
-                // images: true          
+                images: true          // include product images
                 // cart: true         
             },
             orderBy: {

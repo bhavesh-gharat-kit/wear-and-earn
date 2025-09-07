@@ -109,7 +109,6 @@ model Product {
   price            Float
   sellingPrice     Float
   keyFeature       String?
-  mainImage        String?
   type             ProductType    @default(REGULAR)
   createdAt        DateTime?      @default(now())
   // NEW PRICING STRUCTURE - Following the spec
