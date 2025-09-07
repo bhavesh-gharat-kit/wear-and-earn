@@ -178,8 +178,27 @@ export async function PUT(request, { params }) {
             for (const item of rawImages) {
                 // Check if item is a file by checking file-like properties
                 if (typeof item === 'object' && item !== null && 'name' in item && 'size' in item && 'type' in item && item.name) {
-                    const url = await uploadFileToCloudinary(item);
-                    incomingImageUrls.push(url);
+                    try {
+                        console.log('Processing product image:', {
+                            name: item.name,
+                            size: item.size,
+                            type: item.type
+                        });
+                        
+                        const buffer = Buffer.from(await item.arrayBuffer());
+                        console.log('Buffer created, size:', buffer.length, 'bytes');
+                        
+                        const cloudinaryResult = await uploadImageToCloudinary(buffer, {
+                            folder: 'products/images',
+                            public_id: `product-edit-${Date.now()}-${Math.random().toString(36).substring(2)}`
+                        });
+                        
+                        incomingImageUrls.push(cloudinaryResult.url);
+                        console.log('✅ Product image uploaded successfully:', cloudinaryResult.url);
+                    } catch (uploadError) {
+                        console.error('❌ Error uploading product image:', uploadError);
+                        // Continue with other images instead of failing completely
+                    }
                 } else if (typeof item === "string") {
                     const trimmed = item.trim();
                     if (trimmed && trimmed !== "[object Object]") {
@@ -201,7 +220,27 @@ export async function PUT(request, { params }) {
         let thumbnailImageUrl = existingProduct.mainImage; // Keep existing if no new one
         const thumbnailFile = formData.get("thumbnailImage");
         if (thumbnailFile && typeof thumbnailFile === 'object' && thumbnailFile !== null && 'name' in thumbnailFile && 'size' in thumbnailFile && 'type' in thumbnailFile && thumbnailFile.name) {
-            thumbnailImageUrl = await uploadFileToCloudinary(thumbnailFile);
+            try {
+                console.log("Processing thumbnail image:", {
+                    name: thumbnailFile.name,
+                    size: thumbnailFile.size,
+                    type: thumbnailFile.type
+                });
+                
+                const buffer = Buffer.from(await thumbnailFile.arrayBuffer());
+                console.log("Buffer created for thumbnail, size:", buffer.length, "bytes");
+                
+                const cloudinaryResult = await uploadImageToCloudinary(buffer, {
+                    folder: 'products/thumbnails',
+                    public_id: `thumbnail-edit-${Date.now()}-${Math.random().toString(36).substring(2)}`
+                });
+                
+                thumbnailImageUrl = cloudinaryResult.url;
+                console.log("✅ Thumbnail uploaded successfully:", thumbnailImageUrl);
+            } catch (thumbnailError) {
+                console.error("❌ Error uploading thumbnail:", thumbnailError);
+                // Keep existing thumbnail if upload fails
+            }
         }
 
         // Map form data to update object
