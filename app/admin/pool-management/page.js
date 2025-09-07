@@ -155,7 +155,7 @@ export default function PoolManagementPanel() {
           {[
             { id: 'overview', name: 'Overview', icon: TrendingUp },
             { id: 'distribution', name: 'Pool Distribution', icon: DollarSign },
-            { id: 'teams', name: 'Teams', icon: Team },
+            { id: 'teams', name: 'Teams', icon: Users },
             { id: 'levels', name: 'Level Management', icon: Crown },
           ].map((tab) => (
             <button
