@@ -27,6 +27,7 @@ const AdminEditProduct = ({ params }) => {
     gst: "",
     shipping: "",
     productType: "REGULAR",
+    totalPrice: 0,        // Auto-calculated total price
     productImages: [],
   };
 
@@ -190,20 +191,34 @@ const AdminEditProduct = ({ params }) => {
       type
     } = productDetails;
 
-    setFormData((prev) => ({
-      ...prev,
-      title,
-      description,
-      overview: longDescription,
-      discount: discount || "",
-      keyFeatures: keyFeature || "",
-      productPrice: productPrice || "",
-      mlmPrice: mlmPrice || "",
-      gst: gst || "",
-      shipping: homeDelivery || "",
-      productType: type || "REGULAR",
-      category: category?.name,
-    }));
+    setFormData((prev) => {
+      const updatedData = {
+        ...prev,
+        title,
+        description,
+        overview: longDescription,
+        discount: discount || "",
+        keyFeatures: keyFeature || "",
+        productPrice: productPrice || "",
+        mlmPrice: mlmPrice || "",
+        gst: gst || "",
+        shipping: homeDelivery || "",
+        productType: type || "REGULAR",
+        category: category?.name,
+      };
+
+      // Calculate total price when loading existing product data
+      if (productPrice && mlmPrice) {
+        const basePrice = Number(productPrice) + Number(mlmPrice);
+        const shippingAmount = Number(homeDelivery) || 0;
+        const subtotal = basePrice + shippingAmount;
+        const gstAmount = (subtotal * (Number(gst) || 0)) / 100;
+        const discountAmount = (subtotal * (Number(discount) || 0)) / 100;
+        updatedData.totalPrice = Number((subtotal + gstAmount - discountAmount).toFixed(2));
+      }
+
+      return updatedData;
+    });
     
     // Handle images - use images array or fallback to mainImage
     if (images && images.length > 0) {
