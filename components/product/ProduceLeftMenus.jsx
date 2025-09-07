@@ -54,7 +54,7 @@ function ProduceLeftMenus() {
                         width={200}
                         height={200}
                         className="h-12 w-12 object-fill rounded"
-                        src={product.products[0].mainImage}
+                        src={product.products[0]?.images && product.products[0].images.length > 0 ? product.products[0].images[0].imageUrl : "/images/brand-logo.png"}
                         alt={product.name}
                       />
                     </span>

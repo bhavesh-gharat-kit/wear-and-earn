@@ -21,15 +21,13 @@ export default function ProductDetailsImageComponent({ productDetails }) {
 
   if(!productDetails?.images || productDetails?.images.length <= 0){
     return (
-      <div className="w-full h-full min-h-[500px] bg-gray-100 rounded-lg overflow-hidden">
-        <Image
-          width={600}
-          height={600}
-          src={productDetails?.mainImage || "/placeholder-image.jpg"}
-          alt={productDetails?.title || "Product Image"}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-          priority
-        />
+      <div className="w-full h-full min-h-[500px] bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-32 h-32 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
+            <span className="text-gray-400 text-sm">No Image</span>
+          </div>
+          <p className="text-gray-500">{productDetails?.title || "Product"}</p>
+        </div>
       </div>
     )
   }
@@ -55,7 +53,7 @@ export default function ProductDetailsImageComponent({ productDetails }) {
             <Image
               width={600}
               height={600}
-              src={product.imageUrl || productDetails?.mainImage}
+              src={product.imageUrl}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
               alt={`${productDetails?.title} - Image ${index + 1}`}
               priority={index === 0}
@@ -95,7 +93,7 @@ export default function ProductDetailsImageComponent({ productDetails }) {
                 <Image
                   width={80}
                   height={80}
-                  src={product.imageUrl || productDetails?.mainImage}
+                  src={product.imageUrl}
                   className="w-full h-full object-cover"
                   alt={`${productDetails?.title} - Thumbnail ${index + 1}`}
                 />

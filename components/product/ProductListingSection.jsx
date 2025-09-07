@@ -155,12 +155,12 @@ function ProductListingSection() {
                   }`}
                 >
                   <div className="flex-shrink-0">
-                    {category.products[0]?.mainImage ? (
+                    {category.products[0]?.images && category.products[0].images.length > 0 ? (
                       <Image
                         width={56}
                         height={56}
                         className="h-14 w-14 object-cover rounded-xl"
-                        src={category.products[0].mainImage}
+                        src={category.products[0].images[0].imageUrl}
                         alt={category.name}
                       />
                     ) : (
@@ -227,12 +227,12 @@ function ProductListingSection() {
                       isSelected ? 'bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-800' : 'border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >
-                    {category.products[0]?.mainImage ? (
+                    {category.products[0]?.images && category.products[0].images.length > 0 ? (
                       <Image
                         width={40}
                         height={40}
                         className="h-10 w-10 object-cover rounded-lg flex-shrink-0"
-                        src={category.products[0].mainImage}
+                        src={category.products[0].images[0].imageUrl}
                         alt={category.name}
                       />
                     ) : (

@@ -16,13 +16,16 @@ function ProductCard({ product, variant = "grid" }) {
     price, 
     productPrice,
     mlmPrice,
-    mainImage, 
+    images, 
     id, 
     discount,
     description,
     category,
     inStock
   } = product;
+  
+  // Get first image from ProductImage table or use fallback
+  const productImage = images && images.length > 0 ? images[0].imageUrl : "/images/brand-logo.png";
   
   // Calculate total price using new structure or fallback to existing
   const displayProductPrice = productPrice || (sellingPrice ? sellingPrice * 0.7 : 0);
@@ -91,7 +94,7 @@ function ProductCard({ product, variant = "grid" }) {
           <div className="relative flex-shrink-0">
             <div className="w-32 h-32 relative rounded-lg overflow-hidden bg-gray-100">
               <Image
-                src={mainImage || "/placeholder-product.jpg"}
+                src={productImage}
                 alt={title}
                 fill
                 className="object-cover"
@@ -180,14 +183,14 @@ function ProductCard({ product, variant = "grid" }) {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
       {/* Product Image */}
       <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
-        <Image
-          src={mainImage || "/placeholder-product.jpg"}
-          alt={title}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-        
-        {/* Badges */}
+              <Image
+                width={300}
+                height={300}
+                src={productImage}
+                alt={title || "Product image"}
+                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />        {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {discount && (
             <span className="bg-red-500 text-white text-xs py-1 px-2 rounded-full font-medium shadow-sm">

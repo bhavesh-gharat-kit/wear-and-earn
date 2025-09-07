@@ -14,14 +14,14 @@ function ProductCard({ product, variant = "default", setShowModal }) {
     title, 
     sellingPrice, 
     price, 
-    mainImage, 
+    images, 
     id, 
     discount,
     categoryId 
   } = product;
   
-  // Ensure mainImage is not empty string or null
-  const validMainImage = mainImage && mainImage.trim() !== "" ? mainImage : "/images/brand-logo.png";
+  // Get first image from ProductImage table or use fallback
+  const productImage = images && images.length > 0 ? images[0].imageUrl : "/images/brand-logo.png";
   
   const { data: session } = useSession();
   const router = useRouter();
@@ -90,7 +90,7 @@ function ProductCard({ product, variant = "default", setShowModal }) {
             <Image
               width={300}
               height={300}
-              src={validMainImage}
+              src={productImage}
               alt={title || "Product image"}
               className="w-full h-56 object-cover"
               loading="lazy"
@@ -164,7 +164,7 @@ function ProductCard({ product, variant = "default", setShowModal }) {
       {/* Uniform image area using aspect ratio */}
       <div className="relative w-full aspect-[4/5] overflow-hidden bg-gray-50">
         <Image
-          src={validMainImage}
+          src={productImage}
           alt={title || "Product image"}
           fill
           sizes="(max-width: 640px) 100vw, 288px"

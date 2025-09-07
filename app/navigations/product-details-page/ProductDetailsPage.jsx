@@ -47,7 +47,7 @@ function ProductDetailsPage({ id }) {
     category,
     description,
     longDescription,
-    mainImage,
+    images,
     price,
     discount,
     sellingPrice,

@@ -20,7 +20,8 @@ export const GET = async () => {
                         createdAt: 'desc'
                     },
                     select: {
-                        mainImage: true,
+                        id: true,
+                        images: true,
                     },
                 },
             },
