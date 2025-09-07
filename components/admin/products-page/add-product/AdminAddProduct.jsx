@@ -14,14 +14,13 @@ const AdminAddProduct = () => {
     title: "",
     description: "",
     category: "",
-    maxPrice: "",
+    productPrice: "",      // Pr - Product Price (NEW SPEC)
+    mlmPrice: "",         // Pm - MLM Price (NEW SPEC) - MANDATORY
     discount: "",
-    price: "",
     overview: "",
     keyFeatures: "",
     gst: "",
     shipping: "",
-    mlmPrice: "",
     productType: "REGULAR",
     thumbnailImage: null,
     productImages: [],
@@ -54,12 +53,14 @@ const AdminAddProduct = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "maxPrice" || name === "discount") {
+    // NEW SPEC: Auto-calculate total price when product price or MLM price changes
+    if (name === "productPrice" || name === "mlmPrice") {
       const updatedData = { ...formData, [name]: value };
-      const { maxPrice, discount } = updatedData;
+      const { productPrice, mlmPrice } = updatedData;
 
-      if (maxPrice && discount) {
-        updatedData.price = (maxPrice - (maxPrice * discount) / 100).toFixed(2);
+      // Calculate total price = Pr + Pm
+      if (productPrice && mlmPrice) {
+        updatedData.totalPrice = (Number(productPrice) + Number(mlmPrice)).toFixed(2);
       }
 
       setFormData(updatedData);
@@ -86,14 +87,20 @@ const AdminAddProduct = () => {
 
     console.log("Form data before submission:", formData);
 
-    // Basic validation
+    // NEW SPEC: Validation for mandatory fields
     if (!formData.title || !formData.description || !formData.category) {
       toast.error("Please fill in all required fields: Title, Description, and Category");
       return;
     }
 
-    if (!formData.maxPrice || formData.maxPrice <= 0) {
-      toast.error("Please enter a valid price");
+    // NEW SPEC: Both Product Price and MLM Price are mandatory
+    if (!formData.productPrice || formData.productPrice <= 0) {
+      toast.error("Please enter a valid Product Price (Pr)");
+      return;
+    }
+
+    if (!formData.mlmPrice || formData.mlmPrice <= 0) {
+      toast.error("Please enter a valid MLM Price (Pm) - required for pool system");
       return;
     }
 
@@ -101,14 +108,15 @@ const AdminAddProduct = () => {
     form.append("title", formData.title);
     form.append("description", formData.description);
     form.append("category", formData.category);
-    form.append("maxPrice", formData.maxPrice);
-    form.append("discount", formData.discount || "0");
-    form.append("price", formData.price || formData.maxPrice);
+    
+    // NEW SPEC: Append pricing data according to spec
+    form.append("productPrice", formData.productPrice);  // Pr
+    form.append("mlmPrice", formData.mlmPrice);          // Pm
+    
     form.append("overview", formData.overview || "");
     form.append("keyFeatures", formData.keyFeatures || "");
     form.append("gst", formData.gst || "0");
     form.append("shipping", formData.shipping || "0");
-    form.append("mlmPrice", formData.mlmPrice || "0");
     form.append("productType", formData.productType || "REGULAR");
 
     // Append thumbnail image
@@ -236,23 +244,61 @@ const AdminAddProduct = () => {
             </div>
             <div>
               <label className="block mb-1 text-sm font-medium text-gray-700">
-                Price
+                Product Price (Pr) - ₹ <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
-                name="maxPrice"
-                value={formData.maxPrice}
+                name="productPrice"
+                value={formData.productPrice}
                 onChange={handleInputChange}
+                min="0"
+                step="0.01"
+                required
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+                placeholder="Product base price"
               />
+              <p className="text-xs text-gray-500 mt-1">This goes directly to company</p>
             </div>
           </div>
 
-          {/* Discount and Final Price */}
+          {/* MLM Price and Total Price */}
           <div className="col-span-2 grid grid-cols-2 gap-x-2">
             <div>
               <label className="block mb-1 text-sm font-medium text-gray-700">
-                Discount (%)
+                MLM Price (Pm) - ₹ <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                name="mlmPrice"
+                value={formData.mlmPrice}
+                onChange={handleInputChange}
+                min="0"
+                step="0.01"
+                required
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+                placeholder="MLM commission amount"
+              />
+              <p className="text-xs text-gray-500 mt-1">30% company, 70% pool distribution</p>
+            </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700">
+                Total Price (Pr + Pm)
+              </label>
+              <input
+                type="text"
+                value={formData.totalPrice ? `₹${formData.totalPrice}` : 'Auto-calculated'}
+                readOnly
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-600"
+              />
+              <p className="text-xs text-blue-500 mt-1">This is what customer pays</p>
+            </div>
+          </div>
+
+          {/* Discount (Optional) */}
+          <div className="col-span-2 grid grid-cols-1 gap-x-2">
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700">
+                Discount (%) - Optional
               </label>
               <input
                 type="number"
@@ -263,24 +309,13 @@ const AdminAddProduct = () => {
                 max="100"
                 step="0.01"
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
-              />
-            </div>
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                Final Price
-              </label>
-              <input
-                type="number"
-                name="price"
-                value={formData.price}
-                readOnly
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-gray-100"
+                placeholder="Optional discount percentage"
               />
             </div>
           </div>
 
-          {/* GST, Shipping, and MLM Price */}
-          <div className="col-span-2 grid grid-cols-3 gap-x-2">
+          {/* GST and Shipping */}
+          <div className="col-span-2 grid grid-cols-2 gap-x-2">
             <div>
               <label className="block mb-1 text-sm font-medium text-gray-700">
                 GST (%)
@@ -294,6 +329,7 @@ const AdminAddProduct = () => {
                 max="100"
                 step="0.01"
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+                placeholder="18"
               />
             </div>
             <div>
@@ -308,20 +344,7 @@ const AdminAddProduct = () => {
                 min="0"
                 step="0.01"
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
-              />
-            </div>
-            <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                MLM Price (₹)
-              </label>
-              <input
-                type="number"
-                name="mlmPrice"
-                value={formData.mlmPrice}
-                onChange={handleInputChange}
-                min="0"
-                step="0.01"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+                placeholder="50"
               />
             </div>
           </div>

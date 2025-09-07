@@ -120,13 +120,25 @@ export async function POST(req) {
         console.log("Thumbnail URL:", thumbnailUrl);
         console.log("Product image URLs:", productImageUrls);
 
-        // Validate required fields
+        // Validate required fields for new spec
         if (!data.title || !data.description || !data.category) {
             return NextResponse.json({
                 success: false,
                 message: 'Missing required fields: title, description, or category'
             }, { status: 400 });
         }
+
+        // NEW SPEC: Validate pricing structure
+        if (!data.productPrice || !data.mlmPrice) {
+            return NextResponse.json({
+                success: false,
+                message: 'Both Product Price (Pr) and MLM Price (Pm) are required as per MLM Pool Plan spec'
+            }, { status: 400 });
+        }
+
+        const productPrice = Number(data.productPrice); // Pr
+        const mlmPrice = Number(data.mlmPrice);         // Pm
+        const totalPrice = productPrice + mlmPrice;     // Total = Pr + Pm
 
         // Validate category ID exists
         const categoryExists = await prisma.category.findUnique({
@@ -145,19 +157,23 @@ export async function POST(req) {
                 title: data.title,
                 description: data.description,
                 longDescription: data.overview || "",
-                inStock: data.inStock ? Number(data.inStock) : 1, // Set default stock
+                inStock: data.inStock ? Number(data.inStock) : 1,
                 categoryId: Number(data.category),
-                isActive: true, // Make products active by default
+                isActive: true,
                 keyFeature: data.keyFeatures || "",
                 discount: data.discount ? Number(data.discount) : 0,
-                price: data.maxPrice ? Number(data.maxPrice) : 0,
-                sellingPrice: data.price ? Number(data.price) : 0,
-                gst: data.gst ? Number(data.gst) : 18, // Default GST
-                homeDelivery: data.shipping ? Number(data.shipping) : 50, // Default delivery
-                mlmPrice: data.mlmPrice ? Number(data.mlmPrice) : 0,
-                type: data.productType || "REGULAR", // Set product type
+                
+                // NEW SPEC: Clear pricing structure
+                productPrice: productPrice,      // Pr - Product Price (goes to company)
+                mlmPrice: mlmPrice,             // Pm - MLM Price (30% company, 70% pool)
+                price: totalPrice,              // Total Price = Pr + Pm (for compatibility)
+                sellingPrice: totalPrice,       // Same as total price (for compatibility)
+                
+                gst: data.gst ? Number(data.gst) : 18,
+                homeDelivery: data.shipping ? Number(data.shipping) : 50,
+                type: data.productType || "REGULAR",
                 mainImage: thumbnailUrl,
-                manufacturer: data.manufacturer || "WeArEarn", // Default manufacturer
+                manufacturer: data.manufacturer || "WeArEarn",
                 images: {
                     create: productImageUrls.map((url) => ({ imageUrl: url }))
                 }

@@ -57,7 +57,12 @@ export default function CartPage() {
   }
 
   const totalCartPrice = addToCartList?.length >= 1
-    ? addToCartList.reduce((total, item) => total + (item.product.sellingPrice * item.quantity), 0)
+    ? addToCartList.reduce((total, item) => {
+        const productPrice = item.product.productPrice || (item.product.sellingPrice ? item.product.sellingPrice * 0.7 : 0)
+        const mlmPrice = item.product.mlmPrice || (item.product.sellingPrice ? item.product.sellingPrice * 0.3 : 0)
+        const totalPrice = item.product.sellingPrice || (productPrice + mlmPrice)
+        return total + (totalPrice * item.quantity)
+      }, 0)
     : 0
 
   // Calculate shipping charges based on individual product shipping rates
@@ -175,9 +180,15 @@ export default function CartPage() {
         <div className="lg:col-span-2 space-y-3">
           {addToCartList.map((item) => {
             const { id, quantity, productId, product } = item
-            const { mainImage, title, price, sellingPrice } = product
-            const itemTotal = sellingPrice * quantity
-            const savings = (price - sellingPrice) * quantity
+            const { mainImage, title, price, sellingPrice, productPrice, mlmPrice } = product
+            
+            // Calculate display prices with fallback
+            const displayProductPrice = productPrice || (sellingPrice ? sellingPrice * 0.7 : 0)
+            const displayMlmPrice = mlmPrice || (sellingPrice ? sellingPrice * 0.3 : 0)
+            const displayTotalPrice = sellingPrice || (displayProductPrice + displayMlmPrice)
+            
+            const itemTotal = displayTotalPrice * quantity
+            const savings = (price - displayTotalPrice) * quantity
 
             return (
               <div key={id} className="bg-white shadow-sm rounded-lg overflow-hidden hover:shadow-md transition-shadow">
@@ -199,20 +210,25 @@ export default function CartPage() {
                       <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-2">{title}</h3>
                       
                       {/* Price Information */}
-                      <div className="flex items-center space-x-3 mb-2">
-                        <span className="text-lg font-bold text-gray-900">
-                          ₹{sellingPrice.toLocaleString()}
-                        </span>
-                        {price > sellingPrice && (
-                          <span className="text-sm text-gray-500 line-through">
-                            ₹{price.toLocaleString()}
+                      <div className="mb-2">
+                        <div className="flex items-center space-x-3 mb-1">
+                          <span className="text-lg font-bold text-gray-900">
+                            ₹{displayTotalPrice.toLocaleString()}
                           </span>
-                        )}
-                        {savings > 0 && (
-                          <span className="text-xs text-green-600 font-medium">
-                            Save ₹{savings.toLocaleString()}
-                          </span>
-                        )}
+                          {price > displayTotalPrice && (
+                            <span className="text-sm text-gray-500 line-through">
+                              ₹{price.toLocaleString()}
+                            </span>
+                          )}
+                          {savings > 0 && (
+                            <span className="text-xs text-green-600 font-medium">
+                              Save ₹{savings.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Product: ₹{displayProductPrice.toLocaleString()} + MLM: ₹{displayMlmPrice.toLocaleString()}
+                        </div>
                       </div>
 
                       {/* Quantity Controls */}

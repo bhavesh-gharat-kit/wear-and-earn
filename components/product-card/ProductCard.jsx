@@ -14,6 +14,8 @@ function ProductCard({ product, variant = "grid" }) {
     title, 
     sellingPrice, 
     price, 
+    productPrice,
+    mlmPrice,
     mainImage, 
     id, 
     discount,
@@ -21,6 +23,11 @@ function ProductCard({ product, variant = "grid" }) {
     category,
     inStock
   } = product;
+  
+  // Calculate total price using new structure or fallback to existing
+  const displayProductPrice = productPrice || (sellingPrice ? sellingPrice * 0.7 : 0);
+  const displayMlmPrice = mlmPrice || (sellingPrice ? sellingPrice * 0.3 : 0);
+  const displayTotalPrice = sellingPrice || (displayProductPrice + displayMlmPrice);
   
   const { data: session } = useSession();
   const router = useRouter();
@@ -120,12 +127,16 @@ function ProductCard({ product, variant = "grid" }) {
               
               {/* Price */}
               <div className="text-right ml-4">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex flex-col items-end gap-1 mb-2">
                   <span className="text-2xl font-bold text-blue-600">
-                    ₹{Number(sellingPrice).toLocaleString("en-IN")}
+                    ₹{Number(displayTotalPrice).toLocaleString("en-IN")}
                   </span>
-                  {price && price !== sellingPrice && (
-                    <span className="text-lg text-gray-500 line-through">
+                  <div className="text-xs text-gray-500 text-right leading-tight">
+                    <div>Product: ₹{Number(displayProductPrice).toLocaleString("en-IN")}</div>
+                    <div>MLM: ₹{Number(displayMlmPrice).toLocaleString("en-IN")}</div>
+                  </div>
+                  {price && price !== displayTotalPrice && (
+                    <span className="text-sm text-gray-500 line-through">
                       ₹{Number(price).toLocaleString("en-IN")}
                     </span>
                   )}
@@ -224,15 +235,20 @@ function ProductCard({ product, variant = "grid" }) {
         </div>
 
         {/* Price */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-xl font-bold text-blue-600">
-            ₹{Number(sellingPrice).toLocaleString("en-IN")}
-          </span>
-          {price && price !== sellingPrice && (
-            <span className="text-sm text-gray-500 line-through">
-              ₹{Number(price).toLocaleString("en-IN")}
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xl font-bold text-blue-600">
+              ₹{Number(displayTotalPrice).toLocaleString("en-IN")}
             </span>
-          )}
+            {price && price !== displayTotalPrice && (
+              <span className="text-sm text-gray-500 line-through">
+                ₹{Number(price).toLocaleString("en-IN")}
+              </span>
+            )}
+          </div>
+          <div className="text-xs text-gray-500">
+            Product: ₹{Number(displayProductPrice).toLocaleString("en-IN")} + MLM: ₹{Number(displayMlmPrice).toLocaleString("en-IN")}
+          </div>
         </div>
 
         {/* Actions */}

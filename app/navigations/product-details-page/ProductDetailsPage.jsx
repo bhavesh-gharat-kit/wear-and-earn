@@ -51,10 +51,17 @@ function ProductDetailsPage({ id }) {
     price,
     discount,
     sellingPrice,
+    productPrice,
+    mlmPrice,
     title,
     inStock,
     keyFeature,
   } = productDetails;
+
+  // Calculate display prices with fallback
+  const displayProductPrice = productPrice || (sellingPrice ? sellingPrice * 0.7 : 0);
+  const displayMlmPrice = mlmPrice || (sellingPrice ? sellingPrice * 0.3 : 0);
+  const displayTotalPrice = sellingPrice || (displayProductPrice + displayMlmPrice);
 
   const handleAddToCart = async () => {
     if (!loggedInUserId) {
@@ -128,20 +135,36 @@ function ProductDetailsPage({ id }) {
             </div>
 
             {/* Price */}
-            <div className="flex items-center space-x-3">
-              <span className="text-3xl font-bold text-blue-600">
-                ₹{sellingPrice?.toLocaleString("en-IN")}
-              </span>
-              {price && price !== sellingPrice && (
-                <>
-                  <span className="text-xl text-gray-500 line-through">
-                    ₹{price?.toLocaleString("en-IN")}
-                  </span>
-                  <span className="inline-block px-2 py-1 bg-red-500 text-white text-sm font-bold rounded">
-                    {discount}% OFF
-                  </span>
-                </>
-              )}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center space-x-3 mb-2">
+                <span className="text-3xl font-bold text-blue-600">
+                  ₹{displayTotalPrice?.toLocaleString("en-IN")}
+                </span>
+                {price && price !== displayTotalPrice && (
+                  <>
+                    <span className="text-xl text-gray-500 line-through">
+                      ₹{price?.toLocaleString("en-IN")}
+                    </span>
+                    <span className="inline-block px-2 py-1 bg-red-500 text-white text-sm font-bold rounded">
+                      {discount}% OFF
+                    </span>
+                  </>
+                )}
+              </div>
+              <div className="text-sm text-gray-600">
+                <div className="flex justify-between items-center">
+                  <span>Product Price (Pr):</span>
+                  <span className="font-medium">₹{displayProductPrice?.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>MLM Price (Pm):</span>
+                  <span className="font-medium">₹{displayMlmPrice?.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="border-t pt-1 mt-1 flex justify-between items-center font-semibold">
+                  <span>Total Price:</span>
+                  <span className="text-blue-600">₹{displayTotalPrice?.toLocaleString("en-IN")}</span>
+                </div>
+              </div>
             </div>
 
             {/* Product Description */}

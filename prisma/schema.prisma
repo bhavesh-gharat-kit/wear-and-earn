@@ -116,8 +116,9 @@ model Product {
   type             ProductType    @default(REGULAR)
   commissionAmount Int            @default(0)
   createdAt        DateTime?      @default(now())
-  mlmPrice         Float?
-  productPrice     Float?
+  // NEW PRICING STRUCTURE - Following the spec
+  productPrice     Float?         // Pr - Product Price (goes to company) - Optional for existing products
+  mlmPrice         Float?         // Pm - MLM Price (30% company, 70% pool) - Optional for existing products
   cart             Cart[]
   images           ProductImage[]
   category         Category?      @relation(fields: [categoryId], references: [id])
