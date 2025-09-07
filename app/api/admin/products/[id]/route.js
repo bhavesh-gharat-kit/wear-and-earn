@@ -152,7 +152,12 @@ export async function PUT(request, { params }) {
         const formData = await request.formData();
         const data = {};
         for (const [key, value] of formData.entries()) {
-            if (!(value instanceof File)) data[key] = value;
+            // Check if value is a file by checking if it has file-like properties
+            if (typeof value === 'object' && value !== null && 'name' in value && 'size' in value && 'type' in value) {
+                console.log(`Skipping file field: ${key}, file name: ${value.name}, size: ${value.size}`);
+                continue; // skip files here
+            }
+            data[key] = value;
         }
 
         const existingProduct = await prisma.product.findUnique({
@@ -171,7 +176,8 @@ export async function PUT(request, { params }) {
         const incomingImageUrls = [];
         if (rawImages) {
             for (const item of rawImages) {
-                if (item instanceof File && item.name) {
+                // Check if item is a file by checking file-like properties
+                if (typeof item === 'object' && item !== null && 'name' in item && 'size' in item && 'type' in item && item.name) {
                     const url = await uploadFileToCloudinary(item);
                     incomingImageUrls.push(url);
                 } else if (typeof item === "string") {
@@ -194,7 +200,7 @@ export async function PUT(request, { params }) {
         // Handle thumbnail upload
         let thumbnailImageUrl = existingProduct.mainImage; // Keep existing if no new one
         const thumbnailFile = formData.get("thumbnailImage");
-        if (thumbnailFile && thumbnailFile instanceof File && thumbnailFile.name) {
+        if (thumbnailFile && typeof thumbnailFile === 'object' && thumbnailFile !== null && 'name' in thumbnailFile && 'size' in thumbnailFile && 'type' in thumbnailFile && thumbnailFile.name) {
             thumbnailImageUrl = await uploadFileToCloudinary(thumbnailFile);
         }
 
@@ -203,10 +209,13 @@ export async function PUT(request, { params }) {
             title: data.title || existingProduct.title,
             description: data.description || existingProduct.description,
             longDescription: data.overview || existingProduct.longDescription,
-            price: parseFloat(data.maxPrice) || existingProduct.price,
-            sellingPrice: parseFloat(data.price) || existingProduct.sellingPrice,
+            productPrice: parseFloat(data.productPrice) || existingProduct.productPrice,
+            mlmPrice: parseFloat(data.mlmPrice) || existingProduct.mlmPrice,
+            gst: parseFloat(data.gst) || existingProduct.gst,
+            homeDelivery: parseFloat(data.shipping) || existingProduct.homeDelivery,
             discount: parseFloat(data.discount) || existingProduct.discount,
             keyFeature: data.keyFeatures || existingProduct.keyFeature,
+            type: data.productType || existingProduct.type,
             mainImage: thumbnailImageUrl,
         };
 

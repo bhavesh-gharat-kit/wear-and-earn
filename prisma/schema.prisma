@@ -60,7 +60,7 @@ model User {
   // commissions            Commission[]            @relation("UserCommissions")
   // ancestorHierarchy      Hierarchy[]             @relation("HierarchyAncestor")
   // descendantHierarchy    Hierarchy[]             @relation("HierarchyDescendant")
-  // ledgerEntries          Ledger[]
+  ledgerEntries          Ledger[]
   // node                   MatrixNode?
 
   @@index([sponsorId], map: "users_sponsorId_fkey")
@@ -104,17 +104,13 @@ model Product {
   categoryId       Int?           @db.UnsignedInt
   isActive         Boolean        @default(false)
   discount         Float?
-  profit           Float?
   gst              Float?
-  gatewayFee       Float?
   homeDelivery     Float?
   price            Float
   sellingPrice     Float
   keyFeature       String?
   mainImage        String?
-  manufacturer     String?
   type             ProductType    @default(REGULAR)
-  commissionAmount Int            @default(0)
   createdAt        DateTime?      @default(now())
   // NEW PRICING STRUCTURE - Following the spec
   productPrice     Float?         // Pr - Product Price (goes to company) - Optional for existing products
@@ -229,25 +225,25 @@ model OrderProducts {
 //   @@map("hierarchy")
 // }
 
-// model Ledger {
-//   id           Int      @id @default(autoincrement()) @db.UnsignedInt
-//   userId       Int?     @db.UnsignedInt
-//   type         String
-//   amount       Int
-//   description  String?
-//   referenceId  String?
-//   balanceAfter Int?
-//   levelDepth   Int?
-//   note         String?
-//   createdAt    DateTime @default(now())
-//   ref          String?  @unique
-//   user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-// 
-//   @@index([userId, type])
-//   @@index([referenceId])
-//   @@index([ref])
-//   @@map("ledger")
-// }
+model Ledger {
+  id           Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId       Int?     @db.UnsignedInt
+  type         String
+  amount       Int
+  description  String?
+  referenceId  String?
+  balanceAfter Int?
+  levelDepth   Int?
+  note         String?
+  createdAt    DateTime @default(now())
+  ref          String?  @unique
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([referenceId])
+  @@index([ref])
+  @@map("ledger")
+}
 
 model SelfPayoutSchedule {
   id          Int      @id @default(autoincrement()) @db.UnsignedInt
