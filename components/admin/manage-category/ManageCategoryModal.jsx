@@ -100,7 +100,7 @@ function ManageCategoryModal({
               required
               value={formData.name}
               onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded"
+              className="w-full mt-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             />
           </div>
 
@@ -115,7 +115,7 @@ function ManageCategoryModal({
               rows="3"
               value={formData.description}
               onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded"
+              className="w-full mt-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             ></textarea>
           </div>
 

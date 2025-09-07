@@ -83,11 +83,11 @@ function AdminNavAsideBar({ showMenus, setShowMenus }) {
         showMenus ? "max-sm:-translate-x-[100%]" : "max-sm:-translate-x-[0%] "
       } `}
     >
-      <div className="bg-base-100 rounded-box shadow p-4 h-full ">
+      <div className="bg-base-100 dark:bg-gray-800 rounded-box shadow p-4 h-full ">
         {/* close btn on screeen start */}
         <button
           onClick={() => setShowMenus(true)}
-          className="w-fit ml-auto p-2 bg-slate-100 z-50 hidden max-sm:flex"
+          className="w-fit ml-auto p-2 bg-slate-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 z-50 hidden max-sm:flex"
         >
           <i>
             <RiCloseLargeLine />
@@ -97,13 +97,15 @@ function AdminNavAsideBar({ showMenus, setShowMenus }) {
 
         <ul className="menu w-full space-y-3.5">
           {asideMenus.map((menu, i) => (
-            <li className="border-b border-slate-200" key={i}>
+            <li className="border-b border-slate-200 dark:border-gray-600" key={i}>
               <Link
                 onClick={() => setShowMenus(true)}
                 href={menu.path}
                 className={`${
-                  menu.path === pathname ? "bg-slate-900 text-white" : ""
-                } p-3`}
+                  menu.path === pathname 
+                    ? "bg-slate-900 dark:bg-gray-700 text-white" 
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                } p-3 transition-colors duration-200`}
               >
                 <i className="text-xl">{menu.icon}</i> {menu.title}
               </Link>
@@ -112,7 +114,7 @@ function AdminNavAsideBar({ showMenus, setShowMenus }) {
           <li>
             <button
               onClick={handleUserLogOut}
-              className="flex items-center gap-1.5 rounded text-white btn bg-amber-500"
+              className="flex items-center gap-1.5 rounded text-white btn bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700"
             >
               <MdLogout fontSize={20} /> Logout
             </button>

@@ -71,11 +71,11 @@ function AddBannerModel({ fetchAllBannersDetails }) {
 
   return (
     <dialog id="my_modal_3" className="modal">
-      <div className="modal-box">
+      <div className="modal-box dark:bg-gray-800">
         <form method="dialog">
           <button
             id="close-btn"
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-600 dark:text-gray-300"
           >
             ✕
           </button>
@@ -84,30 +84,30 @@ function AddBannerModel({ fetchAllBannersDetails }) {
         {/* Add Banner form */}
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-lg p-6 w-full max-w-lg space-y-4 text-sm"
+          className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-lg space-y-4 text-sm"
         >
-          <h3 className="text-xl font-semibold text-indigo-700">Add Banner</h3>
+          <h3 className="text-xl font-semibold text-indigo-700 dark:text-indigo-400">Add Banner</h3>
 
           <div>
-            <label className="text-indigo-600">Title</label>
+            <label className="text-indigo-600 dark:text-indigo-400">Title</label>
             <input
               type="text"
               name="title"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full mt-1 p-2 border rounded"
+              className="w-full mt-1 p-2 border dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
 
           <div>
-            <label className="text-indigo-600">Thumbnail Image</label>
+            <label className="text-indigo-600 dark:text-indigo-400">Thumbnail Image</label>
             <input
               type="file"
               name="thumbnailImage"
               accept="image/*"
               required
-              className="w-full mt-1 p-2 border rounded"
+              className="w-full mt-1 p-2 border dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               onChange={handleThumbnailChange}
             />
             {thumbnailPreview && (

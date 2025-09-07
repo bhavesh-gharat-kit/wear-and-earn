@@ -173,7 +173,6 @@ export async function POST(req) {
                 homeDelivery: data.shipping ? Number(data.shipping) : 50,
                 type: data.productType || "REGULAR",
                 mainImage: thumbnailUrl,
-                manufacturer: data.manufacturer || "WeArEarn",
                 images: {
                     create: productImageUrls.map((url) => ({ imageUrl: url }))
                 }

@@ -141,7 +141,7 @@ function AdminManageCategoryPage() {
         <input
           onChange={(e) => setSearchCategory(e.target.value)}
           value={searchCategory}
-          className=" w-full px-3 py-1 bg-slate-200 h-full rounded outline-none"
+          className="w-full px-3 py-1 bg-slate-200 dark:bg-gray-800 h-full rounded outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
           type="search"
           placeholder="search category..."
         />
@@ -155,9 +155,9 @@ function AdminManageCategoryPage() {
 
       {/* Category table */}
 
-      <div className="overflow-x-auto rounded-lg shadow bg-white py-4">
+  <div className="overflow-x-auto rounded-lg shadow bg-white dark:bg-gray-900 py-4">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-indigo-100 text-gray-700">
+          <thead className="bg-indigo-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
             <tr>
               <th className="p-3 text-left">#</th>
               <th className="p-3 text-left">Name</th>
@@ -166,7 +166,7 @@ function AdminManageCategoryPage() {
               <th className="p-3 text-left">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
             {categories
               .filter((category) =>
                 category.name

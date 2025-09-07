@@ -77,7 +77,7 @@ function AdminLoginPage() {
                 value={credentials.userId}
                 onChange={handleChange}
                 placeholder="Enter email or mobile number"
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900 dark:text-white bg-white dark:bg-gray-900"
                 required
               />
             </div>
@@ -96,7 +96,7 @@ function AdminLoginPage() {
                 value={credentials.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
-                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900 dark:text-white bg-white dark:bg-gray-900"
                 required
               />
               <button

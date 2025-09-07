@@ -32,7 +32,7 @@ function AdminNavbar({ setShowMenus }) {
       <header id="header" className="w-full">
         <div className="w-full">
           {/* NAVBAR HEADER TOP */}
-          <div className="navbar shadow-sm gap-4 px-4 sm:px-6 lg:px-8 top-header-bg-color-animtion max-h-20 ">
+          <div className="navbar shadow-sm gap-4 px-4 sm:px-6 lg:px-8 top-header-bg-color-animtion max-h-20 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
             <div className="text-3xl max-sm:block hidden">
               <button onClick={handleShowMenus}>
                 <FaBars />
@@ -50,7 +50,7 @@ function AdminNavbar({ setShowMenus }) {
               </Link>
             </div>
             <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold text-blue-700 max-sm:text-xl max-sm:hidden">
+              <h1 className="text-2xl font-bold text-blue-700 dark:text-blue-400 max-sm:text-xl max-sm:hidden">
                 Admin Dashboard
               </h1>
               
@@ -59,25 +59,25 @@ function AdminNavbar({ setShowMenus }) {
                 <div className="relative">
                   <button
                     onClick={() => setShowDropdown(!showDropdown)}
-                    className="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg transition-colors"
+                    className="flex items-center gap-2 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 px-4 py-2 rounded-lg transition-colors"
                   >
-                    <FaUser className="text-blue-600" />
-                    <span className="text-blue-800 font-medium max-sm:hidden">
+                    <FaUser className="text-blue-600 dark:text-blue-400" />
+                    <span className="text-blue-800 dark:text-blue-200 font-medium max-sm:hidden">
                       {session?.user?.name || "Admin"}
                     </span>
                   </button>
                   
                   {showDropdown && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                      <div className="p-3 border-b border-gray-200">
-                        <p className="text-sm font-medium text-gray-800">
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+                      <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+                        <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
                           {session?.user?.name || "Administrator"}
                         </p>
-                        <p className="text-xs text-gray-500">Admin Panel Access</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Admin Panel Access</p>
                       </div>
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-left text-red-600 hover:bg-red-50 transition-colors"
+                        className="w-full flex items-center gap-2 px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
                       >
                         <FaSignOutAlt />
                         Sign Out

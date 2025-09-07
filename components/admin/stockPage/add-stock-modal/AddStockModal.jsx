@@ -36,17 +36,17 @@ function AddStockModal({ productsStockDetails, fetchproductsStockDetails }) {
 
   return (
     <dialog id="my_modal_3" className="modal">
-      <div className="modal-box">
+      <div className="modal-box dark:bg-gray-800">
         <form method="dialog">
           {/* if there is a button in form, it will close the modal */}
           <button
             id="closeBtn"
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-600 dark:text-gray-300"
           >
             ✕
           </button>
         </form>
-        <h3 className="font-bold text-lg py-4">Add Product Stocks!</h3>
+        <h3 className="font-bold text-lg py-4 text-gray-900 dark:text-white">Add Product Stocks!</h3>
         <form
           className="space-y-4"
           action="#"
@@ -54,13 +54,13 @@ function AddStockModal({ productsStockDetails, fetchproductsStockDetails }) {
         >
           {/* select the product */}
           <div>
-            <label htmlFor="productTitle"> Product Title: </label>
+            <label htmlFor="productTitle" className="text-gray-900 dark:text-gray-100"> Product Title: </label>
             <select
               name="productTitle"
               value={stockForm.productTitle}
               onChange={handleStockFormInput}
               required
-              className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300"
+              className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               <option value="" disabled>
                 Select Product:
@@ -74,14 +74,14 @@ function AddStockModal({ productsStockDetails, fetchproductsStockDetails }) {
           </div>
           {/* add quantity */}
           <div>
-            <label htmlFor="productInStock">Product Quantity</label>
+            <label htmlFor="productInStock" className="text-gray-900 dark:text-gray-100">Product Quantity</label>
             <input
               type="number"
               name="productInStock"
               min={1}
               placeholder="enter your quantity"
               onChange={handleStockFormInput}
-              className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300"
+              className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
 

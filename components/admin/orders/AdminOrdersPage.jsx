@@ -117,7 +117,7 @@ function AdminOrdersPage() {
   }
 
   return (
-    <section className="p-4 sm:p-8 bg-gray-50 min-h-screen">
+  <section className="p-4 sm:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
       
       
       <h2 className="text-3xl font-bold mb-8 text-blue-700">Manage Orders</h2>
@@ -129,14 +129,14 @@ function AdminOrdersPage() {
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
-            className="border border-blue-400 rounded-md p-1 px-2"
+              className="border border-blue-400 rounded-md p-1 px-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
           />
           <span className="font-semibold">TO</span>
           <input
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
-            className="border border-blue-400 rounded-md p-1 px-2"
+              className="border border-blue-400 rounded-md p-1 px-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
           />
         </div>
         <div className="flex items-center md:max-w-sm border border-blue-400 rounded-lg overflow-hidden">
@@ -145,7 +145,7 @@ function AdminOrdersPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by email or order ID..."
-            className="w-full px-4 py-2 bg-white focus:outline-none"
+              className="w-full px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none"
           />
           <button
             type="submit"
@@ -168,10 +168,10 @@ function AdminOrdersPage() {
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Order ID
@@ -196,7 +196,7 @@ function AdminOrdersPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
                 {orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -227,7 +227,7 @@ function AdminOrdersPage() {
                         <select
                           value={order.status}
                           onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                          className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                         >
                           <option value="pending">Pending</option>
                           <option value="inProcess">In Process</option>

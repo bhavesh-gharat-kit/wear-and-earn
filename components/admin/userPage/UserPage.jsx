@@ -111,7 +111,7 @@ function UserPage() {
     <div className="space-y-6">
       {/* header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-xl text-blue-700 font-bold">Manage Users</h1>
+        <h1 className="text-xl text-blue-700 dark:text-blue-400 font-bold">Manage Users</h1>
       </div>
 
       {/* Search */}
@@ -122,7 +122,7 @@ function UserPage() {
         action=""
       >
         <input
-          className=" w-full px-3 py-1 bg-slate-200 h-full rounded outline-none"
+          className="w-full px-3 py-1 bg-slate-200 dark:bg-gray-700 dark:text-white h-full rounded outline-none"
           type="search"
           placeholder="search by user email..."
           onChange={(e) => setSearchUserEmail(e.target.value)}
@@ -138,9 +138,9 @@ function UserPage() {
 
       {/* Category table */}
 
-      <div className="overflow-x-auto rounded-lg shadow bg-white py-4">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-indigo-100 text-gray-700">
+      <div className="overflow-x-auto rounded-lg shadow bg-white dark:bg-gray-800 py-4">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600 text-sm">
+          <thead className="bg-indigo-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
             <tr>
               <th className="p-3 text-left">#</th>
               <th className="p-3 text-left">Gender</th>
@@ -150,7 +150,7 @@ function UserPage() {
               <th className="p-3 text-left">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600 text-gray-900 dark:text-gray-100">
             {allUserDetails
               .filter((user) =>
                 user.email.includes(searchUserEmail.toLowerCase())

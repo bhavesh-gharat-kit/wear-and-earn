@@ -35,22 +35,22 @@ function AdminDashBoard() {
     allDatabaseDetails;
 
   return (
-    <div className="bg-white min-h-screen text-gray-800 mx-auto">
+    <div className="bg-white dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 mx-auto">
       <section>
-        <section className="min-h-screen bg-gray-50 p-6 text-gray-800 font-sans">
+        <section className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 text-gray-800 dark:text-gray-100 font-sans">
           {/* Header */}
-          <h1 className="text-4xl font-bold mb-8 text-blue-700">
+          <h1 className="text-4xl font-bold mb-8 text-blue-700 dark:text-blue-400">
             Welcome Admin,
           </h1>
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {/* Orders */}
-            <div className="bg-white rounded-2xl shadow p-6 hover:shadow-md transition group border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-gray-100 dark:border-gray-800">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold text-blue-600">Total Orders</h2>
-                  <p className="text-xl md:text-2xl font-bold mt-2 text-blue-900">
+                  <h2 className="font-semibold text-blue-600 dark:text-blue-400">Total Orders</h2>
+                  <p className="text-xl md:text-2xl font-bold mt-2 text-blue-900 dark:text-blue-200">
                     {" "}
                     {totalOrders}{" "}
                   </p>
@@ -73,11 +73,11 @@ function AdminDashBoard() {
             </div>
 
             {/* Users */}
-            <div className="bg-white rounded-2xl shadow p-6 hover:shadow-md transition group border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-gray-100 dark:border-gray-800">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold text-blue-600">Total Users</h2>
-                  <p className="text-xl md:text-2xl font-bold mt-2 text-blue-900">
+                  <h2 className="font-semibold text-blue-600 dark:text-blue-400">Total Users</h2>
+                  <p className="text-xl md:text-2xl font-bold mt-2 text-blue-900 dark:text-blue-200">
                     {totalUsers}
                   </p>
                 </div>
@@ -99,11 +99,11 @@ function AdminDashBoard() {
             </div>
 
             {/* Products */}
-            <div className="bg-white rounded-2xl shadow p-6 hover:shadow-md transition group border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-gray-100 dark:border-gray-800">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold text-blue-600">Products</h2>
-                  <p className="text-xl md:text-2xl font-bold mt-2 text-blue-900">
+                  <h2 className="font-semibold text-blue-600 dark:text-blue-400">Products</h2>
+                  <p className="text-xl md:text-2xl font-bold mt-2 text-blue-900 dark:text-blue-200">
                     {totalProducts}
                   </p>
                 </div>
@@ -125,11 +125,11 @@ function AdminDashBoard() {
             </div>
 
             {/* In Stock */}
-            <div className="bg-white rounded-2xl shadow p-6 hover:shadow-md transition group border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-gray-100 dark:border-gray-800">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold text-blue-600">In Stock</h2>
-                  <p className="text-xl md:text-2xl font-bold mt-2 text-blue-900">
+                  <h2 className="font-semibold text-blue-600 dark:text-blue-400">In Stock</h2>
+                  <p className="text-xl md:text-2xl font-bold mt-2 text-blue-900 dark:text-blue-200">
                     {totalInStockQuantity}
                   </p>
                 </div>
@@ -153,14 +153,14 @@ function AdminDashBoard() {
 
           {/* MLM Summary Cards */}
           <div className="mt-8">
-            <h2 className="text-2xl font-semibold mb-4 text-green-700">MLM Overview</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-green-700 dark:text-green-400">MLM Overview</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {/* Active MLM Users */}
-              <div className="bg-white rounded-2xl shadow p-6 hover:shadow-md transition group border border-green-100">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-green-100 dark:border-green-800">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="font-semibold text-green-600">Active MLM Users</h2>
-                    <p className="text-xl md:text-2xl font-bold mt-2 text-green-900">
+                    <h2 className="font-semibold text-green-600 dark:text-green-400">Active MLM Users</h2>
+                    <p className="text-xl md:text-2xl font-bold mt-2 text-green-900 dark:text-green-200">
                       {mlmStats?.activeMLMUsers || 0}
                     </p>
                   </div>
@@ -182,11 +182,11 @@ function AdminDashBoard() {
               </div>
 
               {/* Total Commissions */}
-              <div className="bg-white rounded-2xl shadow p-6 hover:shadow-md transition group border border-green-100">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-green-100 dark:border-green-800">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="font-semibold text-green-600">Total Commissions</h2>
-                    <p className="text-xl md:text-2xl font-bold mt-2 text-green-900">
+                    <h2 className="font-semibold text-green-600 dark:text-green-400">Total Commissions</h2>
+                    <p className="text-xl md:text-2xl font-bold mt-2 text-green-900 dark:text-green-200">
                       ₹{mlmStats?.totalCommissionAmount?.toLocaleString() || 0}
                     </p>
                   </div>
@@ -208,11 +208,11 @@ function AdminDashBoard() {
               </div>
 
               {/* Total Referrals */}
-              <div className="bg-white rounded-2xl shadow p-6 hover:shadow-md transition group border border-green-100">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-green-100 dark:border-green-800">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="font-semibold text-green-600">Users with Referrals</h2>
-                    <p className="text-xl md:text-2xl font-bold mt-2 text-green-900">
+                    <h2 className="font-semibold text-green-600 dark:text-green-400">Users with Referrals</h2>
+                    <p className="text-xl md:text-2xl font-bold mt-2 text-green-900 dark:text-green-200">
                       {mlmStats?.totalReferrals || 0}
                     </p>
                   </div>
@@ -237,29 +237,29 @@ function AdminDashBoard() {
 
           {/* Quick Actions */}
           <div className="mt-12">
-            <h2 className="text-2xl font-semibold mb-4">Quick Actions</h2>
+            <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">Quick Actions</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <Link
                 href="/admin/products/add"
-                className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl shadow hover:shadow-md transition"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl shadow hover:shadow-md transition dark:bg-blue-700 dark:hover:bg-blue-800"
               >
                 Add New Product
               </Link>
               <Link
                 href="/admin/orders"
-                className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl shadow hover:shadow-md transition"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl shadow hover:shadow-md transition dark:bg-blue-700 dark:hover:bg-blue-800"
               >
                 View Orders
               </Link>
               <Link
                 href="/admin/stock"
-                className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl shadow hover:shadow-md transition"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl shadow hover:shadow-md transition dark:bg-blue-700 dark:hover:bg-blue-800"
               >
                 Manage Stock
               </Link>
               <Link
                 href="/admin/mlm-panel"
-                className="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl shadow hover:shadow-md transition"
+                className="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl shadow hover:shadow-md transition dark:bg-green-700 dark:hover:bg-green-800"
               >
                 MLM Management
               </Link>
@@ -269,21 +269,21 @@ function AdminDashBoard() {
         </section>
       </section>
       <div className="w-full max-w-screen-xl mx-auto px-4 py-6">
-        <hr className="mb-4 border-gray-300" />
+        <hr className="mb-4 border-gray-300 dark:border-gray-700" />
 
         {/* Copyright */}
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-gray-600 dark:text-gray-400">
           © 2025{" "}
-          <a href="#" className="text-blue-600 hover:underline font-medium">
+          <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
             wearnearn
           </a>
           . All rights reserved.
         </p>
 
         {/* Designed by */}
-        <p className="text-center text-sm text-gray-500 mt-1">
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-1">
           Designed by{" "}
-          <a href="#" className="text-green-600 hover:underline font-medium">
+          <a href="#" className="text-green-600 dark:text-green-400 hover:underline font-medium">
             KumarInfotech
           </a>
         </p>

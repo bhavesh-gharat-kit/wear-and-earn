@@ -5,47 +5,55 @@ import prisma from "@/lib/prisma";
 
 export const GET = async () => {
     try {
-        const [totalOrders, totalUsers, totalProducts, inStockTotal, mlmStats] = await Promise.all([
-            prisma.order.count(),
-            prisma.user.count(),
-            prisma.product.count(),
-            prisma.product.aggregate({
-                _sum: {
-                    inStock: true
+        // Basic counts
+        const totalOrders = await prisma.order.count();
+        const totalUsers = await prisma.user.count();
+        const totalProducts = await prisma.product.count();
+        
+        // Aggregate for inStock
+        const inStockResult = await prisma.product.aggregate({
+            _sum: {
+                inStock: true
+            }
+        });
+        
+        const totalInStockQuantity = inStockResult?._sum?.inStock || 0;
+        
+        // MLM stats
+        const activeMLMUsers = await prisma.user.count({
+            where: {
+                isActive: true
+            }
+        });
+        
+        const totalReferrals = await prisma.user.count({
+            where: {
+                referralCode: {
+                    not: null
                 }
-            }),
-            // MLM Statistics
-            Promise.all([
-                prisma.user.count({
-                    where: {
-                        isActive: true
-                    }
-                }),
-                prisma.ledger.aggregate({
-                    _sum: {
-                        amount: true
-                    },
-                    where: {
-                        type: 'COMMISSION'
-                    }
-                }),
-                prisma.user.count({
-                    where: {
-                        referralCode: {
-                            not: null
-                        }
-                    }
-                })
-            ])
-        ]);
+            }
+        });
         
-        const totalInStockQuantity = inStockTotal._sum.inStock || 0;
-        const [activeMLMUsers, totalCommissions, totalReferrals] = mlmStats;
-        const totalCommissionAmount = totalCommissions._sum.amount || 0;
+        // Commission from ledger with careful error handling
+        let totalCommissionAmount = 0;
+        try {
+            const commissionResult = await prisma.ledger.aggregate({
+                _sum: {
+                    amount: true
+                },
+                where: {
+                    type: 'COMMISSION'
+                }
+            });
+            totalCommissionAmount = commissionResult?._sum?.amount || 0;
+        } catch (ledgerError) {
+            console.error('Ledger query error:', ledgerError);
+            totalCommissionAmount = 0;
+        }
         
-        return res.json({
+        return Response.json({
             totalOrders,
-            totalUsers,
+            totalUsers, 
             totalProducts,
             totalInStockQuantity,
             mlmStats: {
@@ -56,8 +64,8 @@ export const GET = async () => {
         });
     } catch (error) {
         console.error('Error fetching dashboard stats:', error);
-        return res.json(
-            { error: 'Failed to fetch dashboard stats' },
+        return Response.json(
+            { error: 'Failed to fetch dashboard stats', details: error.message },
             { status: 500 }
         );
     }

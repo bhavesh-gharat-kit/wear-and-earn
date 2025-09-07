@@ -44,13 +44,13 @@ export default function AdminLayout({ children }) {
   return (
     <div className="w-full">
       <AdminNavbar setShowMenus={setShowMenus} />
-      <div className="min-h-screen bg-base-200 w-full px-4 sm:px-6 md:px-8 lg:px-10 py-6 relative">
+      <div className="min-h-screen bg-base-200 dark:bg-gray-900 w-full px-4 sm:px-6 md:px-8 lg:px-10 py-6 relative">
         <div className="w-full max-sm:rounded-none max-sm:border-slate-200">
           <div className="flex flex-col lg:flex-row gap-6">
             <AdminNavAsideBar setShowMenus={setShowMenus} showMenus={showMenus} />
             {/* Dynamic Main Content */}
             <main className="lg:w-3/4 w-full">
-              <div className="bg-base-100 rounded-box shadow p-6">{children}</div>
+              <div className="bg-base-100 dark:bg-gray-800 rounded-box shadow p-6 text-gray-900 dark:text-gray-100">{children}</div>
             </main>
           </div>
         </div>

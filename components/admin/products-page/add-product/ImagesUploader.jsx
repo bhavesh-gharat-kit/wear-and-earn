@@ -61,13 +61,13 @@ const ImagesUploader = ({ label, maxFiles, images, setImages }) => {
 
   return (
     <div className="mb-4">
-      <label className="block font-medium text-gray-700">{label}</label>
+      <label className="block font-medium text-gray-700 dark:text-gray-300">{label}</label>
       <input
         type="file"
         accept="image/*"
         multiple
         onChange={handleImageChange}
-        className="w-full border rounded-lg p-2"
+        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
       />
       <div className="flex flex-wrap gap-2 mt-2">
         {images?.map((file, index) => {

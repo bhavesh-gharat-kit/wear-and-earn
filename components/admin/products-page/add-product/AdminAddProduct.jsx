@@ -22,14 +22,12 @@ const AdminAddProduct = () => {
     gst: "",
     shipping: "",
     productType: "REGULAR",
-    thumbnailImage: null,
     productImages: [],
   };
 
   const [formData, setFormData] = useState(formInitilizer);
 
   // For preview
-  const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [multipleImages, setMultipleImages] = useState([]);
 
   const [categories, setCategories] = useState([]);
@@ -53,14 +51,19 @@ const AdminAddProduct = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // NEW SPEC: Auto-calculate total price when product price or MLM price changes
-    if (name === "productPrice" || name === "mlmPrice") {
+    // Auto-calculate total price when any price component changes
+    if (["productPrice", "mlmPrice", "gst", "shipping", "discount"].includes(name)) {
       const updatedData = { ...formData, [name]: value };
-      const { productPrice, mlmPrice } = updatedData;
+      const { productPrice, mlmPrice, gst, shipping, discount } = updatedData;
 
-      // Calculate total price = Pr + Pm
+      // Calculate total price = (Pr + Pm + Shipping) + GST - Discount
       if (productPrice && mlmPrice) {
-        updatedData.totalPrice = (Number(productPrice) + Number(mlmPrice)).toFixed(2);
+        const basePrice = Number(productPrice) + Number(mlmPrice);
+        const shippingAmount = Number(shipping) || 0;
+        const subtotal = basePrice + shippingAmount;
+        const gstAmount = (subtotal * (Number(gst) || 0)) / 100;
+        const discountAmount = (subtotal * (Number(discount) || 0)) / 100;
+        updatedData.totalPrice = Number((subtotal + gstAmount - discountAmount).toFixed(2));
       }
 
       setFormData(updatedData);
@@ -69,16 +72,6 @@ const AdminAddProduct = () => {
         ...prev,
         [name]: value,
       }));
-    }
-  };
-
-  const handleThumbnailChange = (e) => {
-    const file = e.target.files[0];
-    setFormData((prev) => ({ ...prev, thumbnailImage: file }));
-
-    if (file) {
-      const preview = URL.createObjectURL(file);
-      setThumbnailPreview(preview);
     }
   };
 
@@ -112,17 +105,13 @@ const AdminAddProduct = () => {
     // NEW SPEC: Append pricing data according to spec
     form.append("productPrice", formData.productPrice);  // Pr
     form.append("mlmPrice", formData.mlmPrice);          // Pm
+    form.append("discount", formData.discount || "0");   // Discount percentage
     
     form.append("overview", formData.overview || "");
     form.append("keyFeatures", formData.keyFeatures || "");
     form.append("gst", formData.gst || "0");
     form.append("shipping", formData.shipping || "0");
     form.append("productType", formData.productType || "REGULAR");
-
-    // Append thumbnail image
-    if (formData.thumbnailImage) {
-      form.append("thumbnailImage", formData.thumbnailImage);
-    }
 
     // Append multiple images
     multipleImages.forEach((file) => {
@@ -170,7 +159,7 @@ const AdminAddProduct = () => {
   };
 
   return (
-    <section className="p-4 sm:p-8 bg-gray-50 min-h-screen">
+    <section className="p-4 sm:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="flex justify-between items-start">
         <button
           onClick={() => window.history.back()}
@@ -178,12 +167,12 @@ const AdminAddProduct = () => {
         >
           <FaArrowLeft /> Back
         </button>
-        <h2 className="text-2xl font-semibold text-green-800 mb-6">
+        <h2 className="text-2xl font-semibold text-green-800 dark:text-green-400 mb-6">
           Add Product
         </h2>
       </div>
 
-      <p className="p-2 text-sm text-gray-600">
+      <p className="p-2 text-sm text-gray-600 dark:text-gray-400">
         Use Webp Optimized images standard size
       </p>
 
@@ -191,7 +180,7 @@ const AdminAddProduct = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Product Name */}
           <div className="col-span-2">
-            <label className="block mb-1 text-sm font-medium text-gray-700">
+            <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
               Product Name
             </label>
             <input
@@ -200,13 +189,13 @@ const AdminAddProduct = () => {
               value={formData.title}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             />
           </div>
 
           {/* Product Description */}
           <div className="col-span-2">
-            <label className="block mb-1 text-sm font-medium text-gray-700">
+            <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
               Description
             </label>
             <textarea
@@ -215,14 +204,14 @@ const AdminAddProduct = () => {
               onChange={handleInputChange}
               rows="4"
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             ></textarea>
           </div>
 
           {/* Category and Price */}
           <div className="col-span-2 grid grid-cols-2 gap-x-2">
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
+              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
                 Category
               </label>
               <select
@@ -230,7 +219,7 @@ const AdminAddProduct = () => {
                 value={formData.category}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300"
+                className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               >
                 <option value="" disabled>
                   Select Category
@@ -243,7 +232,7 @@ const AdminAddProduct = () => {
               </select>
             </div>
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
+              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
                 Product Price (Pr) - ₹ <span className="text-red-500">*</span>
               </label>
               <input
@@ -254,17 +243,17 @@ const AdminAddProduct = () => {
                 min="0"
                 step="0.01"
                 required
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 placeholder="Product base price"
               />
-              <p className="text-xs text-gray-500 mt-1">This goes directly to company</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">This goes directly to company</p>
             </div>
           </div>
 
           {/* MLM Price and Total Price */}
           <div className="col-span-2 grid grid-cols-2 gap-x-2">
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
+              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
                 MLM Price (Pm) - ₹ <span className="text-red-500">*</span>
               </label>
               <input
@@ -275,29 +264,56 @@ const AdminAddProduct = () => {
                 min="0"
                 step="0.01"
                 required
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 placeholder="MLM commission amount"
               />
-              <p className="text-xs text-gray-500 mt-1">30% company, 70% pool distribution</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">30% company, 70% pool distribution</p>
             </div>
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
-                Total Price (Pr + Pm)
+              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                Total Price (Pr + Pm + GST + Shipping)
               </label>
               <input
                 type="text"
-                value={formData.totalPrice ? `₹${formData.totalPrice}` : 'Auto-calculated'}
+                value={formData.totalPrice ? `₹${Number(formData.totalPrice).toFixed(2)}` : 'Auto-calculated'}
                 readOnly
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-gray-100 text-gray-600"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300"
               />
-              <p className="text-xs text-blue-500 mt-1">This is what customer pays</p>
+              <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">Full price including all charges</p>
             </div>
           </div>
+
+          {/* Customer Pricing Preview */}
+          {formData.productPrice && formData.mlmPrice && (
+            <div className="col-span-2 bg-blue-50 dark:bg-blue-900 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">Customer Will See:</h4>
+              <div className="space-y-1 text-sm text-blue-800 dark:text-blue-200">
+                <div className="flex justify-between">
+                  <span>Product Price:</span>
+                  <span>₹{(Number(formData.productPrice) + Number(formData.mlmPrice || 0) + Number(formData.shipping || 0)).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>GST ({formData.gst || 0}%):</span>
+                  <span>₹{(((Number(formData.productPrice) + Number(formData.mlmPrice || 0) + Number(formData.shipping || 0)) * (Number(formData.gst) || 0)) / 100).toFixed(2)}</span>
+                </div>
+                {formData.discount && (
+                  <div className="flex justify-between text-green-600 dark:text-green-400">
+                    <span>Discount ({formData.discount}%):</span>
+                    <span>-₹{(((Number(formData.productPrice) + Number(formData.mlmPrice || 0) + Number(formData.shipping || 0)) * Number(formData.discount)) / 100).toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-semibold border-t border-blue-200 dark:border-blue-700 pt-1">
+                  <span>Final Amount:</span>
+                  <span>₹{Number(formData.totalPrice).toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Discount (Optional) */}
           <div className="col-span-2 grid grid-cols-1 gap-x-2">
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
+              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
                 Discount (%) - Optional
               </label>
               <input
@@ -308,7 +324,7 @@ const AdminAddProduct = () => {
                 min="0"
                 max="100"
                 step="0.01"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 placeholder="Optional discount percentage"
               />
             </div>
@@ -317,7 +333,7 @@ const AdminAddProduct = () => {
           {/* GST and Shipping */}
           <div className="col-span-2 grid grid-cols-2 gap-x-2">
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
+              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
                 GST (%)
               </label>
               <input
@@ -328,12 +344,12 @@ const AdminAddProduct = () => {
                 min="0"
                 max="100"
                 step="0.01"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 placeholder="18"
               />
             </div>
             <div>
-              <label className="block mb-1 text-sm font-medium text-gray-700">
+              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
                 Shipping Charges (₹)
               </label>
               <input
@@ -351,29 +367,23 @@ const AdminAddProduct = () => {
 
           {/* Product Type */}
           <div className="col-span-2">
-            <label className="block mb-1 text-sm font-medium text-gray-700">
+            <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
               Product Type
             </label>
             <select
               name="productType"
               value={formData.productType}
               onChange={handleInputChange}
-              className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300"
+              className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             >
               <option value="REGULAR">Regular Product</option>
               <option value="TRENDING">Trending Product</option>
-              <option value="MLM">MLM Product</option>
             </select>
-            {formData.productType === "MLM" && (
-              <p className="text-xs text-blue-600 mt-1">
-                💡 MLM products require MLM Price to be set for commission calculations
-              </p>
-            )}
           </div>
 
           {/* Overview and Key Features */}
           <div className="col-span-2">
-            <label className="block mb-1 text-sm font-medium text-gray-700">
+            <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
               Overview
             </label>
             <textarea
@@ -381,12 +391,12 @@ const AdminAddProduct = () => {
               value={formData.overview}
               onChange={handleInputChange}
               rows="4"
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             ></textarea>
           </div>
 
           <div className="col-span-2">
-            <label className="block mb-1 text-sm font-medium text-gray-700">
+            <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
               Key Features (,,)
             </label>
             <textarea
@@ -394,33 +404,8 @@ const AdminAddProduct = () => {
               value={formData.keyFeatures}
               onChange={handleInputChange}
               rows="4"
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             ></textarea>
-          </div>
-
-          {/* Thumbnail Image Upload */}
-          <div className="col-span-2">
-            <label className="block mb-1 text-sm font-medium text-gray-700">
-              Thumbnail Image
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              name="thumbnailImage"
-              onChange={handleThumbnailChange}
-              className="w-full text-sm border border-gray-300 rounded-md py-2 px-3"
-            />
-            {thumbnailPreview && (
-              <div className="mt-2">
-                <Image
-                  width={200}
-                  height={200}
-                  src={thumbnailPreview}
-                  alt="Thumbnail Preview"
-                  className=" w-24 object-contain rounded-md"
-                />
-              </div>
-            )}
           </div>
 
           {/* Multiple Images Upload */}
