@@ -173,6 +173,21 @@ export async function PUT(request, { params }) {
         const hasProductImagesField = formData.has("productImages");
         const rawImages = hasProductImagesField ? formData.getAll("productImages") : null;
 
+        console.log("🔍 Image processing debug:");
+        console.log("- hasProductImagesField:", hasProductImagesField);
+        console.log("- rawImages length:", rawImages ? rawImages.length : 0);
+        if (rawImages) {
+            rawImages.forEach((item, index) => {
+                console.log(`- rawImages[${index}]:`, {
+                    type: typeof item,
+                    isFile: typeof item === 'object' && 'name' in item && 'size' in item,
+                    name: item?.name,
+                    size: item?.size,
+                    value: typeof item === 'string' ? item.substring(0, 100) : '[Object]'
+                });
+            });
+        }
+
         const incomingImageUrls = [];
         if (rawImages) {
             for (const item of rawImages) {
@@ -215,6 +230,7 @@ export async function PUT(request, { params }) {
         }
 
         const finalIncomingUrls = Array.from(new Set(incomingImageUrls.filter(Boolean)));
+        console.log("🔍 Final processed URLs:", finalIncomingUrls);
 
         // Handle thumbnail upload
         let thumbnailImageUrl = existingProduct.mainImage; // Keep existing if no new one
@@ -272,6 +288,12 @@ export async function PUT(request, { params }) {
             const existingUrls = existingProduct.images.map(img => img.imageUrl);
             const toDelete = existingUrls.filter(u => !finalIncomingUrls.includes(u));
             const toCreate = finalIncomingUrls.filter(u => !existingUrls.includes(u));
+            
+            console.log("🔍 Database operations debug:");
+            console.log("- Existing URLs:", existingUrls);
+            console.log("- URLs to delete:", toDelete);
+            console.log("- URLs to create:", toCreate);
+            
             const imagesOps = {};
 
             if (toDelete.length > 0) {
