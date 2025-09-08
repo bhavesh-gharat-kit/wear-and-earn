@@ -18,7 +18,7 @@ function ContactUsFormDetails() {
 
   // pagination logic here
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPage, setRowsPage] = useState(10);
+  const [rowsPage, setRowsPage] = useState(20);
   const [totalUsersCount, setTotalUsersCount] = useState(0);
 
   const totalPages = Math.ceil(totalUsersCount / rowsPage);

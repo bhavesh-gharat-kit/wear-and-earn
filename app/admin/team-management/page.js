@@ -92,21 +92,21 @@ export default function TeamManagementPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+  <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Team Management</h1>
-        <p className="text-gray-600">View and manage all teams in the pool MLM system</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Team Management</h1>
+        <p className="text-gray-600 dark:text-gray-300">View and manage all teams in the pool MLM system</p>
       </div>
 
       {/* Filters and Controls */}
-      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-6">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6">
         <div className="flex flex-wrap items-center gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Level Filter</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Level Filter</label>
             <select
               value={filters.level}
               onChange={(e) => handleFilterChange('level', e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             >
               <option value="all">All Levels</option>
               <option value="1">Level 1</option>
@@ -118,11 +118,11 @@ export default function TeamManagementPage() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status Filter</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Status Filter</label>
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             >
               <option value="all">All Teams</option>
               <option value="active">Complete Teams</option>
@@ -131,11 +131,11 @@ export default function TeamManagementPage() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Page Size</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Page Size</label>
             <select
               value={filters.limit}
               onChange={(e) => handleFilterChange('limit', parseInt(e.target.value))}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             >
               <option value={10}>10 per page</option>
               <option value={20}>20 per page</option>
@@ -153,47 +153,47 @@ export default function TeamManagementPage() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
+  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{pagination.total || 0}</div>
-            <div className="text-sm text-gray-600">Total Teams</div>
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{pagination.total || 0}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Total Teams</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {teams.filter(t => t.isComplete).length}
             </div>
-            <div className="text-sm text-gray-600">Complete Teams</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Complete Teams</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-orange-600">
+            <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
               {teams.filter(t => !t.isComplete).length}
             </div>
-            <div className="text-sm text-gray-600">Incomplete Teams</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Incomplete Teams</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               {teams.filter(t => t.level >= 3).length}
             </div>
-            <div className="text-sm text-gray-600">L3+ Teams</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">L3+ Teams</div>
           </div>
         </div>
       </div>
 
       {/* Teams List */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200">
+  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
         {teams.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium mb-2">No Teams Found</h3>
+          <div className="p-8 text-center text-gray-500 dark:text-gray-300">
+            <Users className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-500" />
+            <h3 className="text-lg font-medium mb-2 dark:text-gray-100">No Teams Found</h3>
             <p>No teams match your current filters.</p>
           </div>
         ) : (
           <div className="overflow-hidden">
             {teams.map((team) => (
-              <div key={team.id} className="border-b border-gray-200 last:border-b-0">
+              <div key={team.id} className="border-b border-gray-200 dark:border-gray-700 last:border-b-0">
                 {/* Team Header */}
                 <div 
-                  className="p-6 hover:bg-gray-50 cursor-pointer"
+                  className="p-6 hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer"
                   onClick={() => toggleTeamExpansion(team.id)}
                 >
                   <div className="flex items-center justify-between">
@@ -204,13 +204,13 @@ export default function TeamManagementPage() {
                       
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h3 className="text-lg font-semibold text-gray-900">{team.leaderName}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{team.leaderName}</h3>
                           <div className="flex items-center space-x-1">
-                            <Crown className={`w-4 h-4 ${team.level >= 4 ? 'text-yellow-500' : 'text-gray-400'}`} />
-                            <span className="text-sm font-medium text-gray-600">L{team.level}</span>
+                            <Crown className={`w-4 h-4 ${team.level >= 4 ? 'text-yellow-500' : 'text-gray-400 dark:text-gray-500'}`} />
+                            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">L{team.level}</span>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500 mt-1">
+                        <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-300 mt-1">
                           <div className="flex items-center">
                             <Mail className="w-3 h-3 mr-1" />
                             {team.leaderEmail}
@@ -229,26 +229,26 @@ export default function TeamManagementPage() {
                     
                     <div className="flex items-center space-x-3">
                       <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
-                        team.isComplete ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
+                        team.isComplete ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-400' : 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-400'
                       }`}>
                         {team.isComplete ? 'Complete' : 'Incomplete'}
                       </span>
                       
                       <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
-                        team.isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                        team.isActive ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'
                       }`}>
                         {team.isActive ? 'Active' : 'Inactive'}
                       </span>
                       
-                      <div className="text-2xl font-bold text-gray-600">
+                      <div className="text-2xl font-bold text-gray-600 dark:text-gray-100">
                         {team.teamCount}
                       </div>
-                      <div className="text-xs text-gray-500">teams</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-300">teams</div>
                       
                       {expandedTeams.has(team.id) ? (
-                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                        <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                        <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                       )}
                     </div>
                   </div>
@@ -256,25 +256,25 @@ export default function TeamManagementPage() {
 
                 {/* Expanded Team Details */}
                 {expandedTeams.has(team.id) && (
-                  <div className="px-6 pb-6 bg-gray-50">
-                    <div className="border-t border-gray-200 pt-4">
-                      <h4 className="font-medium text-gray-900 mb-3">Team Members</h4>
+                  <div className="px-6 pb-6 bg-gray-50 dark:bg-gray-900">
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Team Members</h4>
                       {team.members && team.members.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                           {team.members.map((member) => (
-                            <div key={member.id} className="bg-white p-3 rounded-lg border border-gray-200">
+                            <div key={member.id} className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
                               <div className="flex items-center space-x-2">
-                                <UserCheck className="w-4 h-4 text-green-600" />
+                                <UserCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
                                 <div>
-                                  <div className="font-medium text-sm">{member.name}</div>
-                                  <div className="text-xs text-gray-500">{member.email}</div>
+                                  <div className="font-medium text-sm dark:text-gray-100">{member.name}</div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-300">{member.email}</div>
                                 </div>
                               </div>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-gray-500 text-sm">No members in this team yet.</p>
+                        <p className="text-gray-500 dark:text-gray-300 text-sm">No members in this team yet.</p>
                       )}
                     </div>
                   </div>
@@ -288,7 +288,7 @@ export default function TeamManagementPage() {
       {/* Pagination */}
       {pagination.totalPages > 1 && (
         <div className="mt-6 flex items-center justify-between">
-          <div className="text-sm text-gray-700">
+          <div className="text-sm text-gray-700 dark:text-gray-200">
             Showing page {pagination.page} of {pagination.totalPages} 
             ({pagination.total} total teams)
           </div>
@@ -297,7 +297,7 @@ export default function TeamManagementPage() {
             <button
               onClick={() => handlePageChange(pagination.page - 1)}
               disabled={pagination.page <= 1}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
@@ -312,7 +312,7 @@ export default function TeamManagementPage() {
                     className={`px-3 py-2 border rounded-md text-sm font-medium ${
                       page === pagination.page
                         ? 'bg-blue-600 text-white border-blue-600'
-                        : 'text-gray-700 border-gray-300 hover:bg-gray-50'
+                        : 'text-gray-700 dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >
                     {page}
@@ -324,7 +324,7 @@ export default function TeamManagementPage() {
             <button
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>

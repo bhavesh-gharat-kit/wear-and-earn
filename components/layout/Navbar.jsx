@@ -70,10 +70,10 @@ function Navbar() {
   };
 
   return (
-    <header id="header" className="w-full sticky top-0 z-50" data-theme="light">
+  <header id="header" className="w-full sticky top-0 z-50" data-theme="light">
       <div className="w-full mx-auto">
         {/* NAVBAR HEADER TOP (single row) */}
-        <div className="navbar min-h-20 md:min-h-24 py-2 md:py-3 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 text-slate-800 shadow-sm border-b border-gray-100 gap-4 px-4 sm:px-6 md:px-8 lg:px-10">
+  <div className="navbar min-h-20 md:min-h-24 py-2 md:py-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-gray-900/80 text-slate-800 dark:text-gray-100 shadow-sm border-b border-gray-100 dark:border-gray-800 gap-4 px-4 sm:px-6 md:px-8 lg:px-10">
           {/* Left: Logo */}
           <div className="navbar-start">
             <Link href={"/"}>
@@ -93,14 +93,14 @@ function Navbar() {
               {navMenus.map((menu, i) => (
                 <li key={i} className="m-0">
                   <Link
-                    style={{ backgroundColor: "transparent", color: "black" }}
+                    style={{ backgroundColor: "transparent" }}
                     href={menu.path}
                     className={` text-[17px] md:text-[18px] font-medium ${
                       pathname === menu.path &&
-                      "text-[#007bff] border-b-2 border-[#007bff] rounded-none"
-                    } flex items-center justify-center hover:text-blue-700 transition-all nav-link-hover-effect py-4 px-0 hover:bg-transparent rounded-none bg-none active:bg-none active:bg-white`}
+                      "text-[#007bff] dark:text-yellow-400 border-b-2 border-[#007bff] dark:border-yellow-400 rounded-none"
+                    } flex items-center justify-center hover:text-blue-700 dark:hover:text-yellow-400 transition-all nav-link-hover-effect py-4 px-0 hover:bg-transparent rounded-none bg-none active:bg-none active:bg-white dark:active:bg-gray-900`}
                   >
-                    <span className="text-[22px] md:text-[24px] mr-3 text-slate-600"> {menu.icon} </span>
+                    <span className="text-[22px] md:text-[24px] mr-3 text-slate-600 dark:text-gray-200"> {menu.icon} </span>
                     <span className="capitalize"> {menu.title} </span>
                   </Link>
                 </li>
@@ -116,7 +116,7 @@ function Navbar() {
               <div
                 tabIndex={0}
                 role="button"
-                className="btn btn-ghost btn-circle mr-2 hover:bg-slate-100 ring-1 ring-gray-200 transition"
+                className="btn btn-ghost btn-circle mr-2 hover:bg-slate-100 dark:hover:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700 transition"
               >
                 <div className="indicator">
                   <svg
@@ -142,7 +142,7 @@ function Navbar() {
               </div>
               <div
                 tabIndex={0}
-                className="card card-compact dropdown-content bg-base-100 z-1 mt-3 w-52 shadow"
+                className="card card-compact dropdown-content bg-base-100 dark:bg-gray-900 z-1 mt-3 w-52 shadow"
               >
                 <div className="card-body">
                   <span className="text-lg font-bold">
@@ -166,28 +166,28 @@ function Navbar() {
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost btn-circle avatar hover:bg-slate-100 transition"
+              className="btn btn-ghost btn-circle avatar hover:bg-slate-100 dark:hover:bg-gray-800 transition"
             >
-              <div className="w-10 md:w-11 rounded-full ring-1 ring-gray-200 hover:ring-blue-300 transition">
+              <div className="w-10 md:w-11 rounded-full ring-1 ring-gray-200 dark:ring-gray-700 hover:ring-blue-300 dark:hover:ring-yellow-400 transition">
                 <span className="flex justify-center items-center h-full">
                   {" "}
-                  <FaUserCog style={{ width: 24, height: 24 }} className="text-slate-600" />
+                  <FaUserCog style={{ width: 24, height: 24 }} className="text-slate-600 dark:text-gray-200" />
                 </span>
               </div>
             </div>
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-72 p-4 shadow-lg"
+                className="menu menu-sm dropdown-content bg-base-100 dark:bg-gray-900 rounded-box z-1 mt-3 w-72 p-4 shadow-lg"
               >
-                <div className="p-3 text-[#e9b008] font-medium text-lg">
+                <div className="p-3 text-[#e9b008] dark:text-yellow-400 font-medium text-lg">
                   Welcome to wearearn
-                  <p className="text-sm text-black font-normal mt-1">
+                  <p className="text-sm text-black dark:text-gray-200 font-normal mt-1">
                     Access account & manage orders
                   </p>
                 </div>
                 <li>
                   {!id ? (
-                    <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 rounded-lg">
+                    <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
                       <i className="text-lg">
                         <FiUser />
                       </i>
@@ -195,7 +195,7 @@ function Navbar() {
                     </Link>
                   ) : (
                     <>
-                      <Link href={"/account"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 rounded-lg">
+                      <Link href={"/account"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
                         <i className="text-lg">
                           <FiUser />
                         </i>
@@ -206,7 +206,7 @@ function Navbar() {
                 </li>
                 <li>
                   {!id ? (
-                    <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 rounded-lg">
+                    <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
                       <i className="text-lg">
                         <FaUserPlus />
                       </i>
@@ -215,7 +215,7 @@ function Navbar() {
                   ) : (
                     <button 
                     onClick={handleUserLogOut}
-                    className="flex items-center gap-3 py-3 px-2 text-base hover:bg-red-500 hover:text-white rounded-lg transition-colors w-full text-left">
+                    className="flex items-center gap-3 py-3 px-2 text-base hover:bg-red-500 hover:text-white dark:hover:bg-red-600 rounded-lg transition-colors w-full text-left">
                       <i className="text-lg">
                         <IoLogOut />
                       </i>
@@ -229,7 +229,7 @@ function Navbar() {
             {loginSession === "user" && (
               <button
                 onClick={handleUserLogOut}
-                className="hidden lg:flex items-center gap-1.5 rounded text-white btn bg-amber-500"
+                className="hidden lg:flex items-center gap-1.5 rounded text-white btn bg-amber-500 dark:bg-yellow-500 hover:bg-amber-600 dark:hover:bg-yellow-400 transition-colors"
               >
                 <MdLogout fontSize={20} /> Logout
               </button>
@@ -246,28 +246,28 @@ function Navbar() {
         </div>
 
         {/* Mobile slide-out menu */}
-        <nav className="lg:hidden shadow-sm mb-0.5 bg-white relative border-b border-gray-100">
+  <nav className="lg:hidden shadow-sm mb-0.5 bg-white dark:bg-gray-900 relative border-b border-gray-100 dark:border-gray-800">
           <div
-      className={` shadow-sm justify-start transition-all duration-300 absolute right-0 z-50 px-4 sm:px-6 md:px-8 py-3 items-center text-slate-800 bg-white w-12/12 ${
+      className={` shadow-sm justify-start transition-all duration-300 absolute right-0 z-50 px-4 sm:px-6 md:px-8 py-3 items-center text-slate-800 dark:text-gray-100 bg-white dark:bg-gray-900 w-12/12 ${
               isMenuOpen ? "max-sm:right-0" : "max-sm:right-[700px]"
             }`}
           >
             <div className="block">
               <ul
-        className="menu px-1 flex-col justify-start gap-4 p-0 m-0 w-full pr-4"
+  className="menu px-1 flex-col justify-start gap-4 p-0 m-0 w-full pr-4"
                 onClick={handleSetOpenMenu}
               >
                 {navMenus.map((menu, i) => (
                   <li key={i} className=" m-0">
                     <Link
-                      style={{ backgroundColor: "transparent", color: "black" }}
+                      style={{ backgroundColor: "transparent" }}
                       href={menu.path}
             className={` text-[17px] md:text-[18px] font-medium ${
                         pathname === menu.path &&
-                        "text-[#007bff] border-b-2 border-[#007bff] rounded-none"
-            } flex items-center justify-start hover:text-blue-700 transition-all nav-link-hover-effect py-3 px-0 hover:bg-transparent rounded-none bg-none active:bg-none active:bg-white`}
+                        "text-[#007bff] dark:text-yellow-400 border-b-2 border-[#007bff] dark:border-yellow-400 rounded-none"
+            } flex items-center justify-start hover:text-blue-700 dark:hover:text-yellow-400 transition-all nav-link-hover-effect py-3 px-0 hover:bg-transparent rounded-none bg-none active:bg-none active:bg-white dark:active:bg-gray-900`}
                     >
-            <span className="text-[20px] mr-2.5 text-slate-600"> {menu.icon} </span>
+            <span className="text-[20px] mr-2.5 text-slate-600 dark:text-gray-200"> {menu.icon} </span>
                       <span className="capitalize"> {menu.title} </span>
                     </Link>
                   </li>
@@ -278,7 +278,7 @@ function Navbar() {
                 {loginSession === "user" && (
                   <button
                     onClick={handleUserLogOut}
-                    className=" flex items-center gap-1.5 rounded text-white btn bg-amber-500"
+                    className=" flex items-center gap-1.5 rounded text-white btn bg-amber-500 dark:bg-yellow-500 hover:bg-amber-600 dark:hover:bg-yellow-400 transition-colors"
                   >
                     <MdLogout fontSize={20} /> Logout
                   </button>

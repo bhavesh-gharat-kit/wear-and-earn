@@ -124,7 +124,7 @@ export default function PlaceOrderDialog({
   if (type === "cart" && userAddressDetails === null) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-8 rounded-lg">
+        <div className="bg-white dark:bg-gray-900 p-8 rounded-lg">
           <LoaderEffect />
         </div>
       </div>
@@ -133,23 +133,23 @@ export default function PlaceOrderDialog({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-900 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
               {type === "cart" ? "Complete Your Order" : "Place Order"}
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl"
+              className="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white text-2xl"
             >
               ×
             </button>
           </div>
 
           {/* Order Summary */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-semibold mb-2">Order Summary</h3>
+          <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">Order Summary</h3>
             {type === "cart" && addToCartList ? (
               <div className="space-y-2">
                 {addToCartList.map((item, index) => (
@@ -183,7 +183,7 @@ export default function PlaceOrderDialog({
                   <FaEdit /> Edit Address
                 </Link>
               </div>
-              <div className="p-4 border rounded-lg bg-gray-50">
+              <div className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
                 <p>{userAddressDetails.houseNumber}, {userAddressDetails.area}</p>
                 <p>{userAddressDetails.landmark}</p>
                 <p>
@@ -206,7 +206,7 @@ export default function PlaceOrderDialog({
                   value={formData.fullName}
                   onChange={handleChange}
                   required
-                  className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700"
                 />
                 <input
                   type="tel"
@@ -215,7 +215,7 @@ export default function PlaceOrderDialog({
                   value={formData.mobileNumber}
                   onChange={handleChange}
                   required
-                  className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700"
                 />
               </div>
 

@@ -360,21 +360,21 @@ const WalletActions = ({ walletBalance }) => {
       <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
         <button 
           onClick={() => setShowWithdrawModal(true)}
-          className="bg-green-50 border border-green-200 p-4 rounded-lg hover:bg-green-100 transition-colors"
+          className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 p-4 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors"
         >
-          <Download className="w-6 h-6 text-green-600 mx-auto mb-2" />
-          <p className="font-medium text-green-700">Withdraw Money</p>
+          <Download className="w-6 h-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
+          <p className="font-medium text-green-700 dark:text-green-300">Withdraw Money</p>
         </button>
       </div>
 
       {/* Withdraw Modal */}
       {showWithdrawModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Withdraw Funds</h3>
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-md border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Withdraw Funds</h3>
             
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Amount (₹)
               </label>
               <input
@@ -384,19 +384,21 @@ const WalletActions = ({ walletBalance }) => {
                 placeholder="Enter amount"
                 min="500"
                 max={walletBalance}
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 Available balance: ₹{walletBalance?.toFixed(2) || '0.00'}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Minimum withdrawal: ₹500
               </p>
             </div>
 
             {message && (
               <div className={`mb-4 p-3 rounded-lg text-sm ${
-                message.includes('success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                message.includes('success') 
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' 
+                  : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
               }`}>
                 {message}
               </div>
@@ -409,7 +411,7 @@ const WalletActions = ({ walletBalance }) => {
                   setWithdrawAmount('')
                   setMessage('')
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
               >
                 Cancel
               </button>
@@ -523,17 +525,17 @@ const ReferralSection = ({ userData }) => {
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading referral data...</p>
+        <p className="text-gray-600 dark:text-gray-300">Loading referral data...</p>
       </div>
     )
   }
 
   if (!referralData || !referralData.referralCode) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 p-6 rounded-lg text-center">
-        <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Referral Link Not Available</h3>
-        <p className="text-gray-600 mb-4">
+      <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 p-6 rounded-lg text-center">
+        <AlertCircle className="w-12 h-12 text-yellow-500 dark:text-yellow-400 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Referral Link Not Available</h3>
+        <p className="text-gray-600 dark:text-gray-300 mb-4">
           {referralData?.message || 'You need to make your first purchase to get your referral link and start earning commissions.'}
         </p>
         <div className="flex gap-3 justify-center">
@@ -542,12 +544,6 @@ const ReferralSection = ({ userData }) => {
             className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
           >
             Shop Now
-          </button>
-          <button 
-            onClick={() => router.push('/login')}
-            className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-          >
-            Login
           </button>
         </div>
       </div>
@@ -649,7 +645,6 @@ const AccountDashboard = () => {
   const [stats, setStats] = useState(null)
   const [kycData, setKycData] = useState(null)
   const [walletData, setWalletData] = useState(null)
-  const [teamData, setTeamData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [kycForm, setKycForm] = useState({
     fullName: '',
@@ -683,7 +678,6 @@ const AccountDashboard = () => {
       fetchStats()
       fetchKycData()
       fetchWalletData()
-      fetchTeamData()
     } else {
       setLoading(false)
     }
@@ -709,7 +703,6 @@ const AccountDashboard = () => {
         // Normalize API shape to what the UI expects
         const d = data || {}
         const user = d.user || {}
-        const team = d.team || {}
         const wallet = d.wallet || {}
         const earnings = wallet.earnings || {}
         const recent = wallet.recentTransactions || []
@@ -727,16 +720,10 @@ const AccountDashboard = () => {
           monthlyEarnings: wallet?.monthlyEarnings?.paisa ?? 0,
           withdrawableBalance: wallet?.balance?.paisa ?? 0,
           totalWithdrawn: 0,
-          // Team summary
-          totalReferrals: team?.totalMembers ?? team?.directReferrals ?? 0,
+          // MLM summary
+          totalReferrals: user?.totalReferrals ?? 0,
           activeReferrals: 0,
           level: 1,
-          teamVolume: 0,
-          levelBreakdown: {},
-          monthlyTeamSales: 0,
-          totalTeamEarnings: 0,
-          teamCommission: 0,
-          monthlyNewMembers: 0,
           // Earnings breakdown (best-effort if available elsewhere)
           referralEarnings: 0,
           levelEarnings: 0,
@@ -819,18 +806,6 @@ const AccountDashboard = () => {
     }
   }
 
-  const fetchTeamData = async () => {
-    try {
-      const response = await fetch('/api/account/team')
-      if (response.ok) {
-        const data = await response.json()
-        setTeamData(data)
-      }
-    } catch (error) {
-      console.error('Error fetching team data:', error)
-    }
-  }
-
   const handleWithdraw = async () => {
     if (!withdrawAmount || withdrawAmount <= 0) {
       alert('Please enter a valid amount')
@@ -900,13 +875,13 @@ const AccountDashboard = () => {
   const renderOverviewTab = () => (
     <div className="space-y-8">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white p-8 rounded-2xl shadow-xl">
+      <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 dark:from-indigo-700 dark:via-purple-700 dark:to-pink-600 text-white p-8 rounded-2xl shadow-xl">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold mb-2">
               Welcome back, {userData?.fullName || session?.user?.name || 'User'}! 👋
             </h1>
-            <p className="text-indigo-100 text-lg">
+            <p className="text-indigo-100 dark:text-indigo-200 text-lg">
               {userData?.isActive ? 'Your MLM account is active' : 'Complete your first purchase to activate MLM benefits'}
             </p>
             <div className="flex items-center mt-4 space-x-4">
@@ -923,7 +898,7 @@ const AccountDashboard = () => {
             </div>
           </div>
           <div className="text-right">
-            <div className="text-sm text-indigo-200 mb-1">Member Since</div>
+            <div className="text-sm text-indigo-200 dark:text-indigo-300 mb-1">Member Since</div>
             <div className="text-lg font-semibold">
               {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A'}
             </div>
@@ -933,64 +908,64 @@ const AccountDashboard = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium mb-1">Total Orders</p>
-              <p className="text-3xl font-bold text-gray-800">{stats?.totalOrders || 0}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Total Orders</p>
+              <p className="text-3xl font-bold text-gray-800 dark:text-white">{stats?.totalOrders || 0}</p>
               <p className="text-xs text-green-600 font-medium mt-1">
                 +{stats?.monthlyOrders || 0} this month
               </p>
             </div>
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <Package className="w-8 h-8 text-blue-600" />
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+              <Package className="w-8 h-8 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium mb-1">Total Spent</p>
-              <p className="text-3xl font-bold text-gray-800">₹{stats?.totalSpent || 0}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Total Spent</p>
+              <p className="text-3xl font-bold text-gray-800 dark:text-white">₹{stats?.totalSpent || 0}</p>
               <p className="text-xs text-green-600 font-medium mt-1">
                 ₹{stats?.monthlySpent || 0} this month
               </p>
             </div>
-            <div className="p-3 bg-green-50 rounded-lg">
-              <DollarSign className="w-8 h-8 text-green-600" />
+            <div className="p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
+              <DollarSign className="w-8 h-8 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium mb-1">Team Size</p>
-              <p className="text-3xl font-bold text-gray-800">{mlmData?.totalReferrals || 0}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Team Size</p>
+              <p className="text-3xl font-bold text-gray-800 dark:text-white">{mlmData?.totalReferrals || 0}</p>
               <p className="text-xs text-purple-600 font-medium mt-1">
                 Level {mlmData?.level || 1} Member
               </p>
             </div>
-            <div className="p-3 bg-purple-50 rounded-lg">
-              <Users className="w-8 h-8 text-purple-600" />
+            <div className="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
+              <Users className="w-8 h-8 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium mb-1">Wallet Balance</p>
-              <p className="text-3xl font-bold text-gray-800">
+              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Wallet Balance</p>
+              <p className="text-3xl font-bold text-gray-800 dark:text-white">
                 {showBalance ? `₹${(mlmData?.walletBalance || 0) / 100}` : '₹ ****'}
               </p>
               <p className="text-xs text-yellow-600 font-medium mt-1">
                 +₹{(mlmData?.monthlyEarnings || 0) / 100} this month
               </p>
             </div>
-            <div className="p-3 bg-yellow-50 rounded-lg">
-              <Wallet className="w-8 h-8 text-yellow-600" />
+            <div className="p-3 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg">
+              <Wallet className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
             </div>
           </div>
         </div>
@@ -998,21 +973,21 @@ const AccountDashboard = () => {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+          <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-900 dark:text-white">
             <Share2 className="w-5 h-5 mr-2 text-blue-600" />
             Referral Program
           </h3>
           <div className="space-y-3">
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Your Referral Code</p>
+            <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Your Referral Code</p>
               <div className="flex items-center justify-between">
-                <code className="font-mono font-bold text-lg">
+                <code className="font-mono font-bold text-lg text-gray-900 dark:text-white">
                   {mlmData?.referralCode || 'N/A'}
                 </code>
                 <button
                   onClick={copyReferralCode}
-                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                   title="Copy code"
                 >
                   <Copy size={16} />
@@ -1028,8 +1003,8 @@ const AccountDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+          <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-900 dark:text-white">
             <Wallet className="w-5 h-5 mr-2 text-green-600" />
             Quick Withdraw
           </h3>
@@ -1039,7 +1014,7 @@ const AccountDashboard = () => {
               placeholder="Enter amount"
               value={withdrawAmount}
               onChange={(e) => setWithdrawAmount(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
             <button
               onClick={handleWithdraw}
@@ -1049,31 +1024,31 @@ const AccountDashboard = () => {
               {withdrawLoading ? 'Processing...' : 'Withdraw Funds'}
             </button>
             {!userData?.isKycApproved && (
-              <p className="text-xs text-red-600 text-center">
+              <p className="text-xs text-red-600 dark:text-red-400 text-center">
                 Complete KYC verification to withdraw funds
               </p>
             )}
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+          <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-900 dark:text-white">
             <FileText className="w-5 h-5 mr-2 text-purple-600" />
             Account Status
           </h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">MLM Status</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">MLM Status</span>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                userData?.isActive ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                userData?.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
               }`}>
                 {userData?.isActive ? 'Active' : 'Inactive'}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">KYC Status</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">KYC Status</span>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                userData?.isKycApproved ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                userData?.isKycApproved ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
               }`}>
                 {userData?.isKycApproved ? 'Verified' : 'Pending'}
               </span>
@@ -1089,12 +1064,12 @@ const AccountDashboard = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold">Recent Orders</h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Orders</h3>
           <button
             onClick={() => setActiveTab('orders')}
-            className="text-blue-600 hover:text-blue-700 font-medium flex items-center"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium flex items-center"
           >
             View All <ChevronRight size={16} className="ml-1" />
           </button>
@@ -1103,24 +1078,24 @@ const AccountDashboard = () => {
         {orders.length > 0 ? (
           <div className="space-y-4">
             {orders.slice(0, 3).map((order) => (
-              <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="flex items-center space-x-4">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Package className="w-5 h-5 text-blue-600" />
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="font-medium">Order #{order.id}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="font-medium text-gray-900 dark:text-white">Order #{order.id}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold">₹{order.total}</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">₹{order.total}</p>
                   <span className={`text-xs px-2 py-1 rounded-full ${
-                    order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                    order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-blue-100 text-blue-800'
+                    order.status === 'delivered' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                    order.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
+                    'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
                   }`}>
                     {order.status}
                   </span>
@@ -1130,9 +1105,9 @@ const AccountDashboard = () => {
           </div>
         ) : (
           <div className="text-center py-8">
-            <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h4 className="text-lg font-medium text-gray-500 mb-2">No orders yet</h4>
-            <p className="text-gray-400 mb-4">Start shopping to see your orders here</p>
+            <Package className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <h4 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">No orders yet</h4>
+            <p className="text-gray-400 dark:text-gray-500 mb-4">Start shopping to see your orders here</p>
             <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
               Start Shopping
             </button>
@@ -1146,11 +1121,11 @@ const AccountDashboard = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">My Orders</h2>
-          <p className="text-gray-600">Track and manage your orders</p>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">My Orders</h2>
+          <p className="text-gray-600 dark:text-gray-300">Track and manage your orders</p>
         </div>
         <div className="flex space-x-3">
-          <select className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option>All Orders</option>
             <option>Pending</option>
             <option>In Process</option>
@@ -1165,15 +1140,15 @@ const AccountDashboard = () => {
       {orders.length > 0 ? (
         <div className="space-y-4">
           {orders.map((order) => (
-            <div key={order.id} className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+            <div key={order.id} className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <Package className="w-6 h-6 text-blue-600" />
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                    <Package className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-gray-800">Order #{order.id}</h3>
-                    <p className="text-gray-600">Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
+                    <h3 className="font-bold text-lg text-gray-800 dark:text-white">Order #{order.id}</h3>
+                    <p className="text-gray-600 dark:text-gray-300">Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
                     {order.deliveredAt && (
                       <p className="text-green-600 text-sm">
                         Delivered on {new Date(order.deliveredAt).toLocaleDateString()}
@@ -1192,8 +1167,8 @@ const AccountDashboard = () => {
                      order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                   </span>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-gray-800">₹{order.total}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-2xl font-bold text-gray-800 dark:text-white">₹{order.total}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       Including ₹{order.deliveryCharges} delivery
                     </p>
                   </div>
@@ -1203,27 +1178,27 @@ const AccountDashboard = () => {
               <div className="border-t pt-4">
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <h4 className="font-semibold text-gray-700 mb-2">Delivery Address</h4>
-                    <p className="text-gray-600 text-sm leading-relaxed">{order.address}</p>
+                    <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Delivery Address</h4>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{order.address}</p>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-700 mb-2">Order Summary</h4>
+                    <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Order Summary</h4>
                     <div className="space-y-1 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Subtotal:</span>
-                        <span>₹{(order.total - order.deliveryCharges - order.gstAmount).toFixed(2)}</span>
+                        <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
+                        <span className="text-gray-900 dark:text-white">₹{(order.total - order.deliveryCharges - order.gstAmount).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">GST:</span>
-                        <span>₹{order.gstAmount}</span>
+                        <span className="text-gray-600 dark:text-gray-400">GST:</span>
+                        <span className="text-gray-900 dark:text-white">₹{order.gstAmount}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Delivery:</span>
-                        <span>₹{order.deliveryCharges}</span>
+                        <span className="text-gray-600 dark:text-gray-400">Delivery:</span>
+                        <span className="text-gray-900 dark:text-white">₹{order.deliveryCharges}</span>
                       </div>
-                      <div className="flex justify-between font-semibold border-t pt-1">
-                        <span>Total:</span>
-                        <span>₹{order.total}</span>
+                      <div className="flex justify-between font-semibold border-t pt-1 dark:border-gray-600">
+                        <span className="text-gray-900 dark:text-white">Total:</span>
+                        <span className="text-gray-900 dark:text-white">₹{order.total}</span>
                       </div>
                     </div>
                   </div>
@@ -1233,7 +1208,7 @@ const AccountDashboard = () => {
                   <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     View Details
                   </button>
-                  <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     Download Invoice
                   </button>
                   {order.status === 'delivered' && (
@@ -1253,11 +1228,11 @@ const AccountDashboard = () => {
         </div>
       ) : (
         <div className="text-center py-16">
-          <div className="p-4 bg-gray-100 rounded-full w-24 h-24 mx-auto mb-4 flex items-center justify-center">
-            <Package className="w-12 h-12 text-gray-400" />
+          <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full w-24 h-24 mx-auto mb-4 flex items-center justify-center">
+            <Package className="w-12 h-12 text-gray-400 dark:text-gray-500" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-500 mb-2">No orders found</h3>
-          <p className="text-gray-400 mb-6">You haven&apos;t placed any orders yet</p>
+          <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">No orders found</h3>
+          <p className="text-gray-400 dark:text-gray-500 mb-6">You haven&apos;t placed any orders yet</p>
           <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
             Start Shopping
           </button>
@@ -1553,162 +1528,6 @@ const AccountDashboard = () => {
     </div>
   )}
 
-  const renderTeamTab = () => {
-    const team = teamData || {}
-    const hierarchy = team.hierarchy || {}
-    const stats = team.stats || {}
-    const directReferrals = team.directReferrals?.data || []
-    const levels = team.levels || []
-    
-    return (
-    <div className="space-y-8">
-      {/* Team Header */}
-      <div className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 text-white p-8 rounded-3xl shadow-2xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div>
-            <h2 className="text-4xl font-bold mb-2">My Team 👥</h2>
-            <p className="text-blue-100 mb-6 text-lg">Build and grow your network</p>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center bg-white bg-opacity-20 px-4 py-3 rounded-xl">
-                <span className="text-blue-100 font-medium">Total Team Size:</span>
-                <span className="font-bold text-2xl">{stats.totalMembers || 0}</span>
-              </div>
-              <div className="flex justify-between items-center bg-white bg-opacity-20 px-4 py-3 rounded-xl">
-                <span className="text-blue-100 font-medium">Direct Referrals:</span>
-                <span className="font-bold text-2xl">{stats.directReferrals || 0}</span>
-              </div>
-              <div className="flex justify-between items-center bg-white bg-opacity-20 px-4 py-3 rounded-xl">
-                <span className="text-blue-100 font-medium">Active Members:</span>
-                <span className="font-bold text-2xl">{stats.activeMembers || 0}</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-40 h-40 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-6 mx-auto">
-                <Users className="w-20 h-20" />
-              </div>
-              <p className="text-xl font-bold">Team Leader</p>
-              <p className="text-blue-200">Network Builder</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Team Statistics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-blue-400 to-indigo-500 text-white p-8 rounded-2xl shadow-lg">
-          <div className="flex items-center space-x-4">
-            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
-              <UserPlus className="w-10 h-10" />
-            </div>
-            <div>
-              <p className="text-blue-100 text-sm font-medium">Direct Referrals</p>
-              <p className="text-3xl font-bold">{stats.directReferrals || 0}</p>
-              <p className="text-xs text-blue-200 font-medium">Your direct invites</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-green-400 to-emerald-500 text-white p-8 rounded-2xl shadow-lg">
-          <div className="flex items-center space-x-4">
-            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
-              <Users className="w-10 h-10" />
-            </div>
-            <div>
-              <p className="text-green-100 text-sm font-medium">Total Team</p>
-              <p className="text-3xl font-bold">{stats.totalMembers || 0}</p>
-              <p className="text-xs text-green-200 font-medium">All levels combined</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white p-8 rounded-2xl shadow-lg">
-          <div className="flex items-center space-x-4">
-            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
-              <TrendingUp className="w-10 h-10" />
-            </div>
-            <div>
-              <p className="text-yellow-100 text-sm font-medium">Active Members</p>
-              <p className="text-3xl font-bold">{stats.activeMembers || 0}</p>
-              <p className="text-xs text-yellow-200 font-medium">Monthly active</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-purple-400 to-pink-500 text-white p-8 rounded-2xl shadow-lg">
-          <div className="flex items-center space-x-4">
-            <div className="p-4 bg-white bg-opacity-20 rounded-xl">
-              <Star className="w-10 h-10" />
-            </div>
-            <div>
-              <p className="text-purple-100 text-sm font-medium">Max Level</p>
-              <p className="text-3xl font-bold">{hierarchy.maxLevel || 0}</p>
-              <p className="text-xs text-purple-200 font-medium">Deepest level</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Direct Referrals Section */}
-      <div className="bg-gradient-to-br from-white to-blue-50 p-8 rounded-2xl shadow-lg border-2 border-blue-200">
-        <div className="flex justify-between items-center mb-8">
-          <h3 className="text-2xl font-bold text-blue-800 flex items-center">
-            <UserPlus className="w-7 h-7 mr-3" />
-            Direct Referrals
-          </h3>
-          <button className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 font-semibold flex items-center shadow-lg">
-            <Share2 className="w-5 h-5 mr-2" />
-            Invite Friends
-          </button>
-        </div>
-
-        {directReferrals.length > 0 ? (
-          <div className="space-y-4">
-            {directReferrals.map((member) => (
-              <div key={member.id} className="flex items-center justify-between p-6 bg-white rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
-                <div className="flex items-center space-x-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                    {member.name?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-800 text-lg">{member.name}</h4>
-                    <p className="text-gray-600">{member.email}</p>
-                    <p className="text-sm text-gray-500">
-                      Joined: {new Date(member.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className={`inline-block px-4 py-2 rounded-xl text-sm font-bold ${
-                    member.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {member.isActive ? '✅ Active' : '❌ Inactive'}
-                  </span>
-                  {member.totalPurchases && (
-                    <p className="text-sm text-gray-600 mt-2">
-                      Purchases: ₹{member.totalPurchases.rupees?.toFixed(2) || '0.00'}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <UserPlus className="w-20 h-20 text-gray-300 mx-auto mb-6" />
-            <h4 className="text-xl font-bold text-gray-600 mb-3">No direct referrals yet</h4>
-            <p className="text-gray-500 mb-8 text-lg">Start building your team by inviting friends and family</p>
-            <button className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 font-bold text-lg flex items-center mx-auto shadow-lg">
-              <Share2 className="w-6 h-6 mr-3" />
-              Invite Your First Referral
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  )}
-
   const renderReferralTab = () => (
     <div className="space-y-6">
       {/* Referral Header */}
@@ -1828,12 +1647,12 @@ const AccountDashboard = () => {
                   { level: 2, rate: '25%', color: 'bg-blue-500' },
                   { level: 3, rate: '20%', color: 'bg-purple-500' }
                 ].map((item) => (
-                  <div key={item.level} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={item.level} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className={`w-4 h-4 rounded-full ${item.color}`}></div>
-                      <span className="font-medium">Level {item.level}</span>
+                      <span className="font-medium text-gray-900 dark:text-white">Level {item.level}</span>
                     </div>
-                    <span className="font-bold text-lg">{item.rate}</span>
+                    <span className="font-bold text-lg text-gray-900 dark:text-white">{item.rate}</span>
                   </div>
                 ))}
               </div>
@@ -1842,12 +1661,12 @@ const AccountDashboard = () => {
                   { level: 4, rate: '15%', color: 'bg-yellow-500' },
                   { level: 5, rate: '10%', color: 'bg-pink-500' }
                 ].map((item) => (
-                  <div key={item.level} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={item.level} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className={`w-4 h-4 rounded-full ${item.color}`}></div>
-                      <span className="font-medium">Level {item.level}</span>
+                      <span className="font-medium text-gray-900 dark:text-white">Level {item.level}</span>
                     </div>
-                    <span className="font-bold text-lg">{item.rate}</span>
+                    <span className="font-bold text-lg text-gray-900 dark:text-white">{item.rate}</span>
                   </div>
                 ))}
               </div>
@@ -1855,22 +1674,22 @@ const AccountDashboard = () => {
           </div>
 
           {/* Referral Statistics */}
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-            <h3 className="text-xl font-semibold mb-6">Your Referral Statistics</h3>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+            <h3 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">Your Referral Statistics</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
+              <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg">
                 <div className="text-3xl font-bold text-green-600 mb-1">{mlmData?.totalReferrals || 0}</div>
-                <p className="text-gray-600">Total Referrals</p>
+                <p className="text-gray-600 dark:text-gray-300">Total Referrals</p>
               </div>
               
-              <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg">
+              <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-lg">
                 <div className="text-3xl font-bold text-blue-600 mb-1">{mlmData?.activeReferrals || 0}</div>
-                <p className="text-gray-600">Active Members</p>
+                <p className="text-gray-600 dark:text-gray-300">Active Members</p>
               </div>
 
-              <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
+              <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg">
                 <div className="text-3xl font-bold text-purple-600 mb-1">₹{((mlmData?.totalEarnings || 0) / 100).toFixed(2)}</div>
-                <p className="text-gray-600">Total Earnings</p>
+                <p className="text-gray-600 dark:text-gray-300">Total Earnings</p>
               </div>
             </div>
           </div>
@@ -1930,7 +1749,7 @@ const AccountDashboard = () => {
       </div>
 
       {/* KYC Benefits */}
-      <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
         <h3 className="text-xl font-semibold mb-4">Benefits of KYC Verification</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg">
@@ -1973,7 +1792,7 @@ const AccountDashboard = () => {
 
       {/* KYC Form */}
       {(!kycData || kycData.status === 'rejected') && (
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
           <h3 className="text-xl font-semibold mb-6">
             {kycData?.status === 'rejected' ? 'Resubmit KYC Information' : 'Submit KYC Information'}
           </h3>
@@ -2192,7 +2011,7 @@ const AccountDashboard = () => {
 
       {/* KYC Status for Submitted/Approved */}
       {kycData && kycData.status !== 'rejected' && (
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
           <h3 className="text-xl font-semibold mb-6">Your KYC Information</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -2312,7 +2131,7 @@ const AccountDashboard = () => {
 
   const renderSettingsTab = () => (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow border">
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
         <h2 className="text-2xl font-bold mb-4">Account Settings</h2>
         
         <div className="space-y-6">
@@ -2406,14 +2225,13 @@ const AccountDashboard = () => {
 
   const tabs = [
     { id: 'wallet', label: 'Wallet', icon: Wallet, color: 'from-green-400 to-emerald-500' },
-    { id: 'team', label: 'My Team', icon: Users, color: 'from-blue-400 to-indigo-500' },
     { id: 'referral', label: 'Referral', icon: Share2, color: 'from-purple-400 to-pink-500' },
     { id: 'kyc', label: 'KYC Verification', icon: FileText, color: 'from-orange-400 to-red-500' }
   ]
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
       </div>
     )
@@ -2421,11 +2239,11 @@ const AccountDashboard = () => {
 
   if (status === 'unauthenticated') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow border p-8 text-center max-w-md">
-          <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Please Login</h2>
-          <p className="text-gray-600 mb-6">You need to be logged in to access your account dashboard.</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow p-8 text-center max-w-md">
+          <User className="w-16 h-16 text-gray-300 dark:text-gray-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Please Login</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">You need to be logged in to access your account dashboard.</p>
           <a 
             href="/login-register" 
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
@@ -2439,34 +2257,34 @@ const AccountDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-6">
       <div className="max-w-7xl mx-auto px-4">
         {/* Page Header */}
         <div className="mb-6">
-          <div className="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+                <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
                   Welcome back, {userData?.fullName || session?.user?.name || 'User'}!
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   {userData?.isActive ? 'Your MLM account is active and earning!' : 'Complete your first purchase to unlock earnings'}
                 </p>
               </div>
               <div className="mt-6 md:mt-0">
-                <div className="text-center bg-blue-50 border border-blue-200 p-4 rounded-lg">
-                  <Wallet className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                  <div className="text-xl font-semibold text-gray-900">
+                <div className="text-center bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
+                  <Wallet className="w-8 h-8 mx-auto mb-2 text-blue-600 dark:text-blue-400" />
+                  <div className="text-xl font-semibold text-gray-900 dark:text-white">
                     ₹{walletData?.balance?.rupees?.toFixed(2) || '0.00'}
                   </div>
-                  <p className="text-sm text-gray-600">Available Balance</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Available Balance</p>
                 </div>
               </div>
             </div>
@@ -2475,7 +2293,7 @@ const AccountDashboard = () => {
 
         {/* Navigation Tabs */}
         <div className="mb-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2">
             <div className="flex flex-wrap gap-2">
               {tabs.map((tab) => (
                 <button
@@ -2484,7 +2302,7 @@ const AccountDashboard = () => {
                   className={`flex items-center px-4 py-3 rounded-lg font-medium transition-all ${
                     activeTab === tab.id
                       ? 'bg-blue-500 text-white shadow-md'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-100'
                   }`}
                 >
                   <tab.icon className="w-4 h-4 mr-2" />
@@ -2496,19 +2314,19 @@ const AccountDashboard = () => {
         </div>
 
         {/* Content Area */}
-        <div className="bg-white rounded-xl shadow-sm p-8 min-h-96">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-8 min-h-96">
           {activeTab === 'wallet' && (
             <div>
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900">My Wallet</h2>
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">My Wallet</h2>
               
               {/* Balance Card */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 p-6 rounded-lg mb-6">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-800 p-6 rounded-lg mb-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Available Balance</p>
-                    <p className="text-3xl font-bold text-gray-900">₹{walletData?.balance?.rupees?.toFixed(2) || '0.00'}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Available Balance</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white">₹{walletData?.balance?.rupees?.toFixed(2) || '0.00'}</p>
                   </div>
-                  <Wallet className="w-12 h-12 text-blue-500" />
+                  <Wallet className="w-12 h-12 text-blue-500 dark:text-blue-400" />
                 </div>
               </div>
 
@@ -2517,28 +2335,14 @@ const AccountDashboard = () => {
 
               {/* Quick Stats */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600">Total Earnings</p>
-                  <p className="text-xl font-semibold text-gray-900">₹{walletData?.earnings?.total?.rupees?.toFixed(2) || '0.00'}</p>
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Total Earnings</p>
+                  <p className="text-xl font-semibold text-gray-900 dark:text-white">₹{walletData?.earnings?.total?.rupees?.toFixed(2) || '0.00'}</p>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600">This Month</p>
-                  <p className="text-xl font-semibold text-gray-900">₹{walletData?.earnings?.monthly?.rupees?.toFixed(2) || '0.00'}</p>
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">This Month</p>
+                  <p className="text-xl font-semibold text-gray-900 dark:text-white">₹{walletData?.earnings?.monthly?.rupees?.toFixed(2) || '0.00'}</p>
                 </div>
-              </div>
-            </div>
-          )}
-          
-          {activeTab === 'team' && (
-            <div>
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900">My Team</h2>
-              
-              {/* Team Data Display */}
-              <div className="bg-gray-50 border border-gray-200 p-8 rounded-lg text-center">
-                <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Team Data Available</h3>
-                <p className="text-gray-600 mb-4">When you have team members, they will be displayed here in list format.</p>
-                <p className="text-sm text-gray-500">Start referring people to build your team!</p>
               </div>
             </div>
           )}
@@ -2552,17 +2356,17 @@ const AccountDashboard = () => {
           
           {activeTab === 'kyc' && (
             <div>
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900">KYC Verification</h2>
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">KYC Verification</h2>
               
               {/* KYC Status */}
-              <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-6">
+              <div className="bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 p-4 rounded-lg mb-6">
                 <div className="flex items-center gap-3">
                   <div className={`w-4 h-4 rounded-full ${
                     userData?.isKycApproved ? 'bg-green-500' : 
                     kycData?.status === 'pending' ? 'bg-yellow-500' : 
                     kycData?.status === 'rejected' ? 'bg-red-500' : 'bg-gray-400'
                   }`}></div>
-                  <p className="font-medium">
+                  <p className="font-medium text-gray-900 dark:text-white">
                     Status: {
                       userData?.isKycApproved ? '✅ Verified' : 
                       kycData?.status === 'pending' ? '⏳ Under Review' :
@@ -2571,7 +2375,7 @@ const AccountDashboard = () => {
                   </p>
                 </div>
                 {kycData?.status === 'rejected' && kycData?.reviewNote && (
-                  <p className="text-red-600 mt-2 text-sm">Reason: {kycData.reviewNote}</p>
+                  <p className="text-red-600 dark:text-red-400 mt-2 text-sm">Reason: {kycData.reviewNote}</p>
                 )}
               </div>
 

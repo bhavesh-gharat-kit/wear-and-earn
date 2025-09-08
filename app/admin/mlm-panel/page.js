@@ -99,59 +99,59 @@ export default function AdminMLMPanel() {
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
           <div className="flex items-center">
             <Users className="h-8 w-8 text-blue-600 mr-4" />
             <div>
-              <p className="text-sm text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900">{mlmOverview?.stats?.users?.total || 0}</p>
-              <p className="text-xs text-green-600">{mlmOverview?.stats?.users?.active || 0} active</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Total Users</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{mlmOverview?.stats?.users?.total || 0}</p>
+              <p className="text-xs text-green-600 dark:text-green-400">{mlmOverview?.stats?.users?.active || 0} active</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
           <div className="flex items-center">
             <UserCheck className="h-8 w-8 text-green-600 mr-4" />
             <div>
-              <p className="text-sm text-gray-600">KYC Approved</p>
-              <p className="text-2xl font-bold text-gray-900">{mlmOverview?.stats?.users?.kycApproved || 0}</p>
-              <p className="text-xs text-blue-600">{mlmOverview?.stats?.users?.withReferrals || 0} with referrals</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">KYC Approved</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{mlmOverview?.stats?.users?.kycApproved || 0}</p>
+              <p className="text-xs text-blue-600 dark:text-blue-400">{mlmOverview?.stats?.users?.withReferrals || 0} with referrals</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
           <div className="flex items-center">
             <DollarSign className="h-8 w-8 text-purple-600 mr-4" />
             <div>
-              <p className="text-sm text-gray-600">Total Commission Paid</p>
-              <p className="text-2xl font-bold text-gray-900">₹{mlmOverview?.stats?.commissions?.totalPaid?.rupees || 0}</p>
-              <p className="text-xs text-purple-600">₹{mlmOverview?.stats?.commissions?.monthlyPaid?.rupees || 0} this month</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Total Commission Paid</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">₹{mlmOverview?.stats?.commissions?.totalPaid?.rupees || 0}</p>
+              <p className="text-xs text-purple-600 dark:text-purple-400">₹{mlmOverview?.stats?.commissions?.monthlyPaid?.rupees || 0} this month</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
           <div className="flex items-center">
             <Wallet className="h-8 w-8 text-orange-600 mr-4" />
             <div>
-              <p className="text-sm text-gray-600">Company Fund</p>
-              <p className="text-2xl font-bold text-gray-900">₹{mlmOverview?.stats?.company?.fund?.rupees || 0}</p>
-              <p className="text-xs text-orange-600">{mlmOverview?.stats?.monthly?.orders || 0} orders this month</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Company Fund</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">₹{mlmOverview?.stats?.company?.fund?.rupees || 0}</p>
+              <p className="text-xs text-orange-600 dark:text-orange-400">{mlmOverview?.stats?.monthly?.orders || 0} orders this month</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Level Distribution - Limited to 5 levels */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Level Distribution (5 Levels)</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Level Distribution (5 Levels)</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {(mlmOverview?.levelDistribution || []).map((level) => (
-            <div key={level.level} className="text-center p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600">Level {level.level}</p>
-              <p className="text-xl font-bold text-gray-900">{level.count}</p>
+            <div key={level.level} className="text-center p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+              <p className="text-sm text-gray-600 dark:text-gray-300">Level {level.level}</p>
+              <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{level.count}</p>
             </div>
           ))}
         </div>
@@ -162,14 +162,14 @@ export default function AdminMLMPanel() {
   const renderUsersTab = () => (
     <div className="space-y-6">
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">User Management</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">User Management</h3>
           <div className="flex items-center space-x-4">
             <select
               value={filters.userFilter}
               onChange={(e) => setFilters({...filters, userFilter: e.target.value, page: 1})}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             >
               <option value="all">All Users</option>
               <option value="active">Active Users</option>
@@ -189,44 +189,44 @@ export default function AdminMLMPanel() {
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto">
             <thead>
-              <tr className="bg-gray-50">
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">User</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Contact</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Referral Code</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Wallet Balance</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Monthly Purchase</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Joined</th>
+              <tr className="bg-gray-50 dark:bg-gray-800">
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">User</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">Contact</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">Referral Code</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">Wallet Balance</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">Monthly Purchase</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">Status</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">Joined</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
               {(mlmOverview?.users?.data || []).map((user) => (
                 <tr key={user.id}>
                   <td className="px-4 py-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
-                      <p className="text-xs text-gray-500">ID: {user.id}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user.fullName}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-300">ID: {user.id}</p>
                     </div>
                   </td>
                   <td className="px-4 py-3">
                     <div>
-                      <p className="text-sm text-gray-900">{user.email}</p>
-                      <p className="text-xs text-gray-500">{user.mobileNo}</p>
+                      <p className="text-sm text-gray-900 dark:text-gray-100">{user.email}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-300">{user.mobileNo}</p>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm font-mono text-gray-600">{user.referralCode}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">₹{user.walletBalance?.rupees || 0}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">₹{user.monthlyPurchase?.rupees || 0}</td>
+                  <td className="px-4 py-3 text-sm font-mono text-gray-600 dark:text-gray-300">{user.referralCode}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">₹{user.walletBalance?.rupees || 0}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">₹{user.monthlyPurchase?.rupees || 0}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       user.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
+                        ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-400' 
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'
                     }`}>
                       {user.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
+                  <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-300">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
@@ -237,24 +237,24 @@ export default function AdminMLMPanel() {
 
         {/* Pagination */}
         <div className="flex items-center justify-between mt-4">
-          <div className="text-sm text-gray-700">
+          <div className="text-sm text-gray-700 dark:text-gray-200">
             Showing {((filters.page - 1) * filters.limit) + 1} to {Math.min(filters.page * filters.limit, mlmOverview?.totalUsers || 0)} of {mlmOverview?.totalUsers || 0} results
           </div>
           <div className="flex space-x-2">
             <button
               onClick={() => setFilters({...filters, page: filters.page - 1})}
               disabled={filters.page === 1}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
-            <span className="px-3 py-2 text-sm text-gray-700">
+            <span className="px-3 py-2 text-sm text-gray-700 dark:text-gray-100">
               Page {filters.page} of {Math.ceil(mlmOverview?.totalUsers / filters.limit) || 1}
             </span>
             <button
               onClick={() => setFilters({...filters, page: filters.page + 1})}
               disabled={filters.page >= Math.ceil(mlmOverview?.totalUsers / filters.limit)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
@@ -268,54 +268,54 @@ export default function AdminMLMPanel() {
     <div className="space-y-6">
       {/* Commission Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
           <div className="flex items-center">
             <DollarSign className="h-8 w-8 text-green-600 mr-4" />
             <div>
-              <p className="text-sm text-gray-600">Total Distributed</p>
-              <p className="text-2xl font-bold text-gray-900">₹{commissions?.summary?.totalAmount?.rupees || 0}</p>
-              <p className="text-xs text-green-600">{commissions?.pagination?.total || 0} transactions</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Total Distributed</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">₹{commissions?.summary?.totalAmount?.rupees || 0}</p>
+              <p className="text-xs text-green-600 dark:text-green-400">{commissions?.pagination?.total || 0} transactions</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
           <div className="flex items-center">
             <TrendingUp className="h-8 w-8 text-blue-600 mr-4" />
             <div>
-              <p className="text-sm text-gray-600">This Month</p>
-              <p className="text-2xl font-bold text-gray-900">₹{commissions?.summary?.monthlyAmount?.rupees || 0}</p>
-              <p className="text-xs text-blue-600">{commissions?.summary?.monthlyTransactions || 0} transactions</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">This Month</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">₹{commissions?.summary?.monthlyAmount?.rupees || 0}</p>
+              <p className="text-xs text-blue-600 dark:text-blue-400">{commissions?.summary?.monthlyTransactions || 0} transactions</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
           <div className="flex items-center">
             <Award className="h-8 w-8 text-purple-600 mr-4" />
             <div>
-              <p className="text-sm text-gray-600">Avg. Per Transaction</p>
-              <p className="text-2xl font-bold text-gray-900">₹{commissions?.summary?.avgAmount?.rupees || 0}</p>
-              <p className="text-xs text-purple-600">Commission rate</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Avg. Per Transaction</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">₹{commissions?.summary?.avgAmount?.rupees || 0}</p>
+              <p className="text-xs text-purple-600 dark:text-purple-400">Commission rate</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Commission Breakdown */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Commission Breakdown by Type</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Commission Breakdown by Type</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {(commissions?.summary?.byType || []).map((type) => (
-            <div key={type.type} className="p-4 border border-gray-200 rounded-lg">
+            <div key={type.type} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-sm font-medium text-gray-900 capitalize">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">
                   {type.type.replace('_', ' ')}
                 </h4>
               </div>
               <div className="space-y-1">
-                <span className="text-sm font-medium">₹{type.amount?.rupees?.toLocaleString() || 0}</span>
-                <span className="text-xs text-gray-500">({type.count} transactions)</span>
+                <span className="text-sm font-medium dark:text-gray-100">₹{type.amount?.rupees?.toLocaleString() || 0}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-300">({type.count} transactions)</span>
               </div>
             </div>
           ))}
@@ -323,9 +323,9 @@ export default function AdminMLMPanel() {
       </div>
 
       {/* Recent Commission Transactions */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Recent Commission Transactions</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Commission Transactions</h3>
           <button
             onClick={fetchMLMData}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
@@ -338,31 +338,31 @@ export default function AdminMLMPanel() {
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto">
             <thead>
-              <tr className="bg-gray-50">
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">User</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Type</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Amount</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Reference</th>
-                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Date</th>
+              <tr className="bg-gray-50 dark:bg-gray-800">
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">User</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">Type</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">Amount</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">Reference</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 dark:text-gray-200">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
               {(commissions?.transactions || []).map((transaction) => (
                 <tr key={transaction.id}>
                   <td className="px-4 py-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{transaction.user?.fullName}</p>
-                      <p className="text-xs text-gray-500">{transaction.user?.email}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{transaction.user?.fullName}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-300">{transaction.user?.email}</p>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-400">
                       {transaction.type?.replace('_', ' ')}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">₹{transaction.amount?.rupees || 0}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{transaction.reference || 'N/A'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">₹{transaction.amount?.rupees || 0}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{transaction.reference || 'N/A'}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-300">
                     {new Date(transaction.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
@@ -373,7 +373,7 @@ export default function AdminMLMPanel() {
 
         {(!commissions?.transactions || commissions.transactions.length === 0) && (
           <div className="text-center py-8">
-            <p className="text-gray-500">No commission transactions found.</p>
+            <p className="text-gray-500 dark:text-gray-300">No commission transactions found.</p>
           </div>
         )}
       </div>
@@ -389,12 +389,12 @@ export default function AdminMLMPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">MLM Management Panel</h1>
-          <p className="text-gray-600 mt-2">Monitor and manage your MLM system (Simplified Version)</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">MLM Management Panel</h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-2">Monitor and manage your MLM system (Simplified Version)</p>
         </div>
 
         {/* Tabs */}
@@ -410,8 +410,8 @@ export default function AdminMLMPanel() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 px-3 py-2 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'
                 }`}
               >
                 <tab.icon className="h-4 w-4" />

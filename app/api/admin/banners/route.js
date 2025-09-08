@@ -70,7 +70,7 @@ export const GET = async (request) => {
 
         // for pagination query
         const { searchParams } = new URL(request.url);
-        const limit = parseInt(searchParams.get("limit")) || 10;
+        const limit = parseInt(searchParams.get("limit")) || 20;
         const skip = parseInt(searchParams.get("skip")) || 0;
 
         const totalCount = await prisma.Banners.count()

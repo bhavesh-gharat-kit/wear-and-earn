@@ -72,7 +72,7 @@ const PWAInstallButton = () => {
   return (
     <button
       onClick={handleInstallClick}
-      className="hidden md:flex items-center justify-center h-9 gap-1.5 bg-[#ffc107] rounded px-4 py-0.5 hover:bg-[#ffcd3c] transition-colors"
+      className="hidden md:flex items-center justify-center h-9 gap-1.5 bg-[#ffc107] dark:bg-yellow-500 rounded px-4 py-0.5 hover:bg-[#ffcd3c] dark:hover:bg-yellow-400 transition-colors text-gray-900 dark:text-gray-900"
       title="Install Wear and Earn App"
     >
       <span className="max-sm:hidden">

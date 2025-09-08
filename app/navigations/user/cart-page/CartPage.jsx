@@ -62,11 +62,16 @@ function CartPage() {
 
   const totalCartListPrice =
     addToCartList?.length >= 1
-      ? addToCartList?.reduce(
-          (result, items) =>
-            result + items.product.sellingPrice * items.quantity,
-          0
-        )
+      ? addToCartList?.reduce((result, items) => {
+          const { sellingPrice, price, discount } = items.product;
+          
+          // For cart display: show sellingPrice - discount (no GST yet)
+          const basePrice = sellingPrice || price || 0;
+          const discountAmount = (basePrice * (Number(discount) || 0)) / 100;
+          const finalAmount = basePrice - discountAmount; // Simple: selling price - discount
+          
+          return result + finalAmount * items.quantity;
+        }, 0)
       : 0;
 
   if (status === "loading") {
@@ -108,7 +113,7 @@ function CartPage() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-base-100 dark:bg-gray-900 py-8">
       <PlaceOrderDialog 
         isOpen={isOrderDialogOpen} 
         onClose={() => setIsOrderDialogOpen(false)} 
@@ -116,18 +121,18 @@ function CartPage() {
         totalAmount={totalCartListPrice}
         type="cart"
       />
-      <div className="bg-base-100 rounded-box shadow p-6">
+  <div className="max-w-7xl mx-auto rounded-box shadow p-6 bg-white dark:bg-[#18181b] border border-gray-200 dark:border-gray-700 transition-colors">
         <section id="cart">
-          <h2 className="text-2xl font-bold mb-4">My Cart</h2>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">My Cart</h2>
 
           {/* Cart Total + Order Button */}
-          <div className="flex flex-wrap justify-between items-center mb-4">
-            <div className="text-lg font-semibold text-primary">
+          <div className="flex flex-wrap justify-between items-center mb-4 bg-gray-50 dark:bg-[#232326] rounded-lg p-4 shadow border border-gray-100 dark:border-gray-700 transition-colors">
+            <div className="text-lg font-semibold text-primary dark:text-yellow-400">
               Total: ₹ {totalCartListPrice.toLocaleString("en-IN")}
             </div>
             <button
               onClick={() => setIsOrderDialogOpen(true)}
-              className="btn btn-success"
+              className="btn btn-success dark:bg-yellow-500 dark:text-gray-900 dark:hover:bg-yellow-400 dark:border-yellow-500 border border-green-600 dark:hover:border-yellow-400 transition-colors"
             >
               Place Order
             </button>
@@ -139,37 +144,43 @@ function CartPage() {
 
             {addToCartList?.map((product) => {
               const { id, quantity, productId } = product;
-              const { mainImage, title, price, sellingPrice } = product.product;
+              const { images, title, price, sellingPrice, discount } = product.product;
+              // Get first image from ProductImage table or use fallback
+              const productImage = images && images.length > 0 ? images[0].imageUrl : "/images/brand-logo.png";
+              // For cart display: show sellingPrice - discount (no GST yet)
+              const basePrice = sellingPrice || price || 0;
+              const discountAmount = (basePrice * (Number(discount) || 0)) / 100;
+              const finalAmount = basePrice - discountAmount; // Simple: selling price - discount
               return (
-                <div key={id} className="card bg-base-100 shadow-md">
-                  <figure className="h-72 w-full">
+                <div key={id} className="card bg-white dark:bg-[#232326] shadow-md border border-gray-100 dark:border-gray-700 transition-colors">
+                  <figure className="h-72 w-full bg-gray-100 dark:bg-[#18181b]">
                     <img
-                      src={mainImage}
+                      src={productImage}
                       alt={title}
-                      className="h-full w-full"
+                      className="h-full w-full object-cover rounded-t-lg"
                     />
                   </figure>
-                  <div className="card-body">
-                    <h2 className="card-title">{title}</h2>
-                    <p className="line-through">
-                      ₹{price.toLocaleString("en-IN")}{" "}
+                  <div className="card-body bg-white dark:bg-[#232326] transition-colors rounded-b-lg">
+                    <h2 className="card-title text-gray-900 dark:text-gray-100">{title}</h2>
+                    <p className="line-through text-gray-500 dark:text-gray-400">
+                      ₹{price.toLocaleString("en-IN")}
                     </p>
-                    <p className="text-success font-bold">
-                      ₹{sellingPrice.toLocaleString("en-IN")}
+                    <p className="text-success font-bold dark:text-yellow-400">
+                      ₹{finalAmount.toLocaleString("en-IN")}
                     </p>
                     <div className="flex items-center gap-2">
-                      <label>Qty:</label>
+                      <label className="text-gray-700 dark:text-gray-200">Qty:</label>
                       <input
                         onChange={(e) => handleCartQuantityChange(productId, e)}
                         type="number"
-                        className="input input-bordered w-20"
+                        className="input input-bordered w-20 bg-gray-50 dark:bg-[#18181b] text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-primary dark:focus:ring-yellow-400 transition-colors"
                         defaultValue={quantity}
                         min={1}
                       />
                     </div>
                     <button
                       onClick={() => handleRemoveItemFromCart(productId)}
-                      className="btn btn-outline btn-error mt-3"
+                      className="btn btn-outline btn-error mt-3 border border-red-500 dark:border-red-500 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white transition-colors"
                     >
                       Remove
                     </button>

@@ -105,7 +105,13 @@ export const GET = async () => {
     try {
         const items = await prisma.cart.findMany({
             where: { userId },
-            include: { product: true },
+            include: { 
+                product: {
+                    include: {
+                        images: true
+                    }
+                }
+            },
         });
         return NextResponse.json({ success: true, data: items }, { status: 200 });
     } catch (error) {

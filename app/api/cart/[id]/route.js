@@ -18,7 +18,11 @@ export const GET = async (request, {params}) => {
                 userId: Number(id),
             },
             include: {    // Include user details
-                product: true,    // Include product details
+                product: {
+                    include: {
+                        images: true    // Include product images
+                    }
+                },    // Include product details
             },
         });
 

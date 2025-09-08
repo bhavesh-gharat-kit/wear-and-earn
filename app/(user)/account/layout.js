@@ -78,12 +78,12 @@ export default function AccountLayout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
           <aside className="lg:w-80 w-full">
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-8">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-6 sticky top-8">
               {/* Profile Section */}
               <div className="flex flex-col items-center text-center mb-8">
                 <div className="relative">
@@ -96,12 +96,12 @@ export default function AccountLayout({ children }) {
                       <User className="h-8 w-8" />
                     }
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
                 </div>
-                <h2 className="text-lg font-semibold text-gray-900 mt-3 capitalize">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mt-3 capitalize">
                   {session?.user?.fullName || userProfile?.fullName || session?.user?.name || 'User'}
                 </h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {userProfile?.email || session?.user?.email || 'Member'}
                 </p>
               </div>
@@ -116,11 +116,11 @@ export default function AccountLayout({ children }) {
                       href={menu.path}
                       className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                         isActive
-                          ? "bg-blue-50 text-blue-700 border-r-4 border-blue-700"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                          ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-r-4 border-blue-700 dark:border-blue-400"
+                          : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                       }`}
                     >
-                      <span className={`mr-3 ${isActive ? "text-blue-700" : "text-gray-400"}`}>
+                      <span className={`mr-3 ${isActive ? "text-blue-700 dark:text-blue-300" : "text-gray-400 dark:text-gray-500"}`}>
                         {menu.icon}
                       </span>
                       {menu.title}
@@ -130,7 +130,7 @@ export default function AccountLayout({ children }) {
               </nav>
 
               {/* Logout Button */}
-              <div className="mt-8 pt-6 border-t border-gray-200">
+              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
                 <button
                   onClick={handleUserLogOut}
                   className="w-full flex items-center justify-center px-4 py-3 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
@@ -141,10 +141,10 @@ export default function AccountLayout({ children }) {
               </div>
 
               {/* User Stats */}
-              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <div className="text-center">
-                  <p className="text-xs text-gray-500 uppercase tracking-wide">Member Since</p>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Member Since</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     {userProfile?.createdAt ? 
                       new Date(userProfile.createdAt).getFullYear() : 
                       session?.user?.createdAt ? 

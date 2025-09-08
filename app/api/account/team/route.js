@@ -46,9 +46,14 @@ export async function GET(request) {
         take: limit
       })
 
+      // Add debugging
+      console.log('🔍 Querying direct referrals for userId:', userId)
+      
       const totalDirects = await prisma.user.count({
         where: { sponsorId: userId }
       })
+      
+      console.log('✅ Total directs found:', totalDirects)
 
       const formattedReferrals = directReferrals.map(user => ({
         id: user.id,

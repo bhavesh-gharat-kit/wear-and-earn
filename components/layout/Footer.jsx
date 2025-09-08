@@ -39,14 +39,14 @@ function Footer() {
   <footer className="w-full">
 
       {/* FOOTER MAIN */}
-      <div className="footer-main bg-[#ffffff] text-slate-900 px-4 sm:px-6 lg:px-8 py-10">
+      <div className="footer-main bg-[#ffffff] dark:bg-[#18181b] text-slate-900 dark:text-gray-200 px-4 sm:px-6 lg:px-8 py-10 transition-colors">
         <div className="w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {/* About Section */}
             <div className="footer-widget">
               <a
                 href="index.php"
-                className="logo text-3xl font-bold text-[#f0a019]"
+                className="logo text-3xl font-bold text-[#f0a019] dark:text-yellow-400"
               >
                 wearandearn
               </a>
@@ -60,7 +60,7 @@ function Footer() {
 
             {/* Contact Section */}
             <div className="footer-widget">
-              <h4 className="text-xl font-semibold mb-4 text-[#f0a019] ">Contact</h4>
+              <h4 className="text-xl font-semibold mb-4 text-[#f0a019] dark:text-yellow-400 ">Contact</h4>
               <div className="footer-contact">
                 <div className="contact-item flex items-start mb-3">
                   <i className="bi bi-geo-alt text-xl mr-2"></i>
@@ -83,12 +83,12 @@ function Footer() {
 
             {/* Support Section */}
             <div className="footer-widget">
-              <h4 className="text-xl font-semibold mb-4 text-[#f0a019] ">Support</h4>
+              <h4 className="text-xl font-semibold mb-4 text-[#f0a019] dark:text-yellow-400 ">Support</h4>
               <ul className="footer-links space-y-2">
                 <li>
                   <Link
                     href="/products"
-                    className="text-sm hover:text-orange-500"
+                    className="text-sm hover:text-orange-500 dark:hover:text-yellow-400"
                   >
                     Products
                   </Link>
@@ -96,7 +96,7 @@ function Footer() {
                 <li>
                   <Link
                     href="/account/orders"
-                    className="text-sm hover:text-orange-500"
+                    className="text-sm hover:text-orange-500 dark:hover:text-yellow-400"
                   >
                     Order Status
                   </Link>
@@ -106,23 +106,23 @@ function Footer() {
 
             {/* Company Section */}
             <div className="footer-widget">
-              <h4 className="text-xl font-semibold mb-4 text-[#f0a019] ">Company</h4>
+              <h4 className="text-xl font-semibold mb-4 text-[#f0a019] dark:text-yellow-400 ">Company</h4>
               <ul className="footer-links space-y-2">
                 <li>
-                  <Link href="/about-us" className="text-sm hover:text-orange-500">
+                  <Link href="/about-us" className="text-sm hover:text-orange-500 dark:hover:text-yellow-400">
                     About Us
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/contact-us"
-                    className="text-sm hover:text-orange-500"
+                    className="text-sm hover:text-orange-500 dark:hover:text-yellow-400"
                   >
                     Contact Us
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms-and-conditions" className="text-sm hover:text-orange-500">
+                  <Link href="/terms-and-conditions" className="text-sm hover:text-orange-500 dark:hover:text-yellow-400">
                     Terms & Conditions
                   </Link>
                 </li>
@@ -131,7 +131,7 @@ function Footer() {
 
             {/* Social Links */}
             <div className="footer-widget">
-              <h5 className="text-xl font-semibold mb-4">Follow Us</h5>
+              <h5 className="text-xl font-semibold mb-4 dark:text-yellow-400">Follow Us</h5>
               <div className="social-icons flex gap-4">
                 {
                   socialMediaItems.map( (item , i) => {
@@ -139,7 +139,7 @@ function Footer() {
                       <span key={i} >
                         <Link 
                           href={item.socialMediaLink || "#"} 
-                          className="text-2xl hover:text-orange-500 transition-colors" 
+                          className="text-2xl hover:text-orange-500 dark:hover:text-yellow-400 transition-colors" 
                           target="_blank"
                           rel="noopener noreferrer"
                           title={item.socialMediaName}
@@ -156,11 +156,11 @@ function Footer() {
         </div>
       </div>
       {/* FOOTER BOTTOM */}
-      <div className="footer-bottom bg-[#f3f3f6] text-slate-800 py-4 px-4 sm:px-6 lg:px-8 ">
+  <div className="footer-bottom bg-[#f3f3f6] dark:bg-[#232326] text-slate-800 dark:text-gray-300 py-4 px-4 sm:px-6 lg:px-8 transition-colors ">
         <div className="w-full px-0 flex flex-col justify-center items-center">
           {/* Legal Links */}
           <div className="legal-links text-center md:text-left mb-4">
-            <Link href="/terms-and-conditions" className="text-sm hover:text-orange-500">
+            <Link href="/terms-and-conditions" className="text-sm hover:text-orange-500 dark:hover:text-yellow-400">
               Terms and Conditions
             </Link>
           </div>
@@ -170,7 +170,7 @@ function Footer() {
             <p className="text-sm">
               © <span>Copyright</span>
               <span>{new Date().getFullYear()} </span>
-              <strong className="sitename text-purple-700">wearandearn</strong>.
+              <strong className="sitename text-purple-700 dark:text-yellow-400">wearandearn</strong>.
               All Rights Reserved.
             </p>
           </div>
@@ -180,7 +180,7 @@ function Footer() {
             <a className="text-sm">Developed by </a>
             <a
               href="https://kumarinfotech.net/"
-              className="text-sm hover:text-orange-500"
+              className="text-sm hover:text-orange-500 dark:hover:text-yellow-400"
             >
               kumarinfotech
             </a>

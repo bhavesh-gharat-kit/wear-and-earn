@@ -80,15 +80,15 @@ export default function AddressForm({ onAddressUpdate, existingAddress, onCancel
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
+    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-gray-50 dark:bg-gray-900 transition-colors">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
           {existingAddress ? 'Edit Address' : 'Add Delivery Address'}
         </h3>
         {onCancel && (
           <button
             onClick={onCancel}
-            className="p-1 text-gray-400 hover:text-gray-600"
+            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
           >
             <X className="h-5 w-5" />
           </button>
@@ -98,7 +98,7 @@ export default function AddressForm({ onAddressUpdate, existingAddress, onCancel
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="houseNumber" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="houseNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               House/Flat Number
             </label>
             <input
@@ -108,12 +108,12 @@ export default function AddressForm({ onAddressUpdate, existingAddress, onCancel
               value={formData.houseNumber}
               onChange={handleChange}
               placeholder="House/Flat/Block No."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             />
           </div>
 
           <div>
-            <label htmlFor="area" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="area" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               Area/Sector/Locality *
             </label>
             <input
@@ -124,13 +124,13 @@ export default function AddressForm({ onAddressUpdate, existingAddress, onCancel
               onChange={handleChange}
               required
               placeholder="Area, Sector, Locality"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="landmark" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="landmark" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
             Landmark
           </label>
           <input
@@ -146,7 +146,7 @@ export default function AddressForm({ onAddressUpdate, existingAddress, onCancel
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="villageOrCity" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="villageOrCity" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               Village/City *
             </label>
             <input
@@ -162,7 +162,7 @@ export default function AddressForm({ onAddressUpdate, existingAddress, onCancel
           </div>
 
           <div>
-            <label htmlFor="taluka" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="taluka" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               Taluka *
             </label>
             <input
@@ -180,7 +180,7 @@ export default function AddressForm({ onAddressUpdate, existingAddress, onCancel
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="district" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="district" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               District *
             </label>
             <input
@@ -196,7 +196,7 @@ export default function AddressForm({ onAddressUpdate, existingAddress, onCancel
           </div>
 
           <div>
-            <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="state" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               State *
             </label>
             <input
@@ -212,7 +212,7 @@ export default function AddressForm({ onAddressUpdate, existingAddress, onCancel
           </div>
 
           <div>
-            <label htmlFor="pinCode" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="pinCode" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               PIN Code *
             </label>
             <input
@@ -235,7 +235,7 @@ export default function AddressForm({ onAddressUpdate, existingAddress, onCancel
             <button
               type="button"
               onClick={onCancel}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               Cancel
             </button>

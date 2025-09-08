@@ -19,18 +19,40 @@ function AddStockModal({ productsStockDetails, fetchproductsStockDetails }) {
 
   const handlProductStockSubmit = async (e) => {
     e.preventDefault();
+    
+    // Find the current stock for the selected product
+    const selectedProduct = productsStockDetails.find(
+      product => product.id.toString() === stockForm.productTitle
+    );
+    
+    if (!selectedProduct) {
+      toast.error("Product not found");
+      return;
+    }
+
+    // Add the new stock to existing stock
+    const addAmount = Number(stockForm.productInStock);
+    const currentStock = selectedProduct.inStock;
+    const newTotalStock = currentStock + addAmount;
+
     try {
-      const response = await axios.put(`/api/admin/stocks`, stockForm);
+      const response = await axios.put(`/api/admin/stocks`, {
+        productTitle: stockForm.productTitle,
+        productInStock: newTotalStock
+      });
+      
       if (response.status == 200) {
         const closeModalBtn = document.getElementById("closeBtn");
         closeModalBtn.click();
-        toast.success("Product Stock Updated", { duration: 1000 });
+        toast.success(`Added ${addAmount} items. New total stock: ${newTotalStock}`, { duration: 2000 });
+        setStockForm(stockFormInitilizer);
         setTimeout(() => {
           fetchproductsStockDetails();
         }, 1200);
       }
     } catch (error) {
       console.log("error", error);
+      toast.error("Failed to update stock");
     }
   };
 
@@ -67,25 +89,27 @@ function AddStockModal({ productsStockDetails, fetchproductsStockDetails }) {
               </option>
               {productsStockDetails.map((product) => (
                 <option key={product.id} value={product.id}>
-                  {product.title}
+                  {product.title} (Current Stock: {product.inStock})
                 </option>
               ))}
             </select>
           </div>
           {/* add quantity */}
           <div>
-            <label htmlFor="productInStock" className="text-gray-900 dark:text-gray-100">Product Quantity</label>
+            <label htmlFor="productInStock" className="text-gray-900 dark:text-gray-100">Quantity to Add</label>
             <input
               type="number"
               name="productInStock"
               min={1}
-              placeholder="enter your quantity"
+              placeholder="Enter quantity to add"
+              value={stockForm.productInStock}
               onChange={handleStockFormInput}
+              required
               className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
 
-          <button className="btn btn-primary">Save</button>
+          <button className="btn btn-primary">Add to Stock</button>
         </form>
       </div>
     </dialog>

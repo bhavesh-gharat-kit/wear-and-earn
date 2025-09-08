@@ -35,30 +35,25 @@ export default function ProductSlider({ title = "Top Trending", showModal, setSh
   }, []);
 
   return (
-    <section className="w-full py-8">
+    <section className="w-full py-8 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4">
         {/* Top Trending Products Header */}
         <div className="text-center mb-12 trending-header">
-          <h2 className="text-4xl font-bold mb-4" style={{
-              background: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}>
-              Top Trending Products
-            </h2>
+          <h2
+            className="text-4xl font-bold mb-4 text-purple-700 dark:text-purple-400"
+            style={{}}
+          >
+            Top Trending Products
+          </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Discover the most popular products customers are loving right now
           </p>
-          <div className="w-24 h-1 trending-divider mx-auto mt-4 rounded-full bg-amber-500"></div>
+          <div className="w-24 h-1 trending-divider mx-auto mt-4 rounded-full bg-amber-500 dark:bg-amber-400"></div>
         </div>
-        
         <Swiper
           spaceBetween={10}
           slidesPerView={1}
-          pagination={{ 
-            clickable: true
-          }}
+          pagination={{ clickable: true }}
           navigation={true}
           autoplay={{
             delay: 3000,
@@ -84,7 +79,7 @@ export default function ProductSlider({ title = "Top Trending", showModal, setSh
             }
           }}
           modules={[Pagination, Navigation, Autoplay]}
-          className="basic-product-slider"
+          className="basic-product-slider dark:swiper-dark"
         >
           {productList?.map((product, i) => (
             <SwiperSlide key={i}>

@@ -58,10 +58,14 @@ export default function CartPage() {
 
   const totalCartPrice = addToCartList?.length >= 1
     ? addToCartList.reduce((total, item) => {
-        const productPrice = item.product.productPrice || (item.product.sellingPrice ? item.product.sellingPrice * 0.7 : 0)
-        const mlmPrice = item.product.mlmPrice || (item.product.sellingPrice ? item.product.sellingPrice * 0.3 : 0)
-        const totalPrice = item.product.sellingPrice || (productPrice + mlmPrice)
-        return total + (totalPrice * item.quantity)
+        const { sellingPrice, price, discount } = item.product;
+        
+        // For cart display: show sellingPrice - discount (no GST yet)
+        const basePrice = sellingPrice || price || 0;
+        const discountAmount = (basePrice * (Number(discount) || 0)) / 100;
+        const finalAmount = basePrice - discountAmount; // Simple: selling price - discount
+        
+        return total + (finalAmount * item.quantity);
       }, 0)
     : 0
 
@@ -94,12 +98,12 @@ export default function CartPage() {
   if (status === "loading" || cartLoading) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-colors">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded"></div>
+                <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
               ))}
             </div>
           </div>
@@ -110,11 +114,11 @@ export default function CartPage() {
 
   if (status === "unauthenticated") {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-12">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-12 transition-colors">
         <div className="text-center">
           <ShoppingCart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Please Login</h2>
-          <p className="text-gray-600 mb-6">You need to be logged in to view your cart.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Please Login</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">You need to be logged in to view your cart.</p>
           <Link 
             href="/login-register" 
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
@@ -128,11 +132,11 @@ export default function CartPage() {
 
   if (!addToCartList || addToCartList.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-12">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-12 transition-colors">
         <div className="text-center">
           <ShoppingCart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-medium text-gray-900 mb-2">Your cart is empty</h3>
-          <p className="text-gray-500 mb-6">Start shopping to add items to your cart!</p>
+          <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">Your cart is empty</h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">Start shopping to add items to your cart!</p>
           <Link 
             href="/products"
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
@@ -146,27 +150,28 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+  <section className="w-full bg-gray-50 dark:bg-gray-900 transition-colors py-8">
+      <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 transition-colors">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Link 
               href="/account"
-              className="mr-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="mr-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              <ArrowLeft className="h-5 w-5 text-gray-600" />
+              <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-300" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">My Cart</h1>
-              <p className="text-gray-600 text-sm">{addToCartList.length} items</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Cart</h1>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">{addToCartList.length} items</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-gray-900">₹{totalCartPrice.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">₹{totalCartPrice.toLocaleString()}</p>
             <button
               onClick={handleProceedToCheckout}
-              className="mt-1 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors"
+              className="mt-1 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 transition-colors"
             >
               <CreditCard className="h-4 w-4 mr-2" />
               Checkout
@@ -175,29 +180,27 @@ export default function CartPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div className="flex flex-col lg:flex-row gap-8 items-start">
         {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-3">
+        <div className="flex-1 space-y-3">
           {addToCartList.map((item) => {
             const { id, quantity, productId, product } = item
-            const { mainImage, title, price, sellingPrice, productPrice, mlmPrice } = product
-            
-            // Calculate display prices with fallback
-            const displayProductPrice = productPrice || (sellingPrice ? sellingPrice * 0.7 : 0)
-            const displayMlmPrice = mlmPrice || (sellingPrice ? sellingPrice * 0.3 : 0)
-            const displayTotalPrice = sellingPrice || (displayProductPrice + displayMlmPrice)
-            
-            const itemTotal = displayTotalPrice * quantity
-            const savings = (price - displayTotalPrice) * quantity
+            const { images, title, price, sellingPrice, discount } = product
+            const productImage = images && images.length > 0 ? images[0].imageUrl : "/images/brand-logo.png"
+            const basePrice = sellingPrice || price || 0;
+            const discountAmount = (basePrice * (Number(discount) || 0)) / 100;
+            const finalAmount = basePrice - discountAmount;
+            const itemTotal = finalAmount * quantity
+            const savings = (price - finalAmount) * quantity
 
             return (
-              <div key={id} className="bg-white shadow-sm rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+              <div key={id} className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden hover:shadow-md transition-shadow w-full md:w-[800px] mx-auto">
                 <div className="p-4">
                   <div className="flex items-center space-x-4">
                     {/* Product Image */}
                     <div className="flex-shrink-0">
                       <Image 
-                        src={mainImage} 
+                        src={productImage} 
                         alt={title}
                         width={80}
                         height={80}
@@ -207,57 +210,46 @@ export default function CartPage() {
 
                     {/* Product Details */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-2">{title}</h3>
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">{title}</h3>
                       
                       {/* Price Information */}
                       <div className="mb-2">
                         <div className="flex items-center space-x-3 mb-1">
-                          <span className="text-lg font-bold text-gray-900">
-                            ₹{displayTotalPrice.toLocaleString()}
-                          </span>
-                          {price > displayTotalPrice && (
-                            <span className="text-sm text-gray-500 line-through">
-                              ₹{price.toLocaleString()}
-                            </span>
+                          <span className="text-lg font-bold text-gray-900 dark:text-gray-100">₹{finalAmount.toLocaleString()}</span>
+                          {price > finalAmount && (
+                            <span className="text-sm text-gray-500 dark:text-gray-400 line-through">₹{price.toLocaleString()}</span>
                           )}
                           {savings > 0 && (
-                            <span className="text-xs text-green-600 font-medium">
-                              Save ₹{savings.toLocaleString()}
-                            </span>
+                            <span className="text-xs text-green-600 font-medium">Save ₹{savings.toLocaleString()}</span>
                           )}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Product: ₹{displayProductPrice.toLocaleString()} + MLM: ₹{displayMlmPrice.toLocaleString()}
                         </div>
                       </div>
 
                       {/* Quantity Controls */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <span className="text-xs font-medium text-gray-700">Qty:</span>
-                          <div className="flex items-center border border-gray-300 rounded">
+                          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Qty:</span>
+                          <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded">
                             <button
                               onClick={() => handleQuantityChange(productId, quantity - 1)}
                               disabled={quantity <= 1}
-                              className="p-1 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                              <Minus className="h-3 w-3" />
+                              <Minus className="h-3 w-3 text-gray-700 dark:text-gray-200" />
                             </button>
-                            <span className="px-3 py-1 font-medium text-gray-900 text-sm min-w-[2rem] text-center">
-                              {quantity}
-                            </span>
+                            <span className="px-3 py-1 font-medium text-gray-900 dark:text-gray-100 text-sm min-w-[2rem] text-center">{quantity}</span>
                             <button
                               onClick={() => handleQuantityChange(productId, quantity + 1)}
-                              className="p-1 hover:bg-gray-100 transition-colors"
+                              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                             >
-                              <Plus className="h-3 w-3" />
+                              <Plus className="h-3 w-3 text-gray-700 dark:text-gray-200" />
                             </button>
                           </div>
                         </div>
                         
                         <button
                           onClick={() => handleRemoveItemFromCart(productId)}
-                          className="inline-flex items-center px-2 py-1 border border-red-300 text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 transition-colors"
+                          className="inline-flex items-center px-2 py-1 border border-red-300 dark:border-red-400 text-xs font-medium rounded text-red-700 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-600 transition-colors"
                         >
                           <Trash2 className="h-3 w-3 mr-1" />
                           Remove
@@ -267,7 +259,7 @@ export default function CartPage() {
 
                     {/* Item Total */}
                     <div className="text-right">
-                      <p className="text-lg font-bold text-gray-900">
+                      <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
                         ₹{itemTotal.toLocaleString()}
                       </p>
                     </div>
@@ -279,16 +271,16 @@ export default function CartPage() {
         </div>
 
         {/* Cart Summary */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow-sm p-4 sticky top-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
-            <div className="space-y-2">
+        <div className="w-full lg:w-[320px] xl:w-[340px] flex-shrink-0">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 sticky top-4 transition-colors">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Order Summary</h3>
+            <div className="space-y-2"> 
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal ({addToCartList.length} items)</span>
-                <span className="font-medium">₹{totalCartPrice.toLocaleString()}</span>
+                <span className="text-gray-600 dark:text-gray-400">Subtotal ({addToCartList.length} items)</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">₹{totalCartPrice.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Delivery Charges</span>
+                <span className="text-gray-600 dark:text-gray-400">Delivery Charges</span>
                 <span className={`font-medium ${deliveryCharges === 0 ? 'text-green-600' : ''}`}>
                   {deliveryCharges === 0 ? 'FREE' : `₹${deliveryCharges.toFixed(2)}`}
                 </span>
@@ -296,7 +288,7 @@ export default function CartPage() {
               <div className="border-t pt-2">
                 <div className="flex justify-between">
                   <span className="text-base font-semibold">Total Amount</span>
-                  <span className="text-base font-bold text-gray-900">₹{(totalCartPrice + deliveryCharges).toLocaleString()}</span>
+                  <span className="text-base font-bold text-gray-900 dark:text-gray-100">₹{(totalCartPrice + deliveryCharges).toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -304,20 +296,19 @@ export default function CartPage() {
             <div className="mt-4">
               <button
                 onClick={handleProceedToCheckout}
-                className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors"
+                className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 transition-colors"
               >
                 <CreditCard className="h-4 w-4 mr-2" />
                 Proceed to Checkout
               </button>
             </div>
             
-            {/* Trust Indicators */}
             <div className="mt-4 space-y-2">
-              <div className="flex items-center text-xs text-gray-600">
+              <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
                 <Package className="h-3 w-3 mr-2 text-green-500" />
                 {totalCartPrice > 999 ? 'Free Delivery' : 'Delivery Charges Apply'}
               </div>
-              <div className="flex items-center text-xs text-gray-600">
+              <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
                 <ShoppingCart className="h-3 w-3 mr-2 text-blue-500" />
                 Secure Checkout
               </div>
@@ -325,6 +316,7 @@ export default function CartPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </section>
   )
 }

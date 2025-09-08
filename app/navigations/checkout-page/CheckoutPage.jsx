@@ -41,14 +41,26 @@ export default function CheckoutPage() {
     });
   };
 
-  // Calculate totals
+  // Calculate totals with correct logic: (sellingPrice - discount) + GST on discounted amount
   const subtotal = addToCartList.reduce((sum, item) => sum + (item.product.sellingPrice * item.quantity), 0);
   
-  // Calculate GST based on individual product GST rates
+  // Calculate discount first
+  const totalDiscount = addToCartList.reduce((sum, item) => {
+    const productDiscount = item.product.discount || 0;
+    const productSubtotal = item.product.sellingPrice * item.quantity;
+    return sum + (productSubtotal * productDiscount / 100);
+  }, 0);
+  
+  // Calculate discounted amount
+  const discountedAmount = subtotal - totalDiscount;
+  
+  // Calculate GST on discounted amount
   const gstAmount = addToCartList.reduce((sum, item) => {
     const productGst = item.product.gst || 18; // Default to 18% if not set
     const productSubtotal = item.product.sellingPrice * item.quantity;
-    return sum + (productSubtotal * productGst / 100);
+    const productDiscount = item.product.discount || 0;
+    const discountedProductAmount = productSubtotal - (productSubtotal * productDiscount / 100);
+    return sum + (discountedProductAmount * productGst / 100);
   }, 0);
   
   // Calculate shipping based on individual product shipping rates
@@ -60,7 +72,7 @@ export default function CheckoutPage() {
   // Free shipping if subtotal > 999, otherwise use calculated shipping charges
   const deliveryCharges = subtotal > 999 ? 0 : shippingCharges;
   
-  const total = subtotal + deliveryCharges + gstAmount;
+  const total = discountedAmount + deliveryCharges + gstAmount;
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -126,6 +138,7 @@ export default function CheckoutPage() {
         address: `${userAddress.houseNumber || ''} ${userAddress.area}, ${userAddress.landmark || ''}, ${userAddress.villageOrCity}, ${userAddress.taluka}, ${userAddress.district}, ${userAddress.state} - ${userAddress.pinCode}`,
         deliveryCharges,
         gstAmount,
+        totalDiscount,
         total,
         paymentMethod
       };
@@ -167,12 +180,12 @@ export default function CheckoutPage() {
                 console.log('✅ Payment verification response:', verifyResponse.data);
 
                 if (verifyResponse.data.success) {
-                  // Show success message
-                  toast.success('Payment successful! Order placed.', { duration: 3000 });
+                  // Show success message with referral info
+                  toast.success('Payment successful! Your referral code is now active.', { duration: 4000 });
                   
                   // Log referral code for immediate access
                   if (verifyResponse.data.referralCode) {
-                    console.log('🎟️ User referral code:', verifyResponse.data.referralCode);
+                    console.log('🎟️ User referral code generated:', verifyResponse.data.referralCode);
                   }
                   
                   // Clear cart after successful payment
@@ -245,11 +258,11 @@ export default function CheckoutPage() {
 
   if (addToCartList.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center transition-colors">
           <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Your cart is empty</h2>
-          <p className="text-gray-600 mb-6">Add some products to continue with checkout</p>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Your cart is empty</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">Add some products to continue with checkout</p>
           <button
             onClick={() => router.push('/products')}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
@@ -262,20 +275,20 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center">
             <button
               onClick={() => router.back()}
-              className="mr-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="mr-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              <ArrowLeft className="h-5 w-5 text-gray-600" />
+              <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-300" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Checkout</h1>
-              <p className="text-gray-600">Complete your order</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Checkout</h1>
+              <p className="text-gray-600 dark:text-gray-400">Complete your order</p>
             </div>
           </div>
         </div>
@@ -285,18 +298,17 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Address & Payment */}
           <div className="lg:col-span-2 space-y-6">
-            
             {/* Address Section */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   <MapPin className="h-5 w-5 text-blue-600 mr-2" />
-                  <h2 className="text-lg font-semibold text-gray-900">Delivery Address</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Delivery Address</h2>
                 </div>
                 {userAddress && (
                   <button
                     onClick={() => setShowAddressForm(true)}
-                    className="flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    className="flex items-center text-blue-600 hover:text-blue-700 dark:hover:text-blue-400 text-sm font-medium"
                   >
                     <Edit3 className="h-4 w-4 mr-1" />
                     Edit
@@ -305,17 +317,17 @@ export default function CheckoutPage() {
               </div>
 
               {userAddress && !showAddressForm ? (
-                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900 transition-colors">
                   <div className="flex items-start">
-                    <User className="h-5 w-5 text-gray-600 mr-3 mt-1" />
+                    <User className="h-5 w-5 text-gray-600 dark:text-gray-300 mr-3 mt-1" />
                     <div>
-                      <h3 className="font-medium text-gray-900">{session?.user?.fullName}</h3>
-                      <p className="text-gray-700 mt-1">
+                      <h3 className="font-medium text-gray-900 dark:text-gray-100">{session?.user?.fullName}</h3>
+                      <p className="text-gray-700 dark:text-gray-300 mt-1">
                         {userAddress.houseNumber && `${userAddress.houseNumber}, `}
                         {userAddress.area}, {userAddress.landmark && `${userAddress.landmark}, `}
                         {userAddress.villageOrCity}, {userAddress.taluka}, {userAddress.district}, {userAddress.state} - {userAddress.pinCode}
                       </p>
-                      <p className="text-gray-600 mt-1">Phone: {session?.user?.mobileNo}</p>
+                      <p className="text-gray-600 dark:text-gray-400 mt-1">Phone: {session?.user?.mobileNo}</p>
                     </div>
                   </div>
                 </div>
@@ -329,14 +341,13 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment Section */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
               <div className="flex items-center mb-4">
                 <CreditCard className="h-5 w-5 text-blue-600 mr-2" />
-                <h2 className="text-lg font-semibold text-gray-900">Payment Method</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Payment Method</h2>
               </div>
-              
               <div className="space-y-3">
-                <div className="border border-gray-200 rounded-lg p-4">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 transition-colors">
                   <div className="flex items-center">
                     <input
                       id="online"
@@ -345,22 +356,22 @@ export default function CheckoutPage() {
                       value="online"
                       checked={paymentMethod === 'online'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                      className="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
                     />
                     <label htmlFor="online" className="ml-3 flex-1">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-gray-900">Online Payment</span>
-                        <div className="flex items-center text-sm text-gray-600">
+                        <span className="font-medium text-gray-900 dark:text-gray-100">Online Payment</span>
+                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                           <Shield className="h-4 w-4 mr-1" />
                           Secure Payment
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600">Credit Card, Debit Card, Net Banking, UPI & more</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Credit Card, Debit Card, Net Banking, UPI & more</p>
                     </label>
                   </div>
                 </div>
 
-                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 opacity-75">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900 opacity-75 transition-colors">
                   <div className="flex items-center">
                     <input
                       id="cod"
@@ -368,16 +379,16 @@ export default function CheckoutPage() {
                       type="radio"
                       value="cod"
                       disabled
-                      className="h-4 w-4 text-gray-400 border-gray-300 cursor-not-allowed"
+                      className="h-4 w-4 text-gray-400 border-gray-300 dark:border-gray-600 cursor-not-allowed"
                     />
                     <label htmlFor="cod" className="ml-3 flex-1 cursor-not-allowed">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-gray-500">Cash on Delivery</span>
-                        <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-medium">
+                        <span className="font-medium text-gray-500 dark:text-gray-400">Cash on Delivery</span>
+                        <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded-full font-medium">
                           Coming Soon
                         </span>
                       </div>
-                      <p className="text-sm text-gray-500">This payment option will be available soon</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">This payment option will be available soon</p>
                     </label>
                   </div>
                 </div>
@@ -388,25 +399,25 @@ export default function CheckoutPage() {
           {/* Right Column - Order Summary */}
           <div className="space-y-6">
             {/* Order Items */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Order Summary</h3>
               <div className="space-y-4">
                 {addToCartList.map((item) => (
                   <div key={item.id} className="flex items-center space-x-4">
-                    <div className="relative w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
+                    <div className="relative w-16 h-16 bg-gray-100 dark:bg-gray-900 rounded-lg overflow-hidden">
                       <img
-                        src={item.product.mainImage}
+                        src={item.product.images && item.product.images.length > 0 ? item.product.images[0].imageUrl : "/images/brand-logo.png"}
                         alt={item.product.title}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium text-gray-900 truncate">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                         {item.product.title}
                       </h4>
-                      <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Qty: {item.quantity}</p>
                     </div>
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                       ₹{(item.product.sellingPrice * item.quantity).toLocaleString()}
                     </div>
                   </div>
@@ -415,54 +426,63 @@ export default function CheckoutPage() {
             </div>
 
             {/* Price Summary */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Price Details</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Price Details</h3>
+              {/* Price Breakdown */}
+              <div className="bg-blue-50 dark:bg-blue-900 rounded-lg p-4 mb-6 transition-colors">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-3">Price Breakdown</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-700 dark:text-gray-200">Product Price:</span>
+                    <span className="font-medium">₹{Math.round(subtotal)}</span>
+                  </div>
+                  {totalDiscount > 0 && (
+                    <div className="flex justify-between text-green-600 dark:text-green-400">
+                      <span>Discount ({((totalDiscount / subtotal) * 100).toFixed(1)}%):</span>
+                      <span className="font-medium">-₹{Math.round(totalDiscount)}</span>
+                    </div>
+                  )}
+                  {gstAmount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-700 dark:text-gray-200">GST on Discounted Amount ({((gstAmount / discountedAmount) * 100).toFixed(1)}%):</span>
+                      <span className="font-medium">₹{Math.round(gstAmount)}</span>
+                    </div>
+                  )}
+                  {deliveryCharges > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-700 dark:text-gray-200">Delivery Charges:</span>
+                      <span className="font-medium">₹{Math.round(deliveryCharges)}</span>
+                    </div>
+                  )}
+                  <div className="border-t border-blue-200 dark:border-blue-700 pt-2 flex justify-between font-semibold text-blue-900 dark:text-blue-100">
+                    <span>Final Amount:</span>
+                    <span>₹{Math.round(total)}</span>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal ({addToCartList.length} items)</span>
-                  <span className="font-medium">₹{subtotal.toLocaleString()}</span>
-                </div>
-                
-                {/* Individual GST breakdown */}
-                {addToCartList.map((item, index) => {
-                  const itemGst = item.product.gst || 18;
-                  const itemSubtotal = item.product.sellingPrice * item.quantity;
-                  const itemGstAmount = itemSubtotal * itemGst / 100;
-                  return (
-                    <div key={`gst-${item.id}`} className="flex justify-between text-sm">
-                      <span className="text-gray-500">GST ({itemGst}%) on {item.product.title}</span>
-                      <span className="text-gray-600">₹{itemGstAmount.toFixed(2)}</span>
-                    </div>
-                  );
-                })}
-                
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Total GST</span>
-                  <span className="font-medium">₹{gstAmount.toFixed(2)}</span>
-                </div>
-                
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Delivery Charges</span>
-                  <span className={`font-medium ${deliveryCharges === 0 ? 'text-green-600' : ''}`}>
-                    {deliveryCharges === 0 ? 'FREE' : `₹${deliveryCharges.toFixed(2)}`}
+                  <span className="text-gray-600 dark:text-gray-400">Delivery Charges</span>
+                  <span className={`font-medium ${deliveryCharges === 0 ? 'text-green-600 dark:text-green-400' : ''}`}>
+                    {deliveryCharges === 0 ? 'FREE' : `₹${Math.round(deliveryCharges)}`}
                   </span>
                 </div>
-                
                 <div className="border-t pt-3">
                   <div className="flex justify-between">
                     <span className="text-lg font-semibold">Total Amount</span>
-                    <span className="text-lg font-bold text-gray-900">₹{total.toFixed(2)}</span>
+                    <span className="text-lg font-bold text-gray-900 dark:text-gray-100">₹{Math.round(total)}</span>
                   </div>
                 </div>
               </div>
 
               {/* Trust Indicators */}
               <div className="mt-6 space-y-2">
-                <div className="flex items-center text-sm text-gray-600">
+                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                   <Shield className="h-4 w-4 mr-2 text-green-500" />
                   Safe and Secure Payments
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
+                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                   <Truck className="h-4 w-4 mr-2 text-blue-500" />
                   Fast Delivery
                 </div>
@@ -474,11 +494,11 @@ export default function CheckoutPage() {
                 disabled={isPlacingOrder || !userAddress}
                 className={`w-full mt-6 py-3 px-6 rounded-lg font-medium transition-colors ${
                   isPlacingOrder || !userAddress
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                     : 'bg-green-600 hover:bg-green-700 text-white'
                 }`}
               >
-                {isPlacingOrder ? 'Placing Order...' : `Place Order - ₹${total.toFixed(2)}`}
+                {isPlacingOrder ? 'Placing Order...' : `Place Order - ₹${Math.round(total)}`}
               </button>
             </div>
           </div>

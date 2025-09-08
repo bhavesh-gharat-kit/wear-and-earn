@@ -7,6 +7,7 @@ import { IoMdSearch } from "react-icons/io";
 import axios from "axios";
 import toast from "react-hot-toast";
 import AddStockModal from "./add-stock-modal/AddStockModal";
+import ReduceStockModal from "./reduce-stock-modal/ReduceStockModal";
 import LoaderEffect from "@/components/ui/LoaderEffect";
 import PaginationComponent from "@/components/ui/PaginationComponent";
 
@@ -18,7 +19,7 @@ function StockPage() {
 
   // pagination logic here
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPage, setRowsPage] = useState(10);
+  const [rowsPage, setRowsPage] = useState(20);
   const [totalStocksCount, setTotalStocksCount] = useState(0);
   const totalPages = Math.ceil(totalStocksCount / rowsPage);
 
@@ -73,15 +74,26 @@ function StockPage() {
       {/* header */}
       <div className="flex justify-between items-center">
         <h1 className="text-xl text-blue-700 dark:text-blue-400 font-bold">Stock Management</h1>
-        <button
-          onClick={() => document.getElementById("my_modal_3").showModal()}
-          className="flex items-center gap-2 btn btn-primary font-semibold"
-        >
-          <i className="text-xl">
-            <IoMdAdd fontSize={22} />
-          </i>
-          <span>Add Stock</span>
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => document.getElementById("my_modal_3").showModal()}
+            className="flex items-center gap-2 btn btn-primary font-semibold"
+          >
+            <i className="text-xl">
+              <IoMdAdd fontSize={22} />
+            </i>
+            <span>Add Stock</span>
+          </button>
+          <button
+            onClick={() => document.getElementById("reduce_stock_modal").showModal()}
+            className="flex items-center gap-2 btn btn-secondary font-semibold bg-red-600 hover:bg-red-700 text-white border-red-600"
+          >
+            <i className="text-xl">
+              <BiTrash fontSize={22} />
+            </i>
+            <span>Reduce Stock</span>
+          </button>
+        </div>
       </div>
 
       {/* Search */}
@@ -143,6 +155,10 @@ function StockPage() {
         {/* PAGINATION COMPONENT END*/}
       </div>
       <AddStockModal
+        fetchproductsStockDetails={fetchproductsStockDetails}
+        productsStockDetails={productsStockDetails}
+      />
+      <ReduceStockModal
         fetchproductsStockDetails={fetchproductsStockDetails}
         productsStockDetails={productsStockDetails}
       />

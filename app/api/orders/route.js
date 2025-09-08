@@ -75,6 +75,33 @@ export async function POST(request) {
       );
     }
 
+    // Validate stock availability for all items before creating order
+    console.log('📦 Validating stock availability...');
+    for (const item of items) {
+      const product = await prisma.product.findUnique({
+        where: { id: item.productId },
+        select: { inStock: true, title: true }
+      });
+
+      if (!product) {
+        return NextResponse.json(
+          { success: false, message: `Product not found: ${item.productId}` },
+          { status: 400 }
+        );
+      }
+
+      if (product.inStock < item.quantity) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            message: `Insufficient stock for ${product.title}. Available: ${product.inStock}, Requested: ${item.quantity}` 
+          },
+          { status: 400 }
+        );
+      }
+    }
+    console.log('✅ Stock validation passed');
+
     // Check if this is user's first order (joining order)
     const existingOrders = await prisma.order.count({
       where: { 
@@ -84,15 +111,17 @@ export async function POST(request) {
     });
     const isJoiningOrder = existingOrders === 0;
 
-    // Calculate commission amount from individual product commission amounts
+    // Calculate commission amount from individual product MLM prices
     let totalCommissionAmount = 0;
     for (const item of items) {
       const product = await prisma.product.findUnique({
         where: { id: item.productId },
-        select: { commissionAmount: true }
+        select: { mlmPrice: true, sellingPrice: true }
       });
       if (product) {
-        totalCommissionAmount += (product.commissionAmount || 0) * item.quantity;
+        // Use mlmPrice if available, otherwise calculate based on percentage of selling price
+        const commissionAmount = product.mlmPrice || (product.sellingPrice * 0.1); // Default 10% if no mlmPrice
+        totalCommissionAmount += commissionAmount * item.quantity;
       }
     }
 

@@ -96,6 +96,25 @@ export async function POST(req) {
             paidAt: new Date()
           }
         });
+
+        // Reduce stock for purchased items
+        console.log('📦 Reducing stock for purchased items in webhook...');
+        for (const orderProduct of order.orderProducts) {
+          const product = await tx.product.findUnique({
+            where: { id: orderProduct.productId },
+            select: { inStock: true, title: true }
+          });
+
+          if (product) {
+            const newStock = Math.max(0, product.inStock - orderProduct.quantity);
+            await tx.product.update({
+              where: { id: orderProduct.productId },
+              data: { inStock: newStock }
+            });
+            console.log(`📦 Webhook: Stock reduced for ${product.title}: ${product.inStock} → ${newStock} (sold: ${orderProduct.quantity})`);
+          }
+        }
+        console.log('✅ Webhook: Stock reduction completed');
         
         // Check if this is user's first paid order (joining order)
         const paidOrdersCount = await tx.order.count({

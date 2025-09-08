@@ -71,6 +71,25 @@ export async function POST(req) {
 
         console.log('✅ Order updated successfully:', updatedOrder.id);
 
+        // Reduce stock for purchased items
+        console.log('📦 Reducing stock for purchased items...');
+        for (const orderProduct of updatedOrder.orderProducts) {
+          const product = await tx.product.findUnique({
+            where: { id: orderProduct.productId },
+            select: { inStock: true, title: true }
+          });
+
+          if (product) {
+            const newStock = Math.max(0, product.inStock - orderProduct.quantity);
+            await tx.product.update({
+              where: { id: orderProduct.productId },
+              data: { inStock: newStock }
+            });
+            console.log(`📦 Stock reduced for ${product.title}: ${product.inStock} → ${newStock} (sold: ${orderProduct.quantity})`);
+          }
+        }
+        console.log('✅ Stock reduction completed');
+
         // Check if user needs MLM activation (regardless of order count)
         const user = await tx.user.findUnique({
           where: { id: updatedOrder.userId },
@@ -84,6 +103,7 @@ export async function POST(req) {
 
         // Always process with Pool MLM system for all orders
         console.log('🏊 Processing with Pool MLM system for user:', updatedOrder.userId);
+        console.log('🎯 Razorpay payment verified - generating referral code if needed...');
         
         try {
           const { processPoolMLMOrder } = await import('@/lib/pool-mlm-system');
@@ -96,7 +116,7 @@ export async function POST(req) {
               where: { id: updatedOrder.userId },
               data: { isActive: true }
             });
-            console.log('✅ User activated:', updatedOrder.userId);
+            console.log('✅ User activated after Razorpay payment:', updatedOrder.userId);
           }
           
         } catch (error) {

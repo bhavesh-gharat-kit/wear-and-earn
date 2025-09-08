@@ -63,7 +63,7 @@ export default function WithdrawalManagement() {
   const formatDate = (dateString) => new Date(dateString).toLocaleString()
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Withdrawal Management</h1>
         
@@ -179,18 +179,18 @@ export default function WithdrawalManagement() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 capitalize">
+                      <div className="text-sm text-gray-900 dark:text-gray-100 capitalize">
                         {withdrawal.method.replace('_', ' ')}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {formatDate(withdrawal.requestedAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        withdrawal.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        withdrawal.status === 'approved' ? 'bg-green-100 text-green-800' :
-                        'bg-red-100 text-red-800'
+                        withdrawal.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300' :
+                        withdrawal.status === 'approved' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300' :
+                        'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
                       }`}>
                         {withdrawal.status}
                       </span>
@@ -206,7 +206,7 @@ export default function WithdrawalManagement() {
                               }
                             }}
                             disabled={processing[withdrawal.id]}
-                            className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 disabled:opacity-50"
                           >
                             {processing[withdrawal.id] ? 'Processing...' : 'Approve'}
                           </button>
@@ -218,18 +218,18 @@ export default function WithdrawalManagement() {
                               }
                             }}
                             disabled={processing[withdrawal.id]}
-                            className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 disabled:opacity-50"
                           >
                             Reject
                           </button>
                         </div>
                       ) : (
                         <div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             {withdrawal.processedAt && formatDate(withdrawal.processedAt)}
                           </div>
                           {withdrawal.adminNotes && (
-                            <div className="text-xs text-gray-400 mt-1">
+                            <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                               {withdrawal.adminNotes}
                             </div>
                           )}

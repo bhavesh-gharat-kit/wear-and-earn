@@ -19,7 +19,7 @@ function AdminOrdersPage() {
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPage, setRowsPage] = useState(10);
+  const [rowsPage, setRowsPage] = useState(20);
   const [totalOrdersCount, setTotalOrdersCount] = useState(0);
   
   const totalPages = Math.ceil(totalOrdersCount / rowsPage);
@@ -42,7 +42,24 @@ function AdminOrdersPage() {
       const response = await axios.get(`/api/admin/orders?${params}`);
       
       if (response.data.success) {
-        setOrders(response.data.data);
+        // Convert paise to rupees for display
+        const ordersWithRupees = response.data.data.map(order => ({
+          ...order,
+          total: order.total / 100, // Convert paise to rupees
+          deliveryCharges: order.deliveryCharges ? order.deliveryCharges / 100 : 0,
+          gstAmount: order.gstAmount ? order.gstAmount / 100 : 0,
+          commissionAmount: order.commissionAmount ? order.commissionAmount / 100 : 0,
+          orderProducts: order.orderProducts ? order.orderProducts.map(product => ({
+            ...product,
+            sellingPrice: product.sellingPrice / 100,
+            discount: product.discount ? product.discount / 100 : 0,
+            finalMRP: product.finalMRP ? product.finalMRP / 100 : 0,
+            homeDelivery: product.homeDelivery ? product.homeDelivery / 100 : 0,
+            totalPrice: product.totalPrice / 100
+          })) : []
+        }));
+        
+        setOrders(ordersWithRupees);
         setTotalOrdersCount(response.data.totalCount);
       } else {
         toast.error(response.data.message || "Failed to fetch orders");
@@ -171,58 +188,58 @@ function AdminOrdersPage() {
   <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-200">
+              <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-100">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     Order ID
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     Customer
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     Items
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     Total
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
                 {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                       #{order.id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {order.user?.fullName || 'N/A'}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-300">
                         {order.user?.email}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                       {order.orderProducts?.length || 0} items
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      ₹{order.total}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                      ₹{typeof order.total === 'number' ? order.total.toFixed(2) : '0.00'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(order.status)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                       {moment(order.createdAt).format('DD/MM/YYYY')}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium dark:text-gray-100">
                       <div className="flex space-x-2">
                         <select
                           value={order.status}

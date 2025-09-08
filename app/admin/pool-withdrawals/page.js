@@ -139,21 +139,21 @@ export default function PoolWithdrawalsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Pool Withdrawals Management</h1>
-        <p className="text-gray-600">Manage withdrawal requests from the pool MLM system</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Pool Withdrawals Management</h1>
+        <p className="text-gray-600 dark:text-gray-300">Manage withdrawal requests from the pool MLM system</p>
       </div>
 
       {/* Filters and Controls */}
-      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-6">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6">
         <div className="flex flex-wrap items-center gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Status</label>
             <select
               value={filters.status}
               onChange={(e) => setFilters({...filters, status: e.target.value, page: 1})}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
@@ -164,11 +164,11 @@ export default function PoolWithdrawalsPage() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Method</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Method</label>
             <select
               value={filters.method}
               onChange={(e) => setFilters({...filters, method: e.target.value, page: 1})}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             >
               <option value="all">All Methods</option>
               <option value="bank_transfer">Bank Transfer</option>
@@ -192,76 +192,76 @@ export default function PoolWithdrawalsPage() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-600">
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {withdrawals.filter(w => w.status === 'pending').length}
             </div>
-            <div className="text-sm text-gray-600">Pending</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Pending</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {withdrawals.filter(w => w.status === 'processing').length}
             </div>
-            <div className="text-sm text-gray-600">Processing</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Processing</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {withdrawals.filter(w => w.status === 'completed').length}
             </div>
-            <div className="text-sm text-gray-600">Completed</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Completed</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">
               {withdrawals.filter(w => w.status === 'rejected').length}
             </div>
-            <div className="text-sm text-gray-600">Rejected</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Rejected</div>
           </div>
         </div>
       </div>
 
       {/* Withdrawals List */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
         {withdrawals.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            <Wallet className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium mb-2">No Withdrawal Requests</h3>
+          <div className="p-8 text-center text-gray-500 dark:text-gray-300">
+            <Wallet className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-500" />
+            <h3 className="text-lg font-medium mb-2 dark:text-gray-100">No Withdrawal Requests</h3>
             <p>No withdrawal requests match your current filters.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+              <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">User</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Method</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
                 {withdrawals.map((withdrawal) => (
-                  <tr key={withdrawal.id} className="hover:bg-gray-50">
+                  <tr key={withdrawal.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{withdrawal.userName}</div>
-                        <div className="text-sm text-gray-500">{withdrawal.userEmail}</div>
-                        <div className="text-xs text-gray-400">Level {withdrawal.userLevel}</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{withdrawal.userName}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-300">{withdrawal.userEmail}</div>
+                        <div className="text-xs text-gray-400 dark:text-gray-500">Level {withdrawal.userLevel}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-lg font-bold text-green-600">
+                      <div className="text-lg font-bold text-green-600 dark:text-green-400">
                         {formatCurrency(withdrawal.amount)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 capitalize">
+                      <div className="text-sm text-gray-900 dark:text-gray-100 capitalize">
                         {withdrawal.method?.replace('_', ' ') || 'N/A'}
                       </div>
                       {withdrawal.accountDetails && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 dark:text-gray-300">
                           {withdrawal.method === 'upi' ? 
                             withdrawal.accountDetails.upiId :
                             withdrawal.accountDetails.accountNumber ? 
@@ -271,29 +271,28 @@ export default function PoolWithdrawalsPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(withdrawal.status)}`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(withdrawal.status)} dark:${getStatusColor(withdrawal.status).replace('bg-', 'bg-').replace('text-', 'text-').replace('100', '900').replace('800', '400')}`}>
                         {getStatusIcon(withdrawal.status)}
                         <span className="ml-1 capitalize">{withdrawal.status}</span>
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                       <div>{new Date(withdrawal.requestedAt).toLocaleDateString()}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-300">
                         {new Date(withdrawal.requestedAt).toLocaleTimeString()}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900">
+                        <button className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
                           <Eye className="w-4 h-4" />
                         </button>
-                        
                         {withdrawal.status === 'pending' && (
                           <>
                             <button
                               onClick={() => handleWithdrawalAction(withdrawal.id, 'approve')}
                               disabled={processing}
-                              className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                              className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 disabled:opacity-50"
                             >
                               <CheckCircle className="w-4 h-4" />
                             </button>
@@ -303,18 +302,17 @@ export default function PoolWithdrawalsPage() {
                                 if (remarks) handleWithdrawalAction(withdrawal.id, 'reject', remarks)
                               }}
                               disabled={processing}
-                              className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                              className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 disabled:opacity-50"
                             >
                               <XCircle className="w-4 h-4" />
                             </button>
                           </>
                         )}
-                        
                         {withdrawal.status === 'processing' && (
                           <button
                             onClick={() => handleWithdrawalAction(withdrawal.id, 'complete')}
                             disabled={processing}
-                            className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 disabled:opacity-50"
                           >
                             <CheckCircle className="w-4 h-4" />
                           </button>
@@ -332,28 +330,25 @@ export default function PoolWithdrawalsPage() {
       {/* Pagination */}
       {pagination.totalPages > 1 && (
         <div className="mt-6 flex items-center justify-between">
-          <div className="text-sm text-gray-700">
+          <div className="text-sm text-gray-700 dark:text-gray-200">
             Showing page {pagination.page} of {pagination.totalPages} 
             ({pagination.total} total requests)
           </div>
-          
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setFilters(prev => ({ ...prev, page: prev.page - 1 }))}
               disabled={pagination.page <= 1}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50"
             >
               Previous
             </button>
-            
-            <span className="px-3 py-2 text-sm text-gray-700">
+            <span className="px-3 py-2 text-sm text-gray-700 dark:text-gray-100">
               {pagination.page} of {pagination.totalPages}
             </span>
-            
             <button
               onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}
               disabled={pagination.page >= pagination.totalPages}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50"
             >
               Next
             </button>
