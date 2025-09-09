@@ -1,0 +1,2 @@
+-- KYC fields cleanup already applied to database
+-- This migration represents the state after manual database changes
