@@ -8,9 +8,11 @@ import toast from "react-hot-toast";
 
 function AdminDashBoard() {
   const [allDatabaseDetails, setAllDatabaseDetails] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchAllDatabasesDetails = async () => {
     try {
+      setIsRefreshing(true);
       const response = await axios.get("/api/admin/dashboard");
       if (response.status === 200) {
         // toast.success("Data Fetched Successfully");
@@ -20,6 +22,8 @@ function AdminDashBoard() {
     } catch (error) {
       console.log("Internal Server Error While Fetching Details");
       toast.error("Internal Server Error While Fetching Details");
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -39,9 +43,27 @@ function AdminDashBoard() {
       <section>
         <section className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 text-gray-800 dark:text-gray-100 font-sans">
           {/* Header */}
-          <h1 className="text-4xl font-bold mb-8 text-blue-700 dark:text-blue-400">
-            Welcome Admin,
-          </h1>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-4xl font-bold text-blue-700 dark:text-blue-400">
+              Welcome Admin,
+            </h1>
+            <button
+              onClick={fetchAllDatabasesDetails}
+              disabled={isRefreshing}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg shadow hover:shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-700 dark:hover:bg-blue-800"
+            >
+              <svg 
+                className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`}
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+            </button>
+          </div>
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">

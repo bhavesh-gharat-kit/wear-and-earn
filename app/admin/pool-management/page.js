@@ -13,7 +13,12 @@ import {
   UserCheck,
   Wallet,
   Target,
-  Crown
+  Crown,
+  Search,
+  Calendar,
+  AlertCircle,
+  CheckCircle,
+  X
 } from 'lucide-react'
 
 export default function PoolManagementPanel() {
@@ -22,12 +27,19 @@ export default function PoolManagementPanel() {
   const [poolDistribution, setPoolDistribution] = useState(null)
   const [teams, setTeams] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isDistributing, setIsDistributing] = useState(false)
+  const [distributionProgress, setDistributionProgress] = useState(0)
+  const [showDistributionDialog, setShowDistributionDialog] = useState(false)
+  const [distributionPreview, setDistributionPreview] = useState(null)
   const [activeTab, setActiveTab] = useState('overview')
   const [filters, setFilters] = useState({
     level: 'all',
     status: 'all',
     page: 1,
-    limit: 20
+    limit: 20,
+    search: '',
+    dateFrom: '',
+    dateTo: ''
   })
 
   useEffect(() => {
@@ -88,11 +100,29 @@ export default function PoolManagementPanel() {
   }, [activeTab, filters, fetchTeams])
 
   const handleDistributePool = async () => {
-    if (!confirm('Are you sure you want to distribute the current pool to all eligible users?')) {
-      return
-    }
+    // First show preview dialog
+    await fetchDistributionPreview()
+    setShowDistributionDialog(true)
+  }
 
+  const fetchDistributionPreview = async () => {
     try {
+      const response = await fetch('/api/admin/pool-distribution')
+      if (response.ok) {
+        const data = await response.json()
+        setDistributionPreview(data)
+      }
+    } catch (error) {
+      console.error('Error fetching distribution preview:', error)
+    }
+  }
+
+  const confirmDistribution = async () => {
+    try {
+      setIsDistributing(true)
+      setDistributionProgress(0)
+      setShowDistributionDialog(false)
+
       const response = await fetch('/api/admin/pool-distribution', {
         method: 'POST',
         headers: {
@@ -101,18 +131,93 @@ export default function PoolManagementPanel() {
         body: JSON.stringify({ action: 'distribute' })
       })
 
+      // Simulate progress tracking
+      const progressInterval = setInterval(() => {
+        setDistributionProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval)
+            return prev
+          }
+          return prev + Math.random() * 20
+        })
+      }, 500)
+
       if (response.ok) {
         const result = await response.json()
-        alert(`Pool distributed successfully! ${result.distributions} distributions made.`)
-        // Refresh data
-        window.location.reload()
+        setDistributionProgress(100)
+        setTimeout(() => {
+          alert(`Pool distributed successfully! ${result.distributions} distributions made.`)
+          // Refresh data
+          window.location.reload()
+        }, 1000)
       } else {
         const error = await response.json()
         alert('Error distributing pool: ' + error.message)
+        setIsDistributing(false)
+        setDistributionProgress(0)
       }
     } catch (error) {
       console.error('Error:', error)
       alert('Failed to distribute pool')
+      setIsDistributing(false)
+      setDistributionProgress(0)
+    }
+  }
+
+  const exportDistributionHistory = () => {
+    // Create CSV data
+    const csvData = poolDistribution?.recentDistributions?.map(dist => ({
+      Date: new Date(dist.createdAt).toLocaleDateString(),
+      Amount: dist.amount / 100, // Convert paisa to rupees
+      Users: dist.userCount,
+      Status: 'Completed'
+    })) || []
+
+    if (csvData.length === 0) {
+      alert('No data to export')
+      return
+    }
+
+    // Convert to CSV
+    const headers = Object.keys(csvData[0]).join(',')
+    const rows = csvData.map(row => Object.values(row).join(','))
+    const csv = [headers, ...rows].join('\n')
+
+    // Download file
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `pool_distribution_history_${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+  }
+
+  const refreshData = async () => {
+    setLoading(true)
+    try {
+      // Fetch pool overview stats
+      const [statsRes, distributionRes] = await Promise.all([
+        fetch('/api/admin/pool-stats'),
+        fetch('/api/admin/pool-distribution')
+      ])
+      
+      if (statsRes.ok) {
+        const statsData = await statsRes.json()
+        setPoolStats(statsData)
+      }
+      
+      if (distributionRes.ok) {
+        const distributionData = await distributionRes.json()
+        setPoolDistribution(distributionData)
+      }
+      
+    } catch (error) {
+      console.error('Error fetching pool data:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -172,6 +277,18 @@ export default function PoolManagementPanel() {
             </button>
           ))}
         </nav>
+        
+        {/* Real-time Refresh Button */}
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={refreshData}
+            disabled={loading}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </button>
+        </div>
       </div>
 
       {/* Overview Tab */}
@@ -260,14 +377,40 @@ export default function PoolManagementPanel() {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Pool Distribution Control</h3>
-              <button
-                onClick={handleDistributePool}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
-              >
-                <DollarSign className="w-4 h-4 mr-2" />
-                Distribute Pool Now
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDistributePool}
+                  disabled={isDistributing}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center disabled:opacity-50"
+                >
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  {isDistributing ? 'Distributing...' : 'Distribute Pool Now'}
+                </button>
+                <button
+                  onClick={exportDistributionHistory}
+                  className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 flex items-center"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export History
+                </button>
+              </div>
             </div>
+            
+            {/* Distribution Progress */}
+            {isDistributing && (
+              <div className="mb-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-blue-800 dark:text-blue-200 font-medium">Distribution in Progress...</span>
+                  <span className="text-blue-600 dark:text-blue-400">{Math.round(distributionProgress)}%</span>
+                </div>
+                <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${distributionProgress}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -292,7 +435,37 @@ export default function PoolManagementPanel() {
 
           {/* Recent Distributions */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Recent Distributions</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Distribution History</h3>
+              
+              {/* Enhanced Filters */}
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search distributions..."
+                    value={filters.search}
+                    onChange={(e) => setFilters({...filters, search: e.target.value})}
+                    className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="date"
+                    value={filters.dateFrom}
+                    onChange={(e) => setFilters({...filters, dateFrom: e.target.value})}
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  />
+                  <input
+                    type="date"
+                    value={filters.dateTo}
+                    onChange={(e) => setFilters({...filters, dateTo: e.target.value})}
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+              </div>
+            </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-800">
@@ -465,6 +638,68 @@ export default function PoolManagementPanel() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Distribution Confirmation Dialog */}
+      {showDistributionDialog && distributionPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Confirm Pool Distribution</h3>
+              <button
+                onClick={() => setShowDistributionDialog(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="mb-6">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-4">
+                <div className="flex items-center mb-2">
+                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" />
+                  <span className="font-medium text-blue-800 dark:text-blue-200">Distribution Preview</span>
+                </div>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  Total Amount: <span className="font-bold">{distributionPreview ? formatCurrency(distributionPreview.totalAmount || 0) : '₹0'}</span>
+                </p>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  Eligible Users: <span className="font-bold">{distributionPreview ? distributionPreview.eligibleUsers || 0 : 0}</span>
+                </p>
+              </div>
+              
+              {distributionPreview?.levelBreakdown && (
+                <div className="space-y-2">
+                  <p className="font-medium text-gray-700 dark:text-gray-200 mb-2">Level-wise Distribution:</p>
+                  {Object.entries(distributionPreview.levelBreakdown).map(([level, data]) => (
+                    <div key={level} className="flex justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-300">Level {level}:</span>
+                      <span className="font-medium dark:text-gray-100">
+                        {data.users} users × {formatCurrency(data.amount / (data.users || 1))}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDistributionDialog(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDistribution}
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Confirm Distribution
+              </button>
             </div>
           </div>
         </div>

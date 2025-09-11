@@ -180,12 +180,13 @@ export default function CheckoutPage() {
                 console.log('✅ Payment verification response:', verifyResponse.data);
 
                 if (verifyResponse.data.success) {
-                  // Show success message with referral info
-                  toast.success('Payment successful! Your referral code is now active.', { duration: 4000 });
-                  
-                  // Log referral code for immediate access
+                  // Check if referral code was actually generated
                   if (verifyResponse.data.referralCode) {
                     console.log('🎟️ User referral code generated:', verifyResponse.data.referralCode);
+                    toast.success('Payment successful! Your referral code is now active - you can start referring friends!', { duration: 4000 });
+                  } else {
+                    // Just show payment success without referral code mention
+                    toast.success('Payment successful! Your order is being processed.', { duration: 4000 });
                   }
                   
                   // Clear cart after successful payment

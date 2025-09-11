@@ -24,7 +24,7 @@ export async function GET(request) {
     const where = {};
     
     if (level && level !== 'all') {
-      where.leader = {
+      where.user = {
         level: parseInt(level)
       };
     }
@@ -39,7 +39,7 @@ export async function GET(request) {
     const teams = await prisma.team.findMany({
       where,
       include: {
-        leader: {
+        user: {
           select: {
             id: true,
             fullName: true,
@@ -50,7 +50,7 @@ export async function GET(request) {
           }
         },
         members: {
-          select: {
+          include: {
             user: {
               select: {
                 id: true,
@@ -74,11 +74,11 @@ export async function GET(request) {
     // Format teams data
     const formattedTeams = teams.map(team => ({
       id: team.id,
-      leaderName: team.leader.fullName,
-      leaderEmail: team.leader.email,
-      level: team.leader.level,
-      teamCount: team.leader.teamCount,
-      isActive: team.leader.isActive,
+      leaderName: team.user.fullName,
+      leaderEmail: team.user.email,
+      level: team.user.level,
+      teamCount: team.user.teamCount,
+      isActive: team.user.isActive,
       isComplete: team.isComplete,
       memberCount: team.members.length,
       createdAt: team.createdAt,

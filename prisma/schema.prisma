@@ -30,6 +30,7 @@ model User {
   directTeams            Int                     @default(0)
   level                  Int                     @default(0)
   teamCount              Int                     @default(0)
+  totalTeams             Int                     @default(0) // Total teams created by user (for admin tracking)
   
   // NEW MLM POOL PLAN FIELDS
   currentLevel           MLMLevel                @default(NONE) // L1/L2/L3/L4/L5

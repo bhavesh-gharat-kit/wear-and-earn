@@ -98,7 +98,7 @@ export const POST = async (request) => {
             password: hashedPassword,
             sponsorId: sponsorId,
             isActive: false, // Will become active after first purchase
-            isKycApproved: false,
+            kycStatus: 'PENDING',
             walletBalance: 0,
             monthlyPurchase: 0,
             isEligibleRepurchase: false,

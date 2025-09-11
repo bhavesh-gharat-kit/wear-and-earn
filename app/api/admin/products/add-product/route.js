@@ -23,10 +23,12 @@ export async function POST(req) {
             data[key] = value;
         }
 
-        // 2. Handle single thumbnail image
-        const thumbnail = formData.get('thumbnailImage');
-        let thumbnailUrl = null;
+        // 3. Handle multiple product images + thumbnail
+        const productImageFiles = formData.getAll('productImages');
+        const productImageUrls = [];
 
+        // Add thumbnail as first image if exists
+        const thumbnail = formData.get('thumbnailImage');
         if (thumbnail && typeof thumbnail === 'object' && thumbnail.name && thumbnail.size > 0) {
             try {
                 console.log("Processing thumbnail image:", {
@@ -45,8 +47,8 @@ export async function POST(req) {
                     public_id: `thumbnail-${Date.now()}-${Math.random().toString(36).substring(2)}`
                 });
                 
-                thumbnailUrl = cloudinaryResult.url;
-                console.log("✅ Thumbnail uploaded successfully:", thumbnailUrl);
+                productImageUrls.push(cloudinaryResult.url); // Add thumbnail as first image
+                console.log("✅ Thumbnail uploaded successfully:", cloudinaryResult.url);
             } catch (fileError) {
                 console.error("❌ Error processing thumbnail:", fileError);
                 console.error("Thumbnail error details:", {
@@ -61,11 +63,7 @@ export async function POST(req) {
             }
         }
 
-        // 3. Handle multiple product images
-        const productImageFiles = formData.getAll('productImages');
-        const productImageUrls = [];
-
-        console.log(`Processing ${productImageFiles.length} product images...`);
+        console.log(`Processing ${productImageFiles.length} additional product images...`);
 
         for (const [index, image] of productImageFiles.entries()) {
             if (!image || typeof image !== 'object' || !image.name || image.size === 0) {
@@ -108,17 +106,11 @@ export async function POST(req) {
 
         // ✅ You now have:
         // data => all form fields (title, price, etc.)
-        // thumbnailUrl => local path to thumbnail
-        // productImageUrls => array of image paths
-
-        // Optional: Upload to Cloudinary here, then delete local file
-        // await cloudinary.uploader.upload(filePath);
-        // await unlink(filePath);
+        // productImageUrls => array of image paths (thumbnail + product images)
 
 
         console.log("Form data received:", data);
-        console.log("Thumbnail URL:", thumbnailUrl);
-        console.log("Product image URLs:", productImageUrls);
+        console.log("All product image URLs:", productImageUrls);
 
         // Validate required fields for new spec
         if (!data.title || !data.description || !data.category) {
@@ -158,7 +150,6 @@ export async function POST(req) {
                 description: data.description,
                 longDescription: data.overview || "",
                 inStock: data.inStock ? Number(data.inStock) : 1,
-                categoryId: Number(data.category),
                 isActive: true,
                 keyFeature: data.keyFeatures || "",
                 discount: data.discount ? Number(data.discount) : 0,
@@ -172,7 +163,12 @@ export async function POST(req) {
                 gst: data.gst ? Number(data.gst) : 18,
                 homeDelivery: data.shipping ? Number(data.shipping) : 50,
                 type: data.productType || "REGULAR",
-                mainImage: thumbnailUrl,
+                
+                // Use category relation instead of categoryId
+                category: {
+                    connect: { id: Number(data.category) }
+                },
+                
                 images: {
                     create: productImageUrls.map((url) => ({ imageUrl: url }))
                 }
@@ -186,10 +182,9 @@ export async function POST(req) {
 
         return NextResponse.json({
             success: true,
-            message: 'Product received',
+            message: 'Product created successfully',
             newProduct,
             data,
-            thumbnailUrl,
             productImageUrls,
         }, { status: 200 });
 
