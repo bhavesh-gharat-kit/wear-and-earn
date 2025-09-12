@@ -149,7 +149,7 @@ async function createAdminUser() {
       console.log('- Current DATABASE_URL:', process.env.DATABASE_URL)
     }
   } finally {
-    await prisma.$disconnect()
+    //await prisma.$disconnect()
   }
 }
 

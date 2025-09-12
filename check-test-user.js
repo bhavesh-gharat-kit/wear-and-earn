@@ -7,7 +7,7 @@ async function checkTestUser() {
     orderBy: { id: 'desc' }
   });
   console.log(user);
-  await prisma.$disconnect();
+  //await prisma.$disconnect();
 }
 
 checkTestUser();

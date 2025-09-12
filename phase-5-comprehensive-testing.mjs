@@ -1002,7 +1002,7 @@ async function runPhase5ComprehensiveTesting() {
   } catch (error) {
     console.error('❌ Testing execution error:', error)
   } finally {
-    await prisma.$disconnect()
+    //await prisma.$disconnect()
   }
 }
 

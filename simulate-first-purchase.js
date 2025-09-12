@@ -156,7 +156,7 @@ async function simulateFirstPurchaseFlow() {
     console.error('❌ Error in simulation:', error.message);
     console.error('Stack:', error.stack);
   } finally {
-    await prisma.$disconnect();
+    //await prisma.$disconnect();
   }
 }
 

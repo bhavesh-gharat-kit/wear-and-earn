@@ -518,7 +518,7 @@ async function runPhase5RealSystemTesting() {
   } catch (error) {
     console.error('❌ Real system testing error:', error)
   } finally {
-    await prisma.$disconnect()
+    //await prisma.$disconnect()
   }
 }
 

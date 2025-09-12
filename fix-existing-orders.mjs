@@ -139,7 +139,7 @@ async function fixExistingPaidOrders() {
         console.error('❌ Error during fix:', error);
         console.error('Stack:', error.stack);
     } finally {
-        await prisma.$disconnect();
+        //await prisma.$disconnect();
     }
 }
 

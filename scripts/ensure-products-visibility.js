@@ -95,7 +95,7 @@ async function ensureProductsVisibility() {
   } catch (error) {
     console.error('❌ Error:', error);
   } finally {
-    await prisma.$disconnect();
+    //await prisma.$disconnect();
   }
 }
 

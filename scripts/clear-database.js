@@ -47,7 +47,7 @@ async function clearDatabase() {
       console.error('❌ Could not re-enable foreign key checks:', fkError);
     }
   } finally {
-    await prisma.$disconnect();
+    //await prisma.$disconnect();
   }
 }
 

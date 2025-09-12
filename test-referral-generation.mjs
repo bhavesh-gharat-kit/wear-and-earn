@@ -51,7 +51,7 @@ async function testReferralCodeGeneration() {
   } catch (error) {
     console.error('❌ Test failed:', error);
   } finally {
-    await prisma.$disconnect();
+    //await prisma.$disconnect();
   }
 }
 

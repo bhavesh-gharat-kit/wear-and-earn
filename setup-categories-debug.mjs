@@ -133,7 +133,7 @@ async function setupCategoriesAndTest() {
     console.error('❌ Setup failed:', error.message)
     console.error('Full error:', error)
   } finally {
-    await prisma.$disconnect()
+    //await prisma.$disconnect()
   }
 }
 

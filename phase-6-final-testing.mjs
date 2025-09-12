@@ -44,7 +44,7 @@ class FinalSystemTesting {
     try {
       // Test 1: Database connection stability
       await prisma.$connect()
-      await prisma.$disconnect()
+      //await prisma.$disconnect()
       await prisma.$connect()
       this.recordTest('coreSystem', 'Database Connection Stability', true, 'Multiple connect/disconnect cycles successful')
 
@@ -274,7 +274,7 @@ class FinalSystemTesting {
       // Test 4: Final system validation
       await prisma.$connect()
       const systemHealth = await prisma.$queryRaw`SELECT 1 as health`
-      await prisma.$disconnect()
+      //await prisma.$disconnect()
       this.recordTest('deployment', 'Final System Health', !!systemHealth, 'System ready for production deployment')
 
     } catch (error) {

@@ -240,6 +240,6 @@ export async function GET(req) {
       { status: 500 }
     )
   } finally {
-    await prisma.$disconnect()
+    // //await prisma.$disconnect()
   }
 }
