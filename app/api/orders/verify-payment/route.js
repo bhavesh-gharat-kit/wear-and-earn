@@ -140,6 +140,23 @@ export async function POST(req) {
       const result = await Promise.race([transactionPromise, transactionTimeout]);
       const updatedOrder = result;
 
+      // Fallback: Ensure referral code exists after payment (in case transaction timed out or failed to generate)
+      let finalReferralCode = updatedOrder.userReferralCode;
+      if (!finalReferralCode) {
+        try {
+          const { generateAndAssignReferralCode } = await import('@/lib/referral');
+          finalReferralCode = await generateAndAssignReferralCode(prisma, updatedOrder.user.id);
+          // Also mark user as active if not already
+          await prisma.user.update({
+            where: { id: updatedOrder.user.id },
+            data: { isActive: true }
+          });
+          console.log('✅ Fallback: Referral code generated after payment:', finalReferralCode);
+        } catch (err) {
+          console.error('❌ Fallback referral code generation failed:', err);
+        }
+      }
+
       const processingTime = Date.now() - startTime;
       console.log(`🎉 Payment verification completed successfully in ${processingTime}ms`);
 
@@ -155,7 +172,7 @@ export async function POST(req) {
           id: updatedOrder.user.id,
           fullName: updatedOrder.user.fullName,
           email: updatedOrder.user.email,
-          referralCode: updatedOrder.userReferralCode // Include referral code in response
+          referralCode: finalReferralCode // Use fallback if needed
         },
         orderProducts: updatedOrder.orderProducts.map(op => ({
           id: op.id.toString(), // Convert BigInt to string
@@ -169,7 +186,7 @@ export async function POST(req) {
         success: true, 
         message: 'Payment verified successfully',
         order: orderForResponse,
-        referralCode: updatedOrder.userReferralCode // Also include at top level for easy access
+        referralCode: finalReferralCode // Also include at top level for easy access
       })
     } else {
       console.log('❌ Payment signature verification failed');

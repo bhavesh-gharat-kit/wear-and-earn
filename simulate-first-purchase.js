@@ -84,7 +84,7 @@ async function simulateFirstPurchaseFlow() {
       const updatedOrder = await tx.order.update({
         where: { id: testOrder.id },
         data: {
-          status: 'paid',
+          status: 'inProcess',
           paidAt: new Date(),
           paymentId: `verified_${Date.now()}`
         },
