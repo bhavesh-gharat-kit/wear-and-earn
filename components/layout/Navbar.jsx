@@ -79,7 +79,7 @@ function Navbar() {
             <Link href={"/"}>
               <Image
                 alt="brand-logo"
-                src={"/images/brand-logo-png.png"}
+                src={"/images/brand-logo.png"}
                 className="rounded-xl h-14 md:h-16 w-auto object-contain transition-opacity hover:opacity-90 drop-shadow-sm"
                 width={200}
                 height={200}
