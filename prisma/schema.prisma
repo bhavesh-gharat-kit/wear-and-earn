@@ -8,82 +8,61 @@ datasource db {
 }
 
 model User {
-  id                     Int                     @id @default(autoincrement()) @db.UnsignedInt
-  sponsorId              Int?                    @db.UnsignedInt
-  fullName               String
-  email                  String?                 @unique(map: "User_email_key")
-  mobileNo               String                  @unique(map: "User_mobileNo_key")
-  password               String?
-  role                   String?                 @default("user")
-  createdAt              DateTime?               @default(now())
-  isVerified             Boolean                 @default(false)
-  verifyCode             String?
-  verifyCodeExpiry       DateTime?
-  isBlocked              Boolean                 @default(false)
-  gender                 String?
-  referralCode           String?                 @unique
-  isActive               Boolean                 @default(false)
-  lastMonthPurchase      Int                     @default(0)
-  monthlyPurchase        Int                     @default(0)
-  isEligibleRepurchase   Boolean                 @default(false)
-  walletBalance          Int                     @default(0)
-  directTeams            Int                     @default(0)
-  level                  Int                     @default(0)
-  teamCount              Int                     @default(0)
-  totalTeams             Int                     @default(0) // Total teams created by user (for admin tracking)
-  
-  // NEW MLM POOL PLAN FIELDS
-  currentLevel           MLMLevel                @default(NONE) // L1/L2/L3/L4/L5
-  firstPurchaseDate      DateTime?               // Track when user made first purchase
-  totalSelfIncomeEarned  Float                   @default(0) // Total self income earned
-  totalPoolIncomeEarned  Float                   @default(0) // Total pool income earned
-  kycStatus              KYCStatus               @default(PENDING) // Enhanced KYC status (renamed from kycStatusEnum)
-  
-  kycData                KycData?
-  address                Address?
-  cart                   Cart[]
-  
-  // NEW POOL MLM SYSTEM relationships
-  newWithdrawals         NewWithdrawal[]
-  orders                 Order[]                 @relation("UserOrders")
-  adminDistributions     PoolDistribution[]      @relation("AdminDistributions")
-  purchases              Purchase[]
-  selfIncomeInstallments SelfIncomeInstallment[]
-  teamMemberships        TeamMember[]
-  
-  // Enhanced Team Relationships for Pool Plan
-  teamsAsLeader          Team[]                  @relation("TeamLeader")
-  teamsAsMember1         Team[]                  @relation("TeamMember1")
-  teamsAsMember2         Team[]                  @relation("TeamMember2") 
-  teamsAsMember3         Team[]                  @relation("TeamMember3")
-  
-  // NEW MLM TABLES RELATIONSHIPS - Phase 1.2
-  selfIncomePayments     SelfIncomePayment[]     @relation("UserSelfIncomePayments")
-  adminSelfIncomePayments SelfIncomePayment[]    @relation("AdminSelfIncomePayments")
-  poolTransactions       PoolTransaction[]       @relation("UserPoolTransactions")
-  userReferrals          ReferralTracking[]      @relation("UserReferrals")
-  referredBy             ReferralTracking[]      @relation("UserReferredBy")
-  kycSubmissions         KYCSubmission[]         @relation("UserKYCSubmissions")
-  reviewedKYC            KYCSubmission[]         @relation("AdminReviewedKYC")
-  
-  walletTransactions     Wallet[]
-  payoutSchedules        SelfPayoutSchedule[]
-  
-  // Referral relationships
-  sponsor                User?                   @relation("UserSponsor", fields: [sponsorId], references: [id])
-  referrals              User[]                  @relation("UserSponsor")
-  
-  // Keep withdrawal system
-  processedWithdrawals   WithdrawalRequest[]     @relation("ProcessedWithdrawals")
-  withdrawalRequests     WithdrawalRequest[]     @relation("UserWithdrawals")
-
-  // OLD MLM SYSTEM (commented out - will be removed after full migration)
-  // generatedCommissions   Commission[]            @relation("CommissionSource")
-  // commissions            Commission[]            @relation("UserCommissions")
-  // ancestorHierarchy      Hierarchy[]             @relation("HierarchyAncestor")
-  // descendantHierarchy    Hierarchy[]             @relation("HierarchyDescendant")
-  ledgerEntries          Ledger[]
-  // node                   MatrixNode?
+  id                      Int                     @id @default(autoincrement()) @db.UnsignedInt
+  sponsorId               Int?                    @db.UnsignedInt
+  fullName                String
+  email                   String?                 @unique(map: "User_email_key")
+  mobileNo                String                  @unique(map: "User_mobileNo_key")
+  password                String?
+  role                    String?                 @default("user")
+  createdAt               DateTime?               @default(now())
+  isVerified              Boolean                 @default(false)
+  verifyCode              String?
+  verifyCodeExpiry        DateTime?
+  isBlocked               Boolean                 @default(false)
+  gender                  String?
+  isActive                Boolean                 @default(false)
+  isEligibleRepurchase    Boolean                 @default(false)
+  lastMonthPurchase       Int                     @default(0)
+  monthlyPurchase         Int                     @default(0)
+  referralCode            String?                 @unique
+  walletBalance           Int                     @default(0)
+  directTeams             Int                     @default(0)
+  kycStatus               KYCStatus               @default(PENDING)
+  level                   Int                     @default(0)
+  teamCount               Int                     @default(0)
+  currentLevel            MLMLevel                @default(NONE)
+  firstPurchaseDate       DateTime?
+  totalSelfIncomeEarned   Float                   @default(0)
+  totalPoolIncomeEarned   Float                   @default(0)
+  totalTeams              Int                     @default(0)
+  kycData                 KycData?
+  address                 Address?
+  cart                    Cart[]
+  reviewedKYC             KYCSubmission[]         @relation("AdminReviewedKYC")
+  kycSubmissions          KYCSubmission[]         @relation("UserKYCSubmissions")
+  ledgerEntries           Ledger[]
+  newWithdrawals          NewWithdrawal[]
+  orders                  Order[]                 @relation("UserOrders")
+  adminDistributions      PoolDistribution[]      @relation("AdminDistributions")
+  poolTransactions        PoolTransaction[]       @relation("UserPoolTransactions")
+  purchases               Purchase[]
+  referredBy              ReferralTracking[]      @relation("UserReferredBy")
+  userReferrals           ReferralTracking[]      @relation("UserReferrals")
+  selfIncomeInstallments  SelfIncomeInstallment[]
+  adminSelfIncomePayments SelfIncomePayment[]     @relation("AdminSelfIncomePayments")
+  selfIncomePayments      SelfIncomePayment[]     @relation("UserSelfIncomePayments")
+  payoutSchedules         SelfPayoutSchedule[]
+  teamMemberships         TeamMember[]
+  teamsAsMember1          Team[]                  @relation("TeamMember1")
+  teamsAsMember2          Team[]                  @relation("TeamMember2")
+  teamsAsMember3          Team[]                  @relation("TeamMember3")
+  teamsAsLeader           Team[]                  @relation("TeamLeader")
+  sponsor                 User?                   @relation("UserSponsor", fields: [sponsorId], references: [id])
+  referrals               User[]                  @relation("UserSponsor")
+  walletTransactions      Wallet[]
+  processedWithdrawals    WithdrawalRequest[]     @relation("ProcessedWithdrawals")
+  withdrawalRequests      WithdrawalRequest[]     @relation("UserWithdrawals")
 
   @@index([sponsorId], map: "users_sponsorId_fkey")
   @@index([referralCode])
@@ -118,31 +97,28 @@ model Category {
 }
 
 model Product {
-  id               Int            @id @default(autoincrement()) @db.UnsignedInt
+  id               Int               @id @default(autoincrement()) @db.UnsignedInt
   title            String
   description      String
-  longDescription  String         @db.Text
-  inStock          Int            @default(1)
-  categoryId       Int?           @db.UnsignedInt
-  isActive         Boolean        @default(false)
+  longDescription  String            @db.Text
+  inStock          Int               @default(1)
+  categoryId       Int?              @db.UnsignedInt
+  isActive         Boolean           @default(false)
   discount         Float?
   gst              Float?
   homeDelivery     Float?
   price            Float
   sellingPrice     Float
+  createdAt        DateTime?         @default(now())
   keyFeature       String?
-  type             ProductType    @default(REGULAR)
-  createdAt        DateTime?      @default(now())
-  // NEW PRICING STRUCTURE - Following the spec
-  productPrice     Float?         // Pr - Product Price (goes to company) - Optional for existing products
-  mlmPrice         Float?         // Pm - MLM Price (30% company, 70% pool) - Optional for existing products
+  type             ProductType       @default(REGULAR)
+  mlmPrice         Float?
+  productPrice     Float?
   cart             Cart[]
-  images           ProductImage[]
-  category         Category?      @relation(fields: [categoryId], references: [id])
-  purchases        Purchase[]
-  
-  // NEW MLM TABLES RELATIONSHIPS - Phase 1.2
   poolTransactions PoolTransaction[] @relation("ProductPoolTransactions")
+  images           ProductImage[]
+  category         Category?         @relation(fields: [categoryId], references: [id])
+  purchases        Purchase[]
 
   @@index([categoryId], map: "Product_categoryId_fkey")
   @@map("products")
@@ -185,17 +161,12 @@ model Order {
   status           OrderStatus
   createdAt        DateTime        @default(now())
   deliveredAt      DateTime?
-  isJoiningOrder   Boolean         @default(false)
   gatewayOrderId   String?         @unique
+  isJoiningOrder   Boolean         @default(false)
   paidAt           DateTime?
-  
-  // NEW POOL MLM SYSTEM relationships
   user             User?           @relation("UserOrders", fields: [userId], references: [id], onDelete: Restrict)
   orderProducts    OrderProducts[]
-  purchases        Purchase[]      // Pool MLM purchase tracking
-  
-  // OLD MLM SYSTEM (commented out)
-  // commissions      Commission[]
+  purchases        Purchase[]
 
   @@index([userId], map: "order_userId_fkey")
   @@index([gatewayOrderId])
@@ -222,45 +193,18 @@ model OrderProducts {
   @@map("orderproducts")
 }
 
-// Old MLM system - commented out
-// model MatrixNode {
-//   userId   Int          @id @db.UnsignedInt
-//   parentId Int?         @db.UnsignedInt
-//   position Int?
-//   parent   MatrixNode?  @relation("MatrixParent", fields: [parentId], references: [userId])
-//   children MatrixNode[] @relation("MatrixParent")
-//   user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-// 
-//   @@index([parentId])
-//   @@map("matrix_nodes")
-// }
-
-// model Hierarchy {
-//   id           Int  @id @default(autoincrement()) @db.UnsignedInt
-//   ancestorId   Int  @db.UnsignedInt
-//   descendantId Int  @db.UnsignedInt
-//   depth        Int
-//   ancestor     User @relation("HierarchyAncestor", fields: [ancestorId], references: [id], onDelete: Cascade)
-//   descendant   User @relation("HierarchyDescendant", fields: [descendantId], references: [id], onDelete: Cascade)
-// 
-//   @@unique([ancestorId, descendantId])
-//   @@index([descendantId, depth])
-//   @@index([ancestorId, depth])
-//   @@map("hierarchy")
-// }
-
 model Ledger {
   id           Int      @id @default(autoincrement()) @db.UnsignedInt
   userId       Int?     @db.UnsignedInt
   type         String
+  ref          String?  @unique
   amount       Int
-  description  String?
-  referenceId  String?
-  balanceAfter Int?
   levelDepth   Int?
   note         String?
   createdAt    DateTime @default(now())
-  ref          String?  @unique
+  balanceAfter Int?
+  description  String?
+  referenceId  String?
   user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, type])
@@ -286,28 +230,6 @@ model SelfPayoutSchedule {
   @@index([ref])
   @@map("self_payout_schedule")
 }
-
-// model Commission {
-//   id          Int      @id @default(autoincrement()) @db.UnsignedInt
-//   userId      Int      @db.UnsignedInt
-//   fromUserId  Int      @db.UnsignedInt
-//   orderId     Int?     @db.UnsignedInt
-//   amount      Int
-//   level       Int
-//   type        String
-//   description String?
-//   isEligible  Boolean  @default(true)
-//   createdAt   DateTime @default(now())
-//   fromUser    User     @relation("CommissionSource", fields: [fromUserId], references: [id], onDelete: Cascade)
-//   order       Order?   @relation(fields: [orderId], references: [id])
-//   user        User     @relation("UserCommissions", fields: [userId], references: [id], onDelete: Cascade)
-// 
-//   @@index([userId, type])
-//   @@index([fromUserId])
-//   @@index([orderId])
-//   @@index([createdAt])
-//   @@map("commissions")
-// }
 
 model Config {
   key   String @id
@@ -404,25 +326,20 @@ model Purchase {
   userId                 Int                     @db.UnsignedInt
   productId              Int                     @db.UnsignedInt
   orderId                Int                     @db.UnsignedInt
-  type                   String                  // "first" or "repurchase"
-  mlmAmount              Int                     // Original MLM amount field
-  
-  // NEW MLM POOL PLAN BREAKDOWN FIELDS
-  mlmPriceAtTime         Float?                  // MLM price when purchased (snapshot)
-  poolContributionAmount Float                   @default(0) // 70% of MLM price to pool
-  selfIncomeAmount       Float                   @default(0) // 20% of pool (only for first purchase)
-  companyShareAmount     Float                   @default(0) // 30% of MLM price to company
-  
+  type                   String
+  mlmAmount              Int
   createdAt              DateTime                @default(now())
+  companyShareAmount     Float                   @default(0)
+  mlmPriceAtTime         Float?
+  poolContributionAmount Float                   @default(0)
+  selfIncomeAmount       Float                   @default(0)
+  poolTransactions       PoolTransaction[]       @relation("PurchasePoolTransactions")
   order                  Order                   @relation(fields: [orderId], references: [id])
   product                Product                 @relation(fields: [productId], references: [id])
   user                   User                    @relation(fields: [userId], references: [id])
-  selfIncomeInstallments SelfIncomeInstallment[]
-  
-  // NEW MLM TABLES RELATIONSHIPS - Phase 1.2
-  selfIncomePayments     SelfIncomePayment[]     @relation("PurchaseSelfIncomePayments")
-  poolTransactions       PoolTransaction[]       @relation("PurchasePoolTransactions")
   referralFirstPurchases ReferralTracking[]      @relation("ReferralFirstPurchase")
+  selfIncomeInstallments SelfIncomeInstallment[]
+  selfIncomePayments     SelfIncomePayment[]     @relation("PurchaseSelfIncomePayments")
 
   @@index([userId])
   @@index([type])
@@ -472,29 +389,30 @@ model TurnoverPool {
 model PoolDistribution {
   id               Int          @id @default(autoincrement()) @db.UnsignedInt
   poolId           Int          @db.UnsignedInt
-  distributionType String       @default("POOL_PLAN") // POOL_PLAN, BONUS, etc.
-  totalAmount      Float        @default(0) // Total amount being distributed
-  l1Amount         Float        @default(0) // Amount distributed to L1 users
-  l2Amount         Float        @default(0) // Amount distributed to L2 users  
-  l3Amount         Float        @default(0) // Amount distributed to L3 users
-  l4Amount         Float        @default(0) // Amount distributed to L4 users
-  l5Amount         Float        @default(0) // Amount distributed to L5 users
-  l1UserCount      Int          @default(0) // Number of L1 users who received
-  l2UserCount      Int          @default(0) // Number of L2 users who received
-  l3UserCount      Int          @default(0) // Number of L3 users who received
-  l4UserCount      Int          @default(0) // Number of L4 users who received
-  l5UserCount      Int          @default(0) // Number of L5 users who received
-  status           String       @default("PENDING") // PENDING, COMPLETED, FAILED
-  adminId          Int?         @db.UnsignedInt // Admin who triggered distribution
-  distributedAt    DateTime?    // When distribution was completed
   createdAt        DateTime     @default(now())
-  pool             TurnoverPool @relation(fields: [poolId], references: [id])
+  adminId          Int?         @db.UnsignedInt
+  distributedAt    DateTime?
+  distributionType String       @default("POOL_PLAN")
+  l1Amount         Float        @default(0)
+  l1UserCount      Int          @default(0)
+  l2Amount         Float        @default(0)
+  l2UserCount      Int          @default(0)
+  l3Amount         Float        @default(0)
+  l3UserCount      Int          @default(0)
+  l4Amount         Float        @default(0)
+  l4UserCount      Int          @default(0)
+  l5Amount         Float        @default(0)
+  l5UserCount      Int          @default(0)
+  status           String       @default("PENDING")
+  totalAmount      Float        @default(0)
   admin            User?        @relation("AdminDistributions", fields: [adminId], references: [id])
+  pool             TurnoverPool @relation(fields: [poolId], references: [id])
 
   @@index([poolId])
   @@index([status])
   @@index([distributionType])
   @@index([createdAt])
+  @@index([adminId], map: "pool_distributions_adminId_fkey")
   @@map("pool_distributions")
 }
 
@@ -536,27 +454,28 @@ model NewWithdrawal {
 }
 
 model Team {
-  id                  Int          @id @default(autoincrement()) @db.UnsignedInt
-  teamLeaderId        Int          @db.UnsignedInt // Changed from userId to teamLeaderId
-  member1Id           Int?         @db.UnsignedInt // First referral
-  member2Id           Int?         @db.UnsignedInt // Second referral  
-  member3Id           Int?         @db.UnsignedInt // Third referral
-  formationDate       DateTime     @default(now()) // Changed from createdAt
-  completedAt         DateTime? // When team was completed (3 members)
-  status              TeamStatus   @default(FORMING) // FORMING/COMPLETE/DISBANDED
-  teamSequenceNumber  Int? // For tracking team order
-  
-  // Relationships
-  teamLeader          User         @relation("TeamLeader", fields: [teamLeaderId], references: [id])
-  member1             User?        @relation("TeamMember1", fields: [member1Id], references: [id])
-  member2             User?        @relation("TeamMember2", fields: [member2Id], references: [id])
-  member3             User?        @relation("TeamMember3", fields: [member3Id], references: [id])
-  members             TeamMember[] // Keep existing relationship for compatibility
+  id                 Int          @id @default(autoincrement()) @db.UnsignedInt
+  completedAt        DateTime?
+  formationDate      DateTime     @default(now())
+  member1Id          Int?         @db.UnsignedInt
+  member2Id          Int?         @db.UnsignedInt
+  member3Id          Int?         @db.UnsignedInt
+  status             TeamStatus   @default(FORMING)
+  teamLeaderId       Int          @db.UnsignedInt
+  teamSequenceNumber Int?
+  members            TeamMember[]
+  member1            User?        @relation("TeamMember1", fields: [member1Id], references: [id])
+  member2            User?        @relation("TeamMember2", fields: [member2Id], references: [id])
+  member3            User?        @relation("TeamMember3", fields: [member3Id], references: [id])
+  teamLeader         User         @relation("TeamLeader", fields: [teamLeaderId], references: [id])
 
   @@index([teamLeaderId])
   @@index([status])
   @@index([formationDate])
   @@index([teamSequenceNumber])
+  @@index([member1Id], map: "teams_member1Id_fkey")
+  @@index([member2Id], map: "teams_member2Id_fkey")
+  @@index([member3Id], map: "teams_member3Id_fkey")
   @@map("teams")
 }
 
@@ -573,6 +492,109 @@ model TeamMember {
   @@map("team_members")
 }
 
+model SelfIncomePayment {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  userId     Int       @db.UnsignedInt
+  purchaseId Int       @db.UnsignedInt
+  weekNumber Int
+  amount     Float     @default(0)
+  dueDate    DateTime
+  paidDate   DateTime?
+  status     String    @default("pending")
+  adminId    Int?      @db.UnsignedInt
+  adminNotes String?   @db.Text
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  admin      User?     @relation("AdminSelfIncomePayments", fields: [adminId], references: [id])
+  purchase   Purchase  @relation("PurchaseSelfIncomePayments", fields: [purchaseId], references: [id])
+  user       User      @relation("UserSelfIncomePayments", fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([purchaseId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([weekNumber])
+  @@index([adminId], map: "self_income_payments_adminId_fkey")
+  @@map("self_income_payments")
+}
+
+model PoolTransaction {
+  id              Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId          Int      @db.UnsignedInt
+  purchaseId      Int      @db.UnsignedInt
+  amountToPool    Float    @default(0)
+  transactionDate DateTime @default(now())
+  purchaseType    String   @default("first")
+  productId       Int      @db.UnsignedInt
+  mlmPriceAtTime  Float    @default(0)
+  poolContributed Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  product         Product  @relation("ProductPoolTransactions", fields: [productId], references: [id])
+  purchase        Purchase @relation("PurchasePoolTransactions", fields: [purchaseId], references: [id])
+  user            User     @relation("UserPoolTransactions", fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([purchaseId])
+  @@index([purchaseType])
+  @@index([transactionDate])
+  @@index([poolContributed])
+  @@index([productId], map: "pool_transactions_productId_fkey")
+  @@map("pool_transactions")
+}
+
+model ReferralTracking {
+  id                     Int       @id @default(autoincrement()) @db.UnsignedInt
+  referrerId             Int       @db.UnsignedInt
+  referredUserId         Int       @db.UnsignedInt
+  referralDate           DateTime  @default(now())
+  firstPurchaseCompleted Boolean   @default(false)
+  teamContributionStatus String    @default("pending")
+  referralCodeUsed       String?
+  firstPurchaseId        Int?      @db.UnsignedInt
+  firstPurchaseDate      DateTime?
+  teamFormationTriggered Boolean   @default(false)
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  firstPurchase          Purchase? @relation("ReferralFirstPurchase", fields: [firstPurchaseId], references: [id])
+  referredUser           User      @relation("UserReferredBy", fields: [referredUserId], references: [id])
+  referrer               User      @relation("UserReferrals", fields: [referrerId], references: [id])
+
+  @@index([referrerId])
+  @@index([referredUserId])
+  @@index([firstPurchaseCompleted])
+  @@index([teamContributionStatus])
+  @@index([referralDate])
+  @@index([firstPurchaseId], map: "referral_tracking_firstPurchaseId_fkey")
+  @@map("referral_tracking")
+}
+
+model KYCSubmission {
+  id                Int       @id @default(autoincrement()) @db.UnsignedInt
+  userId            Int       @db.UnsignedInt
+  submissionDate    DateTime  @default(now())
+  documentUrls      Json?
+  status            KYCStatus @default(PENDING)
+  adminComments     String?   @db.Text
+  reviewedByAdminId Int?      @db.UnsignedInt
+  reviewedDate      DateTime?
+  rejectionReason   String?   @db.Text
+  resubmissionCount Int       @default(0)
+  documentType      String?
+  verificationNotes String?   @db.Text
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  reviewedByAdmin   User?     @relation("AdminReviewedKYC", fields: [reviewedByAdminId], references: [id])
+  user              User      @relation("UserKYCSubmissions", fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([submissionDate])
+  @@index([reviewedByAdminId])
+  @@index([isActive])
+  @@map("kyc_submissions")
+}
+
 enum OrderStatus {
   inProcess
   pending
@@ -586,133 +608,25 @@ enum ProductType {
 }
 
 enum MLMLevel {
-  NONE   // Not yet qualified
-  L1     // 1 team (3 referrals)
-  L2     // 3 teams (9 referrals)
-  L3     // 9 teams (27 referrals)
-  L4     // 27 teams (81 referrals)
-  L5     // 81 teams (243 referrals)
+  NONE
+  L1
+  L2
+  L3
+  L4
+  L5
 }
 
 enum KYCStatus {
-  PENDING               // Initial state
-  SUBMITTED            // Documents submitted
-  UNDER_REVIEW         // Admin reviewing
-  APPROVED            // KYC approved - can withdraw
-  REJECTED            // KYC rejected
-  RESUBMISSION_REQUIRED // Need to resubmit
+  PENDING
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  RESUBMISSION_REQUIRED
 }
 
 enum TeamStatus {
-  FORMING   // Team is still forming (less than 3 members)
-  COMPLETE  // Team has 3 members
-  DISBANDED // Team was disbanded (for refunds/changes)
-}
-
-// ============================================================================
-// 🔥 NEW MLM POOL PLAN TABLES - PHASE 1.2
-// ============================================================================
-
-model SelfIncomePayment {
-  id          Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId      Int      @db.UnsignedInt
-  purchaseId  Int      @db.UnsignedInt
-  weekNumber  Int      // 1, 2, 3, or 4
-  amount      Float    @default(0)
-  dueDate     DateTime // For admin reference
-  paidDate    DateTime?
-  status      String   @default("pending") // pending/paid/failed
-  adminId     Int?     @db.UnsignedInt // Admin who processed payment
-  adminNotes  String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  user     User     @relation("UserSelfIncomePayments", fields: [userId], references: [id])
-  purchase Purchase @relation("PurchaseSelfIncomePayments", fields: [purchaseId], references: [id])
-  admin    User?    @relation("AdminSelfIncomePayments", fields: [adminId], references: [id])
-
-  @@index([userId])
-  @@index([purchaseId])
-  @@index([status])
-  @@index([dueDate])
-  @@index([weekNumber])
-  @@map("self_income_payments")
-}
-
-model PoolTransaction {
-  id              Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId          Int      @db.UnsignedInt
-  purchaseId      Int      @db.UnsignedInt
-  amountToPool    Float    @default(0) // 70% of MLM price goes to pool
-  transactionDate DateTime @default(now())
-  purchaseType    String   @default("first") // first/repurchase
-  productId       Int      @db.UnsignedInt
-  mlmPriceAtTime  Float    @default(0) // Store MLM price at time of purchase
-  poolContributed Boolean  @default(false) // Track if contributed to pool
-  createdAt       DateTime @default(now())
-  
-  user     User     @relation("UserPoolTransactions", fields: [userId], references: [id])
-  purchase Purchase @relation("PurchasePoolTransactions", fields: [purchaseId], references: [id])
-  product  Product  @relation("ProductPoolTransactions", fields: [productId], references: [id])
-
-  @@index([userId])
-  @@index([purchaseId])
-  @@index([purchaseType])
-  @@index([transactionDate])
-  @@index([poolContributed])
-  @@map("pool_transactions")
-}
-
-model ReferralTracking {
-  id                       Int      @id @default(autoincrement()) @db.UnsignedInt
-  referrerId               Int      @db.UnsignedInt
-  referredUserId           Int      @db.UnsignedInt
-  referralDate             DateTime @default(now())
-  firstPurchaseCompleted   Boolean  @default(false)
-  teamContributionStatus   String   @default("pending") // pending/contributed/failed
-  referralCodeUsed         String?  // Store the actual code used
-  firstPurchaseId          Int?     @db.UnsignedInt // Link to first purchase
-  firstPurchaseDate        DateTime?
-  teamFormationTriggered   Boolean  @default(false)
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
-  
-  referrer     User      @relation("UserReferrals", fields: [referrerId], references: [id])
-  referredUser User      @relation("UserReferredBy", fields: [referredUserId], references: [id])
-  firstPurchase Purchase? @relation("ReferralFirstPurchase", fields: [firstPurchaseId], references: [id])
-
-  @@index([referrerId])
-  @@index([referredUserId])
-  @@index([firstPurchaseCompleted])
-  @@index([teamContributionStatus])
-  @@index([referralDate])
-  @@map("referral_tracking")
-}
-
-model KYCSubmission {
-  id                   Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId               Int      @db.UnsignedInt
-  submissionDate       DateTime @default(now())
-  documentUrls         Json?    // Store document URLs as JSON array
-  status               KYCStatus @default(PENDING) // Using the enum
-  adminComments        String?   @db.Text
-  reviewedByAdminId    Int?      @db.UnsignedInt
-  reviewedDate         DateTime?
-  rejectionReason      String?   @db.Text
-  resubmissionCount    Int       @default(0)
-  documentType         String?   // ID card, passport, driver's license, etc.
-  verificationNotes    String?   @db.Text
-  isActive             Boolean   @default(true) // Latest submission is active
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  
-  user         User  @relation("UserKYCSubmissions", fields: [userId], references: [id])
-  reviewedByAdmin User? @relation("AdminReviewedKYC", fields: [reviewedByAdminId], references: [id])
-
-  @@index([userId])
-  @@index([status])
-  @@index([submissionDate])
-  @@index([reviewedByAdminId])
-  @@index([isActive])
-  @@map("kyc_submissions")
+  FORMING
+  COMPLETE
+  DISBANDED
 }

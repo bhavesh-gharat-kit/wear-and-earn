@@ -19,12 +19,12 @@ export async function GET(request) {
     // Overall KYC statistics
     const totalUsers = await prisma.user.count()
     const totalKycSubmissions = await prisma.user.count({
-      where: { kycDocument: { isNot: null } }
+      where: { kycData: { isNot: null } }
     })
     
     const kycStatusCounts = await prisma.user.groupBy({
       by: ['kycStatus'],
-      where: { kycDocument: { isNot: null } },
+      where: { kycData: { isNot: null } },
       _count: { kycStatus: true }
     })
 
@@ -39,17 +39,17 @@ export async function GET(request) {
     })
 
     // Processing time analysis
-    const processedKycs = await prisma.kycSubmission.findMany({
+    const processedKycs = await prisma.kycData.findMany({
       where: {
         AND: [
           { status: { in: ['approved', 'rejected'] } },
-          { reviewedDate: { not: null } },
-          { submissionDate: { gte: startDate } }
+          { reviewedAt: { not: null } },
+          { createdAt: { gte: startDate } }
         ]
       },
       select: {
-        submissionDate: true,
-        reviewedDate: true,
+        createdAt: true,
+        reviewedAt: true,
         status: true
       }
     })
@@ -62,8 +62,8 @@ export async function GET(request) {
     let rejectionCount = 0
 
     processedKycs.forEach(kyc => {
-      if (kyc.reviewedDate && kyc.submissionDate) {
-        const processingTimeMs = new Date(kyc.reviewedDate) - new Date(kyc.submissionDate)
+      if (kyc.reviewedAt && kyc.createdAt) {
+        const processingTimeMs = new Date(kyc.reviewedAt) - new Date(kyc.createdAt)
         const processingTimeHours = processingTimeMs / (1000 * 60 * 60)
         
         processingTimes.push(processingTimeHours)
@@ -92,31 +92,31 @@ export async function GET(request) {
       : 0
 
     // Rejection reasons analysis
-    const rejectionReasons = await prisma.kycSubmission.findMany({
+    const rejectionReasons = await prisma.kycData.findMany({
       where: {
         AND: [
           { status: 'rejected' },
-          { rejectionReason: { not: null } },
-          { submissionDate: { gte: startDate } }
+          { reviewNote: { not: null } },
+          { createdAt: { gte: startDate } }
         ]
       },
       select: {
-        rejectionReason: true
+        reviewNote: true
       }
     })
 
     const rejectionReasonCounts = {}
     rejectionReasons.forEach(reason => {
-      const reasonKey = reason.rejectionReason || 'Other'
+      const reasonKey = reason.reviewNote || 'Other'
       rejectionReasonCounts[reasonKey] = (rejectionReasonCounts[reasonKey] || 0) + 1
     })
 
     // Admin performance metrics
-    const adminPerformance = await prisma.kycSubmission.groupBy({
+    const adminPerformance = await prisma.kYCSubmission.groupBy({
       by: ['reviewedByAdminId'],
       where: {
         AND: [
-          { status: { in: ['approved', 'rejected'] } },
+          { status: { in: ['APPROVED', 'REJECTED'] } },
           { reviewedDate: { gte: startDate } },
           { reviewedByAdminId: { not: null } }
         ]
@@ -141,11 +141,11 @@ export async function GET(request) {
         const admin = admins.find(a => a.id === perf.reviewedByAdminId)
         
         // Calculate average processing time for this admin
-        const adminKycs = await prisma.kycSubmission.findMany({
+        const adminKycs = await prisma.kYCSubmission.findMany({
           where: {
             AND: [
               { reviewedByAdminId: perf.reviewedByAdminId },
-              { status: { in: ['approved', 'rejected'] } },
+              { status: { in: ['APPROVED', 'REJECTED'] } },
               { reviewedDate: { gte: startDate } },
               { reviewedDate: { not: null } },
               { submissionDate: { not: null } }
@@ -197,7 +197,7 @@ export async function GET(request) {
       const nextDate = new Date(date)
       nextDate.setDate(nextDate.getDate() + 1)
 
-      const dayStats = await prisma.kycSubmission.groupBy({
+      const dayStats = await prisma.kYCSubmission.groupBy({
         by: ['status'],
         where: {
           submissionDate: {

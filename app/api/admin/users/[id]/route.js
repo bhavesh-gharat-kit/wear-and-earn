@@ -119,7 +119,37 @@ export async function DELETE(request, { params }) {
                 where: { userId: userId }
             });
 
-            // 4. Delete orders (but keep them for business records - mark as deleted user instead)
+            // 4. Delete withdrawal requests
+            await tx.withdrawalRequest.deleteMany({
+                where: { userId: userId }
+            });
+
+            // 5. Delete wallet transactions
+            await tx.wallet.deleteMany({
+                where: { userId: userId }
+            });
+
+            // 6. Delete ledger entries
+            await tx.ledger.deleteMany({
+                where: { userId: userId }
+            });
+
+            // 7. Delete payout schedules
+            await tx.selfPayoutSchedule.deleteMany({
+                where: { userId: userId }
+            });
+
+            // 8. Delete purchases
+            await tx.purchase.deleteMany({
+                where: { userId: userId }
+            });
+
+            // 9. Delete self income installments
+            await tx.selfIncomeInstallment.deleteMany({
+                where: { userId: userId }
+            });
+
+            // 10. Update orders to remove user reference but keep order history
             await tx.order.updateMany({
                 where: { userId: userId },
                 data: { 
@@ -127,48 +157,13 @@ export async function DELETE(request, { params }) {
                 }
             });
 
-            // 5. Delete ledger entries
-            await tx.ledger.deleteMany({
-                where: { userId: userId }
-            });
-
-            // 6. Delete payout schedules
-            await tx.selfPayoutSchedule.deleteMany({
-                where: { userId: userId }
-            });
-
-            // 7. Delete matrix node
-            await tx.matrixNode.deleteMany({
-                where: { userId: userId }
-            });
-
-            // 8. Delete hierarchy entries
-            await tx.hierarchy.deleteMany({
-                where: { 
-                    OR: [
-                        { ancestorId: userId },
-                        { descendantId: userId }
-                    ]
-                }
-            });
-
-            // 9. Delete commissions
-            await tx.commission.deleteMany({
-                where: {
-                    OR: [
-                        { userId: userId },
-                        { sourceUserId: userId }
-                    ]
-                }
-            });
-
-            // 10. Update referrals to remove sponsor relationship
+            // 11. Update referrals to remove sponsor relationship
             await tx.user.updateMany({
                 where: { sponsorId: userId },
                 data: { sponsorId: null }
             });
 
-            // 11. Finally delete the user
+            // 12. Finally delete the user
             await tx.user.delete({
                 where: { id: userId }
             });

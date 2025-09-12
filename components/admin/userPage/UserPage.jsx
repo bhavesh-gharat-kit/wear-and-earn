@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { BiPencil, BiTrash } from "react-icons/bi";
+import { BiTrash } from "react-icons/bi";
 import { IoMdAdd } from "react-icons/io";
 import { IoMdSearch } from "react-icons/io";
 import axios from "axios";
 import toast from "react-hot-toast";
-import Link from "next/link";
 import moment from "moment";
 import PaginationComponent from "@/components/ui/PaginationComponent";
 import LoaderEffect from "@/components/ui/LoaderEffect";
@@ -153,7 +152,7 @@ function UserPage() {
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600 text-gray-900 dark:text-gray-100">
             {allUserDetails
               .filter((user) =>
-                user.email.includes(searchUserEmail.toLowerCase())
+                user.email && user.email.toLowerCase().includes(searchUserEmail.toLowerCase())
               )
               .map((user, index) => (
                 <tr key={user.id}>
@@ -165,12 +164,6 @@ function UserPage() {
                     {moment(user.createdAt).format("MM-DD-YYYY")}
                   </td>
                   <td className="p-3 space-x-2 flex items-center">
-                    <Link
-                      href={`/admin/users/edit/${user.id}`}
-                      className="text-white bg-indigo-600 px-3 py-2 rounded hover:bg-indigo-700 text-xs flex items-center cursor-pointer "
-                    >
-                      <BiPencil fontSize={16} />
-                    </Link>
                     <button
                       onClick={() => handleConfirmAction(user.id)}
                       className="text-white bg-red-600 px-3 py-2 rounded hover:bg-red-700 text-xs flex items-center cursor-pointer "

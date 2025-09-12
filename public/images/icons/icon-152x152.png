@@ -1,0 +1,5 @@
+<!-- Simple SVG placeholder icon -->
+<svg width="144" height="144" xmlns="http://www.w3.org/2000/svg">
+  <rect width="144" height="144" fill="#4F46E5"/>
+  <text x="72" y="80" text-anchor="middle" fill="white" font-family="Arial" font-size="20">WE</text>
+</svg>

@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '../../auth/[...nextauth]/route'
-import prisma from "@/lib/prisma";
-import { serializeBigInt, paisaToRupees } from '@/lib/serialization-utils'
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
+import prisma, { withConnection } from '@/lib/prisma';
+import { serializeBigInt, paisaToRupees } from '@/lib/serialization-utils';
 
 
 export async function GET(request) {
@@ -22,17 +22,19 @@ export async function GET(request) {
     const limit = parseInt(searchParams.get('limit')) || 20
     const type = searchParams.get('type') // filter by transaction type
 
-    // Get user wallet info
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        walletBalance: true,
-        monthlyPurchase: true,
-        lastMonthPurchase: true,
-        isActive: true,
-        isKycApproved: true
-      }
-    })
+    // Get user wallet info with connection handling
+    const user = await withConnection(async (db) => {
+      return await db.user.findUnique({
+        where: { id: userId },
+        select: {
+          walletBalance: true,
+          monthlyPurchase: true,
+          lastMonthPurchase: true,
+          isActive: true,
+          kycStatus: true
+        }
+      });
+    });
 
     if (!user) {
       return NextResponse.json(
@@ -47,69 +49,110 @@ export async function GET(request) {
       whereClause.type = type
     }
 
-    // Get wallet transactions
-    const transactions = await prisma.ledger.findMany({
-      where: whereClause,
-      orderBy: { createdAt: 'desc' },
-      skip: (page - 1) * limit,
-      take: limit,
-      select: {
-        id: true,
-        type: true,
-        amount: true,
-        levelDepth: true,
-        note: true,
-        ref: true,
-        createdAt: true
-      }
-    })
+    // Get wallet transactions with error handling
+    let transactions = [];
+    let totalTransactions = 0;
+    
+    try {
+      transactions = await withConnection(async (db) => {
+        return await db.ledger.findMany({
+          where: whereClause,
+          orderBy: { createdAt: 'desc' },
+          skip: (page - 1) * limit,
+          take: limit,
+          select: {
+            id: true,
+            type: true,
+            amount: true,
+            levelDepth: true,
+            note: true,
+            ref: true,
+            createdAt: true
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error fetching wallet transactions:', error);
+      transactions = [];
+    }
 
-    const totalTransactions = await prisma.ledger.count({
-      where: whereClause
-    })
+    try {
+      totalTransactions = await withConnection(async (db) => {
+        return await db.ledger.count({
+          where: whereClause
+        });
+      });
+    } catch (error) {
+      console.error('Error counting wallet transactions:', error);
+      totalTransactions = 0;
+    }
 
-    // Get pending self payouts
-    const pendingPayouts = await prisma.selfPayoutSchedule.findMany({
-      where: { 
-        userId: userId,
-        status: 'scheduled'
-      },
-      orderBy: { dueAt: 'asc' },
-      select: {
-        id: true,
-        amount: true,
-        dueAt: true,
-        status: true,
-        orderId: true
-      }
-    })
+    // Get pending self payouts with error handling
+    let pendingPayouts = [];
+    try {
+      pendingPayouts = await withConnection(async (db) => {
+        return await db.selfPayoutSchedule.findMany({
+          where: { 
+            userId: userId,
+            status: 'scheduled'
+          },
+          orderBy: { dueAt: 'asc' },
+          select: {
+            id: true,
+            amount: true,
+            dueAt: true,
+            status: true,
+            orderId: true
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error fetching pending payouts:', error);
+      pendingPayouts = [];
+    }
 
-    // Calculate earnings summary
-    const earningsSummary = await prisma.ledger.groupBy({
-      by: ['type'],
-      where: { userId: userId },
-      _sum: {
-        amount: true
-      }
-    })
+    // Calculate earnings summary with error handling
+    let earningsSummary = [];
+    try {
+      earningsSummary = await withConnection(async (db) => {
+        return await db.ledger.groupBy({
+          by: ['type'],
+          where: { userId: userId },
+          _sum: {
+            amount: true
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error calculating earnings summary:', error);
+      earningsSummary = [];
+    }
 
-    // Get monthly earnings for current month
+    // Get monthly earnings for current month with error handling
     const currentMonth = new Date()
     currentMonth.setDate(1)
     currentMonth.setHours(0, 0, 0, 0)
 
-    const monthlyEarnings = await prisma.ledger.aggregate({
-      where: {
-        userId: userId,
-        createdAt: { gte: currentMonth },
-        type: {
-          in: ['sponsor_commission', 'repurchase_commission', 'self_joining_instalment']
-        }
-      },
-      _sum: {
-        amount: true
-      }
-    })
+    let monthlyEarnings = { _sum: { amount: 0 } };
+    try {
+      monthlyEarnings = await withConnection(async (db) => {
+        return await db.ledger.aggregate({
+          where: {
+            userId: userId,
+            createdAt: { gte: currentMonth },
+            type: {
+              in: ['sponsor_commission', 'repurchase_commission', 'self_joining_instalment']
+            }
+          },
+          _sum: {
+            amount: true
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error calculating monthly earnings:', error);
+      monthlyEarnings = { _sum: { amount: 0 } };
+    }
 
     // Format earnings by type
     const earningsByType = {}
@@ -191,9 +234,9 @@ export async function GET(request) {
       },
       status: {
         isActive: user.isActive,
-        isKycApproved: user.isKycApproved,
-        canEarnCommissions: user.isActive && user.isKycApproved && user.monthlyPurchase >= 50000
-      }
+        kycStatus: user.kycStatus,
+        canEarnCommissions: user.isActive && user.kycStatus === 'APPROVED' && user.monthlyPurchase >= 30000
+      },
     }
 
     return NextResponse.json(serializeBigInt(walletData))

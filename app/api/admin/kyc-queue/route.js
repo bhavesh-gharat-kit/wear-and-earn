@@ -19,165 +19,128 @@ export async function GET(request) {
     const sortBy = searchParams.get('sortBy') || 'submittedAt'
     const sortOrder = searchParams.get('sortOrder') || 'desc'
 
-    // Build where clause
-    const whereClause = {
-      kycDocument: {
-        isNot: null
-      }
-    }
+    // Build where clause for KycData
+    const kycWhereClause = {}
 
     // Filter by status
     if (status !== 'all') {
-      whereClause.kycDocument.status = status
+      kycWhereClause.status = status
     }
 
-    // Search filter
+    // Search filter - search in the related user data
+    let userWhereClause = {}
     if (search) {
-      whereClause.OR = [
-        { fullName: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
+      userWhereClause.OR = [
+        { fullName: { contains: search } },
+        { email: { contains: search } },
         { mobileNo: { contains: search } }
       ]
     }
 
-    // Get total count
-    const totalCount = await prisma.user.count({ where: whereClause })
+    // Get total count from KycData directly
+    const totalCount = await prisma.kycData.count({ 
+      where: {
+        ...kycWhereClause,
+        user: userWhereClause
+      }
+    })
+    
+    // Calculate pagination
+    const skip = (page - 1) * limit
+    const totalPages = Math.ceil(totalCount / limit)
 
-    // Get paginated results
-    const users = await prisma.user.findMany({
-      where: whereClause,
+    // Get paginated results from KycData
+    const kycSubmissions = await prisma.kycData.findMany({
+      where: {
+        ...kycWhereClause,
+        user: userWhereClause
+      },
       include: {
-        kycDocument: true,
-        kycSubmissions: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-          include: {
-            reviewedByAdmin: {
-              select: {
-                id: true,
-                fullName: true,
-                email: true
-              }
-            }
-          }
-        }
+        user: true
       },
+      skip,
+      take: limit,
       orderBy: {
-        kycDocument: {
-          [sortBy === 'submittedAt' ? 'createdAt' : sortBy]: sortOrder
-        }
-      },
-      skip: (page - 1) * limit,
-      take: limit
+        [sortBy]: sortOrder
+      }
     })
 
     // Get statistics
-    const stats = await prisma.user.groupBy({
-      by: ['kycStatus'],
-      where: {
-        kycDocument: { isNot: null }
+    const totalKycSubmissions = await prisma.kycData.count()
+
+    const pendingCount = await prisma.kycData.count({
+      where: { status: 'pending' }
+    })
+
+    const approvedCount = await prisma.kycData.count({
+      where: { status: 'approved' }
+    })
+
+    const rejectedCount = await prisma.kycData.count({
+      where: { status: 'rejected' }
+    })
+
+    const statistics = {
+      total: totalKycSubmissions,
+      pending: pendingCount,
+      approved: approvedCount,
+      rejected: rejectedCount,
+      averageProcessingDays: 0
+    }
+
+    // Transform KYC submissions data
+    const transformedUsers = kycSubmissions.map(kycData => ({
+      id: kycData.user.id,
+      fullName: kycData.user.fullName,
+      email: kycData.user.email,
+      mobileNo: kycData.user.mobileNo,
+      kycStatus: kycData.user.kycStatus,
+      kycData: {
+        id: kycData.id,
+        fullName: kycData.fullName,
+        dateOfBirth: kycData.dateOfBirth,
+        gender: kycData.gender,
+        fatherName: kycData.fatherName,
+        aadharNumber: kycData.aadharNumber,
+        panNumber: kycData.panNumber,
+        bankAccountNumber: kycData.bankAccountNumber,
+        ifscCode: kycData.ifscCode,
+        bankName: kycData.bankName,
+        branchName: kycData.branchName,
+        nomineeName: kycData.nomineeName,
+        nomineeRelation: kycData.nomineeRelation,
+        status: kycData.status,
+        submittedAt: kycData.submittedAt,
+        reviewedAt: kycData.reviewedAt,
+        reviewNote: kycData.reviewNote,
       },
-      _count: {
-        kycStatus: true
-      }
-    })
-
-    const statusStats = {}
-    stats.forEach(stat => {
-      statusStats[stat.kycStatus] = stat._count.kycStatus
-    })
-
-    // Calculate processing time averages
-    const processedKycs = await prisma.kycSubmission.findMany({
-      where: {
-        status: { in: ['approved', 'rejected'] },
-        reviewedDate: { not: null }
-      },
-      select: {
-        submissionDate: true,
-        reviewedDate: true,
-        status: true
-      }
-    })
-
-    let totalProcessingTime = 0
-    let processedCount = 0
-
-    processedKycs.forEach(kyc => {
-      if (kyc.reviewedDate && kyc.submissionDate) {
-        const processingTime = new Date(kyc.reviewedDate) - new Date(kyc.submissionDate)
-        totalProcessingTime += processingTime
-        processedCount++
-      }
-    })
-
-    const averageProcessingTime = processedCount > 0 
-      ? Math.round(totalProcessingTime / processedCount / (1000 * 60 * 60 * 24)) // Convert to days
-      : 0
-
-    // Format response
-    const formattedUsers = users.map(user => ({
-      id: user.id,
-      fullName: user.fullName,
-      email: user.email,
-      mobileNo: user.mobileNo,
-      registeredAt: user.createdAt,
-      kycStatus: user.kycStatus,
-      isKycApproved: user.isKycApproved,
-      kycApprovedAt: user.kycApprovedAt,
-      kycDocument: user.kycDocument ? {
-        id: user.kycDocument.id,
-        documentType: user.kycDocument.documentType,
-        documentNumber: user.kycDocument.documentNumber,
-        status: user.kycDocument.status,
-        submittedAt: user.kycDocument.createdAt,
-        reviewedAt: user.kycDocument.reviewedAt,
-        adminNotes: user.kycDocument.adminNotes,
-        rejectionReasons: user.kycDocument.rejectionReasons,
-        frontImageUrl: user.kycDocument.frontImageUrl,
-        backImageUrl: user.kycDocument.backImageUrl,
-        selfieUrl: user.kycDocument.selfieUrl,
-        hasDocuments: !!(user.kycDocument.frontImageUrl || user.kycDocument.backImageUrl)
-      } : null,
-      latestSubmission: user.kycSubmissions[0] || null,
-      waitingDays: user.kycDocument?.createdAt 
-        ? Math.floor((new Date() - new Date(user.kycDocument.createdAt)) / (1000 * 60 * 60 * 24))
+      waitingDays: kycData.submittedAt 
+        ? Math.floor((new Date() - new Date(kycData.submittedAt)) / (1000 * 60 * 60 * 24))
         : 0
     }))
 
     return NextResponse.json({
       success: true,
       data: {
-        users: formattedUsers,
+        users: transformedUsers,
+        statistics,
         pagination: {
           currentPage: page,
-          totalPages: Math.ceil(totalCount / limit),
-          totalCount,
-          limit,
-          hasNext: page < Math.ceil(totalCount / limit),
-          hasPrev: page > 1
-        },
-        statistics: {
-          total: totalCount,
-          pending: statusStats.PENDING || 0,
-          approved: statusStats.APPROVED || 0,
-          rejected: statusStats.REJECTED || 0,
-          averageProcessingDays: averageProcessingTime
-        },
-        filters: {
-          status,
-          search,
-          sortBy,
-          sortOrder
+          totalPages,
+          totalResults: totalCount,
+          hasNext: page < totalPages,
+          hasPrev: page > 1,
+          total: totalCount
         }
       }
     })
 
   } catch (error) {
     console.error('Error fetching KYC queue:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to fetch KYC queue',
+      message: error.message
+    }, { status: 500 })
   }
 }

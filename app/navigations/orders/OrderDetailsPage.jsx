@@ -14,7 +14,6 @@ import {
   Truck
 } from 'lucide-react';
 import LoaderEffect from '@/components/ui/LoaderEffect';
-import PostPurchaseReferral from '@/components/referral/PostPurchaseReferral';
 import toast from 'react-hot-toast';
 
 export default function OrderDetailsPage({ orderId }) {
@@ -231,11 +230,6 @@ export default function OrderDetailsPage({ orderId }) {
                 </div>
               </div>
             </div>
-
-            {/* Post Purchase Referral - Show for paid orders */}
-            {order.paymentId && (
-              <PostPurchaseReferral orderId={order.id} className="mb-6" />
-            )}
 
             {/* Delivery Status */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">

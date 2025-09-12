@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../auth/[...nextauth]/route'
-import prisma from "@/lib/prisma";
+import prisma, { withConnection } from "@/lib/prisma";
 import { serializeBigInt, paisaToRupees } from '@/lib/serialization-utils'
 
 
@@ -18,30 +18,34 @@ export async function GET(req) {
 
     const userId = parseInt(session.user.id)
 
-    // Get user MLM data
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        fullName: true,
-        isActive: true,
-        referralCode: true,
-        sponsorId: true,
-        isKycApproved: true,
-        walletBalance: true,
-        monthlyPurchase: true,
-        lastMonthPurchase: true,
-        isEligibleRepurchase: true,
-        createdAt: true,
-        sponsor: {
-          select: {
-            id: true,
-            fullName: true,
-            referralCode: true
+    // Get user MLM data with connection handling
+    const user = await withConnection(async (db) => {
+      return await db.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          fullName: true,
+          isActive: true,
+          referralCode: true,
+          sponsorId: true,
+          kycStatus: true,
+          walletBalance: true,
+          monthlyPurchase: true,
+          lastMonthPurchase: true,
+          isEligibleRepurchase: true,
+          teamCount: true,
+          directTeams: true,
+          createdAt: true,
+          sponsor: {
+            select: {
+              id: true,
+              fullName: true,
+              referralCode: true
+            }
           }
         }
-      }
-    })
+      });
+    });
 
     if (!user) {
       return NextResponse.json(
@@ -50,72 +54,111 @@ export async function GET(req) {
       )
     }
 
-    // Get total team count (all downline members)
-    const teamCount = await prisma.hierarchy.count({
-      where: { ancestorId: userId }
-    })
+    // Get total team count from user record (already calculated)
+    const teamCount = user.teamCount || 0
 
-    // Get direct referrals count
-    const directReferrals = await prisma.user.count({
-      where: { sponsorId: userId }
-    })
+    // Get direct referrals count with error handling
+    let directReferrals = 0;
+    try {
+      directReferrals = await withConnection(async (db) => {
+        return await db.user.count({
+          where: { sponsorId: userId }
+        });
+      });
+    } catch (error) {
+      console.error('Error counting direct referrals:', error);
+      // Use fallback from user record if available
+      directReferrals = user.directTeams || 0;
+    }
 
-    // Get wallet transactions for recent activity
-    const recentTransactions = await prisma.ledger.findMany({
-      where: { userId: userId },
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-      select: {
-        id: true,
-        type: true,
-        amount: true,
-        note: true,
-        createdAt: true,
-        levelDepth: true
-      }
-    })
+    // Get wallet transactions for recent activity with error handling
+    let recentTransactions = [];
+    try {
+      recentTransactions = await withConnection(async (db) => {
+        return await db.ledger.findMany({
+          where: { userId: userId },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+          select: {
+            id: true,
+            type: true,
+            amount: true,
+            note: true,
+            createdAt: true,
+            levelDepth: true
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error fetching recent transactions:', error);
+      recentTransactions = [];
+    }
 
-    // Get pending self payouts
-    const pendingPayouts = await prisma.selfPayoutSchedule.findMany({
-      where: { 
-        userId: userId,
-        status: 'scheduled',
-        dueAt: { lte: new Date() }
-      },
-      orderBy: { dueAt: 'asc' },
-      take: 5
-    })
+    // Get pending self payouts with error handling
+    let pendingPayouts = [];
+    try {
+      pendingPayouts = await withConnection(async (db) => {
+        return await db.selfPayoutSchedule.findMany({
+          where: { 
+            userId: userId,
+            status: 'scheduled',
+            dueAt: { lte: new Date() }
+          },
+          orderBy: { dueAt: 'asc' },
+          take: 5
+        });
+      });
+    } catch (error) {
+      console.error('Error fetching pending payouts:', error);
+      pendingPayouts = [];
+    }
 
-    // Calculate total commission earned
-    const commissionStats = await prisma.ledger.aggregate({
-      where: {
-        userId: userId,
-        type: {
-          in: ['sponsor_commission', 'repurchase_commission', 'self_joining_instalment']
-        }
-      },
-      _sum: {
-        amount: true
-      }
-    })
+    // Calculate total commission earned with error handling
+    let commissionStats = { _sum: { amount: 0 } };
+    try {
+      commissionStats = await withConnection(async (db) => {
+        return await db.ledger.aggregate({
+          where: {
+            userId: userId,
+            type: {
+              in: ['sponsor_commission', 'repurchase_commission', 'self_joining_instalment']
+            }
+          },
+          _sum: {
+            amount: true
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error calculating commission stats:', error);
+      commissionStats = { _sum: { amount: 0 } };
+    }
 
-    // Get current month's commission
+    // Get current month's commission with error handling
     const currentMonth = new Date()
     currentMonth.setDate(1)
     currentMonth.setHours(0, 0, 0, 0)
 
-    const monthlyCommission = await prisma.ledger.aggregate({
-      where: {
-        userId: userId,
-        type: {
-          in: ['sponsor_commission', 'repurchase_commission', 'self_joining_instalment']
-        },
-        createdAt: { gte: currentMonth }
-      },
-      _sum: {
-        amount: true
-      }
-    })
+    let monthlyCommission = { _sum: { amount: 0 } };
+    try {
+      monthlyCommission = await withConnection(async (db) => {
+        return await db.ledger.aggregate({
+          where: {
+            userId: userId,
+            type: {
+              in: ['sponsor_commission', 'repurchase_commission', 'self_joining_instalment']
+            },
+            createdAt: { gte: currentMonth }
+          },
+          _sum: {
+            amount: true
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error calculating monthly commission:', error);
+      monthlyCommission = { _sum: { amount: 0 } };
+    }
 
     // Format response data
   const origin = req?.nextUrl?.origin || process.env.NEXTAUTH_URL;
@@ -126,7 +169,7 @@ export async function GET(req) {
         isActive: user.isActive,
         referralCode: user.referralCode,
   referralLink: (user.referralCode && origin) ? `${origin}/login-register?spid=${user.id}` : null,
-        isKycApproved: user.isKycApproved,
+        kycStatus: user.kycStatus,
         walletBalance: {
           paisa: user.walletBalance,
           rupees: paisaToRupees(user.walletBalance)
@@ -185,14 +228,7 @@ export async function GET(req) {
           createdAt: tx.createdAt
         }))
       },
-      kycStatus: {
-        isApproved: user.isKycApproved,
-        requiredForEarnings: true,
-        minimumMonthlyPurchase: {
-          paisa: 50000, // ₹500
-          rupees: paisaToRupees(50000)
-        }
-      }
+      kycStatus: true,
     }
 
     return NextResponse.json(serializeBigInt(mlmData))
