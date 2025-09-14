@@ -71,7 +71,7 @@ export async function GET(request) {
 
       // Check team formation
       const [completeTeams, incompleteTeams] = await Promise.all([
-        prisma.team.count({ where: { isComplete: true } }),
+        prisma.team.count({ where: { status: 'COMPLETE' } }),
         prisma.team.count({ where: { isComplete: false } })
       ])
 
