@@ -126,7 +126,7 @@ export async function GET(request) {
       include: {
         distributions: {
           select: {
-            amount: true,
+            totalAmount: true,
             user: { select: { id: true } }
           }
         }
