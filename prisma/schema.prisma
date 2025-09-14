@@ -119,6 +119,7 @@ model Product {
   images           ProductImage[]
   category         Category?         @relation(fields: [categoryId], references: [id])
   purchases        Purchase[]
+  orderProducts    OrderProducts[]
 
   @@index([categoryId], map: "Product_categoryId_fkey")
   @@map("products")
@@ -175,9 +176,9 @@ model Order {
 }
 
 model OrderProducts {
-  id           BigInt @id @default(autoincrement()) @db.UnsignedBigInt
-  orderId      Int    @db.UnsignedInt
-  productId    Int?
+  id           BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
+  orderId      Int     @db.UnsignedInt
+  productId    Int     @db.UnsignedInt
   title        String
   quantity     Int
   sellingPrice Float
@@ -186,7 +187,8 @@ model OrderProducts {
   finalMRP     Float
   homeDelivery Float
   totalPrice   Float
-  order        Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([orderId], map: "orderproducts_orderId_fkey")
   @@index([productId], map: "orderproducts_productId_fkey")
