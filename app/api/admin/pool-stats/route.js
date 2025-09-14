@@ -17,7 +17,7 @@ export async function GET() {
     // Get total pool amount
     const totalPoolAmount = await prisma.turnoverPool.aggregate({
       _sum: {
-        amount: true
+        totalAmount: true
       }
     });
 
