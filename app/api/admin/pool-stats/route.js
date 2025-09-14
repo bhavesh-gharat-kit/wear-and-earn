@@ -23,9 +23,7 @@ export async function GET() {
 
     // Get active teams count
     const activeTeams = await prisma.team.count({
-      where: {
-        isComplete: true
-      }
+      where: { status: 'COMPLETE' }
     });
 
     // Get L5 users count

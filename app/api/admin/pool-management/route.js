@@ -54,7 +54,7 @@ export async function GET(request) {
           take: 10,
           include: {
             distributions: {
-              select: { totalAmount: true, user: { select: { id: true } } }
+              select: { totalAmount: true }
             }
           }
         })
