@@ -24,8 +24,8 @@ export async function POST(request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Check if user is KYC approved
-    if (!user.isKycApproved || !user.kycData || user.kycData.status !== 'approved') {
+    // Check if user is KYC approved (dual field verification)
+    if (user.kycStatus !== 'APPROVED' || !user.kycData || user.kycData.status !== 'approved') {
       return NextResponse.json({ 
         error: 'KYC verification required to withdraw funds' 
       }, { status: 400 })

@@ -2361,17 +2361,7 @@ const AccountDashboard = () => {
               {/* Wallet Options */}
               <WalletActions walletBalance={walletData?.balance?.rupees || 0} />
 
-              {/* Quick Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Total Earnings</p>
-                  <p className="text-xl font-semibold text-gray-900 dark:text-white">₹{walletData?.earnings?.total?.rupees?.toFixed(2) || '0.00'}</p>
-                </div>
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 dark:text-gray-300">This Month</p>
-                  <p className="text-xl font-semibold text-gray-900 dark:text-white">₹{walletData?.earnings?.monthly?.rupees?.toFixed(2) || '0.00'}</p>
-                </div>
-              </div>
+
             </div>
           )}
           
@@ -2387,25 +2377,26 @@ const AccountDashboard = () => {
               <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">KYC Verification</h2>
               
               {/* KYC Status */}
-              <div className="bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 p-4 rounded-lg mb-6">
-                <div className="flex items-center gap-3">
-                  <div className={`w-4 h-4 rounded-full ${
-                    userData?.isKycApproved ? 'bg-green-500' : 
-                    kycData?.status === 'pending' ? 'bg-yellow-500' : 
-                    kycData?.status === 'rejected' ? 'bg-red-500' : 'bg-gray-400'
-                  }`}></div>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    Status: {
-                      userData?.isKycApproved ? '✅ Verified' : 
-                      kycData?.status === 'pending' ? '⏳ Under Review' :
-                      kycData?.status === 'rejected' ? '❌ Rejected' : '⏳ Pending Verification'
-                    }
-                  </p>
+              {/* Only show status row if not fully verified */}
+              {!(userData?.kycStatus === 'APPROVED' && kycData?.status === 'approved') && (
+                <div className="bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 p-4 rounded-lg mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-4 h-4 rounded-full ${
+                      kycData?.status === 'pending' ? 'bg-yellow-500' : 
+                      kycData?.status === 'rejected' ? 'bg-red-500' : 'bg-gray-400'
+                    }`}></div>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      Status: {
+                        kycData?.status === 'pending' ? '⏳ Under Review' :
+                        kycData?.status === 'rejected' ? '❌ Rejected' : '⏳ Pending Verification'
+                      }
+                    </p>
+                  </div>
+                  {kycData?.status === 'rejected' && kycData?.reviewNote && (
+                    <p className="text-red-600 dark:text-red-400 mt-2 text-sm">Reason: {kycData.reviewNote}</p>
+                  )}
                 </div>
-                {kycData?.status === 'rejected' && kycData?.reviewNote && (
-                  <p className="text-red-600 dark:text-red-400 mt-2 text-sm">Reason: {kycData.reviewNote}</p>
-                )}
-              </div>
+              )}
 
               {/* KYC Form */}
               <KYCForm userData={userData} kycData={kycData} onSubmit={() => fetchKycData()} />
