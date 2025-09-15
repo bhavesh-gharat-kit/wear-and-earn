@@ -510,6 +510,7 @@ export default function PoolManagementPanel() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Date</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Amount</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Users</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Level Breakdown</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
@@ -524,6 +525,20 @@ export default function PoolManagementPanel() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                         {dist.userCount}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                        {/* Show level breakdown if available */}
+                        {dist.levelBreakdown ? (
+                          <div className="space-y-1">
+                            {Object.entries(dist.levelBreakdown).map(([level, info]) => (
+                              <div key={level} className="flex justify-between text-xs">
+                                <span className="font-semibold">L{level}:</span>
+                                <span>{info.users} users</span>
+                                <span>₹{info.amount}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : '—'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 dark:text-green-400">
                         Completed
