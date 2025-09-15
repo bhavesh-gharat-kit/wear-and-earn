@@ -93,7 +93,7 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
   }
 
   // If user is already verified
-  if (userData?.isKycApproved) {
+  if (userData?.kycStatus === 'APPROVED' && kycData?.status === 'approved') {
     return (
       <div className="text-center py-12">
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
@@ -390,7 +390,7 @@ const WalletActions = ({ walletBalance }) => {
                 Available balance: ₹{walletBalance?.toFixed(2) || '0.00'}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Minimum withdrawal: ₹500
+                Minimum withdrawal: ₹300
               </p>
             </div>
 
@@ -1018,12 +1018,12 @@ const AccountDashboard = () => {
             />
             <button
               onClick={handleWithdraw}
-              disabled={withdrawLoading || !userData?.isKycApproved}
+              disabled={withdrawLoading || !(userData?.kycStatus === 'APPROVED' && kycData?.status === 'approved')}
               className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {withdrawLoading ? 'Processing...' : 'Withdraw Funds'}
             </button>
-            {!userData?.isKycApproved && (
+            {!(userData?.kycStatus === 'APPROVED' && kycData?.status === 'approved') && (
               <p className="text-xs text-red-600 dark:text-red-400 text-center">
                 Complete KYC verification to withdraw funds
               </p>

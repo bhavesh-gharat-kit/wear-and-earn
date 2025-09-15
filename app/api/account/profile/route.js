@@ -17,11 +17,16 @@ export async function GET() {
 
     const userId = parseInt(session.user.id)
 
-    // Get user profile data with address
+    // Get user profile data with address and KYC status
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        address: true
+        address: true,
+        kycData: {
+          select: {
+            status: true
+          }
+        }
       }
     })
 
@@ -41,6 +46,7 @@ export async function GET() {
       gender: user.gender,
       role: user.role,
       isVerified: user.isVerified,
+      kycStatus: user.kycStatus,
       createdAt: user.createdAt,
       address: user.address ? {
         houseNumber: user.address.houseNumber,
