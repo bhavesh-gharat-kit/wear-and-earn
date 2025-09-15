@@ -39,9 +39,6 @@ export async function POST(request) {
         data: { adminId: parseInt(session.user.id) }
       });
       
-      // Clean up connections after heavy operation
-      await prisma.$disconnect();
-
       console.log(`✅ Pool distribution completed by admin ${session.user.id}:`, result.message);
 
       return NextResponse.json({

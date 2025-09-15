@@ -26,7 +26,12 @@ export async function POST(request) {
       where: { id: userId },
       select: {
         walletBalance: true,
-        kycStatus: true
+        kycStatus: true,
+        kycData: {
+          select: {
+            status: true
+          }
+        }
       }
     });
 
@@ -34,7 +39,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    if (!user.kycStatus) {
+    if (user.kycStatus !== 'APPROVED' || user.kycData?.status !== 'approved') {
       return NextResponse.json({ error: 'KYC approval required for withdrawal' }, { status: 400 })
     }
 
