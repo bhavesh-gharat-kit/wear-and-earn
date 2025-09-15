@@ -662,6 +662,7 @@ const AccountDashboard = () => {
   })
   const [withdrawAmount, setWithdrawAmount] = useState('')
   const [withdrawLoading, setWithdrawLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     if (status === 'loading') return // Still loading
@@ -806,6 +807,24 @@ const AccountDashboard = () => {
     }
   }
 
+  const refreshAllData = async () => {
+    setRefreshing(true)
+    try {
+      await Promise.all([
+        fetchUserData(),
+        fetchMlmData(),
+        fetchOrders(),
+        fetchStats(),
+        fetchKycData(),
+        fetchWalletData()
+      ])
+    } catch (error) {
+      console.error('Error refreshing data:', error)
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
   const handleWithdraw = async () => {
     if (!withdrawAmount || withdrawAmount <= 0) {
       alert('Please enter a valid amount')
@@ -891,17 +910,26 @@ const AccountDashboard = () => {
                 {userData?.isActive ? '✓ Active Member' : '⏳ Pending Activation'}
               </span>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                userData?.isKycApproved ? 'bg-green-500 bg-opacity-20 text-green-100' : 'bg-red-500 bg-opacity-20 text-red-100'
+                (userData?.kycStatus === 'APPROVED' && kycData?.status === 'approved') ? 'bg-green-500 bg-opacity-20 text-green-100' : 'bg-red-500 bg-opacity-20 text-red-100'
               }`}>
-                {userData?.isKycApproved ? '✓ KYC Verified' : '⚠ KYC Pending'}
+                {(userData?.kycStatus === 'APPROVED' && kycData?.status === 'approved') ? '✓ KYC Verified' : '⚠ KYC Pending'}
               </span>
             </div>
           </div>
           <div className="text-right">
             <div className="text-sm text-indigo-200 dark:text-indigo-300 mb-1">Member Since</div>
-            <div className="text-lg font-semibold">
+            <div className="text-lg font-semibold mb-3">
               {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A'}
             </div>
+            <button
+              onClick={refreshAllData}
+              disabled={refreshing}
+              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all disabled:opacity-50"
+              title="Refresh account data"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <span className="text-sm">{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+            </button>
           </div>
         </div>
       </div>
