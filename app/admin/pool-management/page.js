@@ -56,7 +56,7 @@ export default function PoolManagementPanel() {
         
         // Fetch pool overview stats
         const [statsRes, distributionRes] = await Promise.all([
-          fetch('/api/admin/pool-stats'),
+          fetch('/api/admin/pool-management'),
           fetch('/api/admin/pool-distribution')
         ])
         
@@ -200,7 +200,7 @@ export default function PoolManagementPanel() {
     try {
       // Fetch pool overview stats
       const [statsRes, distributionRes] = await Promise.all([
-        fetch('/api/admin/pool-stats'),
+        fetch('/api/admin/pool-management'),
         fetch('/api/admin/pool-distribution')
       ])
       
