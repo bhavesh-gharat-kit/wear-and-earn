@@ -1,37 +1,34 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
-import prisma from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
+import prisma from "@/lib/prisma";
 
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.role || session.user.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+
+    if (!session?.user?.role || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const level = searchParams.get('level');
-    const status = searchParams.get('status');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const level = searchParams.get("level");
+    const status = searchParams.get("status");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "20");
 
     // Build where conditions
     const where = {};
-    
-    if (level && level !== 'all') {
-      where.user = {
-        level: parseInt(level)
+
+    if (level && level !== "all") {
+      where.teamLeader = {
+        level: parseInt(level),
       };
     }
 
-    if (status === 'active') {
+    if (status === "active") {
       where.isComplete = true;
-    } else if (status === 'inactive') {
+    } else if (status === "inactive") {
       where.isComplete = false;
     }
 
@@ -39,15 +36,15 @@ export async function GET(request) {
     const teams = await prisma.team.findMany({
       where,
       include: {
-        user: {
+        teamLeader: {
           select: {
             id: true,
             fullName: true,
             email: true,
             level: true,
             teamCount: true,
-            isActive: true
-          }
+            isActive: true,
+          },
         },
         members: {
           include: {
@@ -55,38 +52,38 @@ export async function GET(request) {
               select: {
                 id: true,
                 fullName: true,
-                email: true
-              }
-            }
-          }
-        }
+                email: true,
+              },
+            },
+          },
+        },
       },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: {
-        createdAt: 'desc'
-      }
+        formationDate: "desc",
+      },
     });
 
     // Get total count for pagination
     const totalCount = await prisma.team.count({ where });
 
     // Format teams data
-    const formattedTeams = teams.map(team => ({
+    const formattedTeams = teams.map((team) => ({
       id: team.id,
-      leaderName: team.user.fullName,
-      leaderEmail: team.user.email,
-      level: team.user.level,
-      teamCount: team.user.teamCount,
-      isActive: team.user.isActive,
+      leaderName: team.teamLeader.fullName,
+      leaderEmail: team.teamLeader.email,
+      level: team.teamLeader.level,
+      teamCount: team.teamLeader.teamCount,
+      isActive: team.teamLeader.isActive,
       isComplete: team.isComplete,
       memberCount: team.members.length,
-      createdAt: team.createdAt,
-      members: team.members.map(m => ({
+      createdAt: team.formationDate,
+      members: team.members.map((m) => ({
         id: m.user.id,
         name: m.user.fullName,
-        email: m.user.email
-      }))
+        email: m.user.email,
+      })),
     }));
 
     return NextResponse.json({
@@ -96,14 +93,13 @@ export async function GET(request) {
         page,
         limit,
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limit)
-      }
+        totalPages: Math.ceil(totalCount / limit),
+      },
     });
-
   } catch (error) {
-    console.error('Error fetching teams:', error);
+    console.error("Error fetching teams:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
