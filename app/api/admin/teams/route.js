@@ -18,12 +18,17 @@ export async function GET(request) {
     const limit = parseInt(searchParams.get("limit") || "20");
 
     // Build where conditions
-    const where = {};
+    const where = {
+      // Only show teams from leaders who have achieved L1+ levels (exclude L0)
+      teamLeader: {
+        level: {
+          gte: 1  // Greater than or equal to 1 (L1, L2, L3, L4, L5)
+        }
+      }
+    };
 
     if (level && level !== "all") {
-      where.teamLeader = {
-        level: parseInt(level),
-      };
+      where.teamLeader.level = parseInt(level);
     }
 
     if (status === "active") {
