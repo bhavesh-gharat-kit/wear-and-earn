@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
-import prisma, { withConnection } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 import { serializeBigInt, paisaToRupees } from '@/lib/serialization-utils';
 
 
@@ -22,18 +22,16 @@ export async function GET(request) {
     const limit = parseInt(searchParams.get('limit')) || 20
     const type = searchParams.get('type') // filter by transaction type
 
-    // Get user wallet info with connection handling
-    const user = await withConnection(async (db) => {
-      return await db.user.findUnique({
-        where: { id: userId },
-        select: {
-          walletBalance: true,
-          monthlyPurchase: true,
-          lastMonthPurchase: true,
-          isActive: true,
-          kycStatus: true
-        }
-      });
+    // Get user wallet info
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        walletBalance: true,
+        monthlyPurchase: true,
+        lastMonthPurchase: true,
+        isActive: true,
+        kycStatus: true
+      }
     });
 
     if (!user) {
@@ -54,22 +52,20 @@ export async function GET(request) {
     let totalTransactions = 0;
     
     try {
-      transactions = await withConnection(async (db) => {
-        return await db.ledger.findMany({
-          where: whereClause,
-          orderBy: { createdAt: 'desc' },
-          skip: (page - 1) * limit,
-          take: limit,
-          select: {
-            id: true,
-            type: true,
-            amount: true,
-            levelDepth: true,
-            note: true,
-            ref: true,
-            createdAt: true
-          }
-        });
+      transactions = await prisma.ledger.findMany({
+        where: whereClause,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        select: {
+          id: true,
+          type: true,
+          amount: true,
+          levelDepth: true,
+          note: true,
+          ref: true,
+          createdAt: true
+        }
       });
     } catch (error) {
       console.error('Error fetching wallet transactions:', error);
@@ -77,10 +73,8 @@ export async function GET(request) {
     }
 
     try {
-      totalTransactions = await withConnection(async (db) => {
-        return await db.ledger.count({
-          where: whereClause
-        });
+      totalTransactions = await prisma.ledger.count({
+        where: whereClause
       });
     } catch (error) {
       console.error('Error counting wallet transactions:', error);
@@ -90,21 +84,19 @@ export async function GET(request) {
     // Get pending self payouts with error handling
     let pendingPayouts = [];
     try {
-      pendingPayouts = await withConnection(async (db) => {
-        return await db.selfPayoutSchedule.findMany({
-          where: { 
-            userId: userId,
-            status: 'scheduled'
-          },
-          orderBy: { dueAt: 'asc' },
-          select: {
-            id: true,
-            amount: true,
-            dueAt: true,
-            status: true,
-            orderId: true
-          }
-        });
+      pendingPayouts = await prisma.selfPayoutSchedule.findMany({
+        where: { 
+          userId: userId,
+          status: 'scheduled'
+        },
+        orderBy: { dueAt: 'asc' },
+        select: {
+          id: true,
+          amount: true,
+          dueAt: true,
+          status: true,
+          orderId: true
+        }
       });
     } catch (error) {
       console.error('Error fetching pending payouts:', error);
@@ -114,14 +106,12 @@ export async function GET(request) {
     // Calculate earnings summary with error handling
     let earningsSummary = [];
     try {
-      earningsSummary = await withConnection(async (db) => {
-        return await db.ledger.groupBy({
-          by: ['type'],
-          where: { userId: userId },
-          _sum: {
-            amount: true
-          }
-        });
+      earningsSummary = await prisma.ledger.groupBy({
+        by: ['type'],
+        where: { userId: userId },
+        _sum: {
+          amount: true
+        }
       });
     } catch (error) {
       console.error('Error calculating earnings summary:', error);
@@ -135,19 +125,17 @@ export async function GET(request) {
 
     let monthlyEarnings = { _sum: { amount: 0 } };
     try {
-      monthlyEarnings = await withConnection(async (db) => {
-        return await db.ledger.aggregate({
-          where: {
-            userId: userId,
-            createdAt: { gte: currentMonth },
-            type: {
-              in: ['sponsor_commission', 'repurchase_commission', 'self_joining_instalment']
-            }
-          },
-          _sum: {
-            amount: true
+      monthlyEarnings = await prisma.ledger.aggregate({
+        where: {
+          userId: userId,
+          createdAt: { gte: currentMonth },
+          type: {
+            in: ['sponsor_commission', 'repurchase_commission', 'self_joining_instalment']
           }
-        });
+        },
+        _sum: {
+          amount: true
+        }
       });
     } catch (error) {
       console.error('Error calculating monthly earnings:', error);
