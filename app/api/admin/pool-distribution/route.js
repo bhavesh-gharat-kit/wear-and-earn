@@ -15,7 +15,7 @@ export async function POST(request) {
 
     const { action } = await request.json()
     
-    if (action === 'distribute_now') {
+    if (action === 'distribute_now' || action === 'distribute') {
       console.log(`🎯 Admin ${session.user.id} triggered pool distribution`);
       
       // Check if there are pools to distribute
@@ -127,8 +127,9 @@ export async function GET(request) {
       const levelAmount = levelAmounts[`L${level}`] || 0;
       const perUserAmount = userCount > 0 ? Math.floor(levelAmount / userCount) : 0;
       
-      levelBreakdown[`L${level}`] = {
+      levelBreakdown[level] = {
         users: userCount,
+        amount: levelAmount,
         totalAmount: levelAmount,
         totalAmountRupees: (levelAmount / 100).toFixed(2),
         perUserAmount: perUserAmount,
@@ -189,13 +190,9 @@ export async function GET(request) {
 
     return NextResponse.json({
       success: true,
-      poolStatus: {
-        totalAmount: totalPoolAmount,
-        totalAmountRupees: (totalPoolAmount / 100).toFixed(2),
-        availablePoolsCount: availablePools.length,
-        canDistribute: totalPoolAmount > 0,
-        eligibleUsers: totalEligibleUsers
-      },
+      // Frontend expected format
+      totalAmount: totalPoolAmount,
+      eligibleUsers: totalEligibleUsers,
       levelBreakdown,
       lastDistribution: lastDistribution ? {
         date: lastDistribution.distributedAt,
@@ -205,7 +202,19 @@ export async function GET(request) {
                    lastDistribution.l3UserCount + lastDistribution.l4UserCount + 
                    lastDistribution.l5UserCount
       } : null,
-      recentDistributions: formattedRecentDistributions,
+      recentDistributions: formattedRecentDistributions.map(dist => ({
+        createdAt: dist.distributedAt,
+        amount: dist.totalAmount,
+        userCount: dist.totalUsers
+      })),
+      // Additional data for backend compatibility
+      poolStatus: {
+        totalAmount: totalPoolAmount,
+        totalAmountRupees: (totalPoolAmount / 100).toFixed(2),
+        availablePoolsCount: availablePools.length,
+        canDistribute: totalPoolAmount > 0,
+        eligibleUsers: totalEligibleUsers
+      },
       eligibleUsersByLevel: eligibleUsersByLevel.reduce((acc, level) => {
         acc[`L${level.level}`] = level._count.level;
         return acc;

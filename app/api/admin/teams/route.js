@@ -110,8 +110,28 @@ export async function GET(request) {
     const completeTeams = formattedData.filter(user => user.teamStatus === 'COMPLETE');
     const incompleteTeams = formattedData.filter(user => user.teamStatus === 'INCOMPLETE');
 
+    // Format data for frontend compatibility
+    const teams = formattedData.map(user => ({
+      id: user.id,
+      leaderName: user.leaderName,
+      leaderEmail: user.leaderEmail,
+      level: user.level,
+      teamCount: user.teamCount || 0,
+      directTeams: user.directTeams || 0,
+      isActive: user.isActive,
+      isComplete: user.teamStatus === 'COMPLETE',
+      memberCount: user.eligibleReferrals,
+      createdAt: new Date().toISOString(), // Format as ISO string for frontend
+      members: user.referrals.map(ref => ({
+        id: ref.id,
+        name: ref.name,
+        email: ref.email
+      })) || []
+    }));
+
     return NextResponse.json({
       success: true,
+      teams, // Main teams array expected by frontend
       completeTeams,
       incompleteTeams,
       allUsers: formattedData, // For backward compatibility

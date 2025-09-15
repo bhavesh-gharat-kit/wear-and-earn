@@ -146,9 +146,13 @@ export default function PoolManagementPanel() {
         const result = await response.json()
         setDistributionProgress(100)
         setTimeout(() => {
-          alert(`Pool distributed successfully! ${result.distributions} distributions made.`)
+          const amount = result.data?.totalAmountDistributed || '0'
+          const users = result.data?.usersRewarded || 0
+          alert(`🎉 Pool Distribution Completed Successfully!\n\n💰 Total Amount Distributed: ₹${amount}\n👥 Users Rewarded: ${users}\n\n✅ All amounts have been added to user wallets.`)
           // Refresh data
-          window.location.reload()
+          refreshData()
+          setIsDistributing(false)
+          setDistributionProgress(0)
         }, 1000)
       } else {
         const error = await response.json()
@@ -425,9 +429,42 @@ export default function PoolManagementPanel() {
               <div>
                 <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-2">Distribution by Level</h4>
                 <div className="space-y-2">
-                  {poolDistribution?.levelBreakdown && Object.entries(poolDistribution.levelBreakdown).map(([level, data]) => (
-                    <p key={level}>L{level}: <span className="font-bold dark:text-gray-100">{data.users} users</span> - <span className="text-green-600 dark:text-green-400">{formatCurrency(data.amount)}</span></p>
-                  ))}
+                  {poolDistribution?.levelBreakdown && Object.entries(poolDistribution.levelBreakdown).map(([level, data]) => {
+                    const hasUsers = data.users > 0;
+                    const displayAmount = hasUsers ? data.amount : 0;
+                    const companyRetainedAmount = hasUsers ? 0 : data.amount;
+                    
+                    return (
+                      <p key={level}>
+                        L{level}: <span className="font-bold dark:text-gray-100">{data.users} users</span> - 
+                        <span className={`${hasUsers ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          {formatCurrency(displayAmount)}
+                        </span>
+                        {!hasUsers && companyRetainedAmount > 0 && (
+                          <span className="text-xs text-orange-600 dark:text-orange-400 ml-2">
+                            (₹{(companyRetainedAmount / 100).toFixed(2)} retained by company)
+                          </span>
+                        )}
+                      </p>
+                    );
+                  })}
+                  
+                  {/* Show total company retained amount */}
+                  {poolDistribution?.levelBreakdown && (() => {
+                    const totalCompanyRetained = Object.values(poolDistribution.levelBreakdown)
+                      .reduce((sum, data) => sum + (data.users === 0 ? data.amount : 0), 0);
+                    
+                    if (totalCompanyRetained > 0) {
+                      return (
+                        <div className="mt-3 pt-2 border-t border-gray-200 dark:border-gray-600">
+                          <p className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                            Total Company Retained: {formatCurrency(totalCompanyRetained)}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
               </div>
             </div>

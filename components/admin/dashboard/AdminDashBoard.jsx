@@ -35,7 +35,7 @@ function AdminDashBoard() {
     return <LoaderEffect />;
   }
 
-  const { totalInStockQuantity, totalOrders, totalProducts, totalUsers, mlmStats } =
+  const { totalInStockQuantity, totalOrders, totalProducts, totalUsers } =
     allDatabaseDetails;
 
   return (
@@ -173,94 +173,12 @@ function AdminDashBoard() {
             </div>
           </div>
 
-          {/* MLM Summary Cards */}
-          <div className="mt-8">
-            <h2 className="text-2xl font-semibold mb-4 text-green-700 dark:text-green-400">MLM Overview</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {/* Active MLM Users */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-green-100 dark:border-green-800">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="font-semibold text-green-600 dark:text-green-400">Active MLM Users</h2>
-                    <p className="text-xl md:text-2xl font-bold mt-2 text-green-900 dark:text-green-200">
-                      {mlmStats?.activeMLMUsers || 0}
-                    </p>
-                  </div>
-                  <svg
-                    className="w-10 h-10 text-green-500 group-hover:scale-110 transition"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M17 20h5v-2a4 4 0 00-5-4M9 20H4v-2a4 4 0 515-4M12 4a4 4 0 100 8 4 4 0 000-8z"
-                    />
-                  </svg>
-                </div>
-              </div>
 
-              {/* Total Commissions */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-green-100 dark:border-green-800">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="font-semibold text-green-600 dark:text-green-400">Total Commissions</h2>
-                    <p className="text-xl md:text-2xl font-bold mt-2 text-green-900 dark:text-green-200">
-                      ₹{mlmStats?.totalCommissionAmount?.toLocaleString() || 0}
-                    </p>
-                  </div>
-                  <svg
-                    className="w-10 h-10 text-green-500 group-hover:scale-110 transition"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                    />
-                  </svg>
-                </div>
-              </div>
-
-              {/* Total Referrals */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-green-100 dark:border-green-800">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="font-semibold text-green-600 dark:text-green-400">Users with Referrals</h2>
-                    <p className="text-xl md:text-2xl font-bold mt-2 text-green-900 dark:text-green-200">
-                      {mlmStats?.totalReferrals || 0}
-                    </p>
-                  </div>
-                  <svg
-                    className="w-10 h-10 text-green-500 group-hover:scale-110 transition"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Quick Actions */}
           <div className="mt-12">
             <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">Quick Actions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Link
                 href="/admin/products/add"
                 className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl shadow hover:shadow-md transition dark:bg-blue-700 dark:hover:bg-blue-800"
@@ -278,12 +196,6 @@ function AdminDashBoard() {
                 className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl shadow hover:shadow-md transition dark:bg-blue-700 dark:hover:bg-blue-800"
               >
                 Manage Stock
-              </Link>
-              <Link
-                href="/admin/mlm-panel"
-                className="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl shadow hover:shadow-md transition dark:bg-green-700 dark:hover:bg-green-800"
-              >
-                MLM Management
               </Link>
             </div>
           </div>

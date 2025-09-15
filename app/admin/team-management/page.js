@@ -153,7 +153,7 @@ export default function TeamManagementPage() {
         </div>
 
         {/* Quick Stats */}
-  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{pagination.total || 0}</div>
             <div className="text-sm text-gray-600 dark:text-gray-300">Total Teams</div>
@@ -163,12 +163,6 @@ export default function TeamManagementPage() {
               {teams.filter(t => t.isComplete).length}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-300">Complete Teams</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-              {teams.filter(t => !t.isComplete).length}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Incomplete Teams</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
