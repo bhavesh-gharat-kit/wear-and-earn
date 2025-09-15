@@ -13,96 +13,109 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const level = searchParams.get("level");
-    const status = searchParams.get("status");
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
 
-    // Build where conditions
+    // Build where conditions for users with referrals
     const where = {
-      // Only show teams from leaders who have achieved L1+ levels (exclude L0)
-      teamLeader: {
-        level: {
-          gte: 1  // Greater than or equal to 1 (L1, L2, L3, L4, L5)
+      level: { gte: 1 }, // Only L1+ users
+      referrals: {
+        some: {
+          purchases: {
+            some: {
+              type: 'first' // Only referrals who made first purchases
+            }
+          }
         }
       }
     };
 
     if (level && level !== "all") {
-      where.teamLeader.level = parseInt(level);
+      where.level = parseInt(level);
     }
 
-    if (status === "active") {
-      where.status = 'COMPLETE';
-    } else if (status === "inactive") {
-      where.status = 'FORMING';
-    }
-
-    // Get teams with pagination
-    const teams = await prisma.team.findMany({
+    // Get users with their eligible referrals (those who made first purchases)
+    const users = await prisma.user.findMany({
       where,
       include: {
-        teamLeader: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-            level: true,
-            teamCount: true,
-            isActive: true,
+        referrals: {
+          where: {
+            purchases: {
+              some: {
+                type: 'first'
+              }
+            }
           },
-        },
-        members: {
           include: {
-            user: {
+            purchases: {
+              where: { type: 'first' },
               select: {
                 id: true,
-                fullName: true,
-                email: true,
+                createdAt: true,
+                mlmAmount: true
               },
-            },
+              take: 1
+            }
           },
-        },
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }
       },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: {
-        formationDate: "desc",
-      },
+        level: 'desc'
+      }
     });
 
     // Get total count for pagination
-    const totalCount = await prisma.team.count({ where });
+    const totalCount = await prisma.user.count({ where });
 
-    // Format teams data
-    const formattedTeams = teams.map((team) => ({
-      id: team.id,
-      leaderName: team.teamLeader.fullName,
-      leaderEmail: team.teamLeader.email,
-      level: team.teamLeader.level,
-      teamCount: team.teamLeader.teamCount,
-      isActive: team.teamLeader.isActive,
-      status: team.status,
-      memberCount: team.members.length,
-      createdAt: team.formationDate,
-      members: team.members.map((m) => ({
-        id: m.user.id,
-        name: m.user.fullName,
-        email: m.user.email,
+    // Format user referral data
+    const formattedData = users.map((user) => ({
+      id: user.id,
+      leaderName: user.fullName,
+      leaderEmail: user.email,
+      level: user.level,
+      teamCount: user.teamCount,
+      directTeams: user.directTeams,
+      isActive: user.isActive,
+      eligibleReferrals: user.referrals.length,
+      referrals: user.referrals.map((referral) => ({
+        id: referral.id,
+        name: referral.fullName,
+        email: referral.email,
+        firstPurchaseDate: referral.purchases[0]?.createdAt || null,
+        mlmAmount: referral.purchases[0]?.mlmAmount || 0,
+        isEligible: true // All these referrals are eligible (made first purchase)
       })),
+      totalReferralValue: user.referrals.reduce((sum, ref) => 
+        sum + (ref.purchases[0]?.mlmAmount || 0), 0
+      )
     }));
 
     return NextResponse.json({
       success: true,
-      teams: formattedTeams,
+      users: formattedData,
       pagination: {
         page,
         limit,
         total: totalCount,
         totalPages: Math.ceil(totalCount / limit),
       },
+      summary: {
+        totalEligibleUsers: totalCount,
+        totalReferrals: formattedData.reduce((sum, user) => sum + user.eligibleReferrals, 0),
+        levelBreakdown: formattedData.reduce((acc, user) => {
+          const levelKey = `L${user.level}`;
+          acc[levelKey] = (acc[levelKey] || 0) + 1;
+          return acc;
+        }, {})
+      }
     });
   } catch (error) {
-    console.error("Error fetching teams:", error);
+    console.error("Error fetching referral data:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
