@@ -154,6 +154,8 @@ export async function POST(request) {
 
         return { updatedWithdrawal, action: 'rejected' };
       }
+    }, {
+      timeout: 10000 // 10 second timeout
     });
 
     return NextResponse.json({

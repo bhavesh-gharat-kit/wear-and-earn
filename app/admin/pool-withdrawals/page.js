@@ -242,7 +242,7 @@ export default function PoolWithdrawalsPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Method</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider min-w-[180px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
@@ -250,27 +250,25 @@ export default function PoolWithdrawalsPage() {
                   <tr key={withdrawal.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{withdrawal.userName}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-300">{withdrawal.userEmail}</div>
-                        <div className="text-xs text-gray-400 dark:text-gray-500">Level {withdrawal.userLevel}</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{withdrawal.user?.fullName || 'N/A'}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-300">{withdrawal.user?.email || 'N/A'}</div>
+                        <div className="text-xs text-gray-400 dark:text-gray-500">ID: {withdrawal.user?.id || 'N/A'}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-lg font-bold text-green-600 dark:text-green-400">
-                        {formatCurrency(withdrawal.amount)}
+                        ₹{withdrawal.amountRs?.toFixed(2) || '0.00'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-gray-100 capitalize">
-                        {withdrawal.method?.replace('_', ' ') || 'N/A'}
+                        Bank Transfer
                       </div>
-                      {withdrawal.accountDetails && (
+                      {withdrawal.bankDetails && (
                         <div className="text-xs text-gray-500 dark:text-gray-300">
-                          {withdrawal.method === 'upi' ? 
-                            withdrawal.accountDetails.upiId :
-                            withdrawal.accountDetails.accountNumber ? 
-                              `****${withdrawal.accountDetails.accountNumber.slice(-4)}` : 'N/A'
-                          }
+                          {withdrawal.bankDetails.bankName}
+                          <br />
+                          ****{withdrawal.bankDetails.accountNumber?.slice(-4)}
                         </div>
                       )}
                     </td>
@@ -281,24 +279,26 @@ export default function PoolWithdrawalsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                      <div>{new Date(withdrawal.requestedAt).toLocaleDateString()}</div>
+                      <div>{new Date(withdrawal.createdAt).toLocaleDateString()}</div>
                       <div className="text-xs text-gray-500 dark:text-gray-300">
-                        {new Date(withdrawal.requestedAt).toLocaleTimeString()}
+                        {new Date(withdrawal.createdAt).toLocaleTimeString()}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center space-x-2">
-                        <button className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                          <Eye className="w-4 h-4" />
-                        </button>
+                      <div className="flex flex-col gap-2 min-w-[150px]">
                         {(withdrawal.status === 'requested' || withdrawal.status === 'pending') && (
                           <>
                             <button
                               onClick={() => handleWithdrawalAction(withdrawal.id, 'approve')}
                               disabled={processing}
-                              className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 disabled:opacity-50"
+                              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              <CheckCircle className="w-4 h-4" />
+                              {processing ? (
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <CheckCircle className="w-4 h-4" />
+                              )}
+                              Approve
                             </button>
                             <button
                               onClick={() => {
@@ -306,21 +306,39 @@ export default function PoolWithdrawalsPage() {
                                 if (remarks) handleWithdrawalAction(withdrawal.id, 'reject', remarks)
                               }}
                               disabled={processing}
-                              className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 disabled:opacity-50"
+                              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              <XCircle className="w-4 h-4" />
+                              {processing ? (
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <XCircle className="w-4 h-4" />
+                              )}
+                              Reject
                             </button>
                           </>
                         )}
-                        {withdrawal.status === 'processing' && (
-                          <button
-                            onClick={() => handleWithdrawalAction(withdrawal.id, 'complete')}
-                            disabled={processing}
-                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 disabled:opacity-50"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                          </button>
+                        {withdrawal.status === 'approved' && (
+                          <div className="bg-green-100 text-green-800 px-4 py-2 rounded-lg text-center text-sm font-medium">
+                            <CheckCircle className="w-4 h-4 inline mr-1" />
+                            Approved
+                          </div>
                         )}
+                        {withdrawal.status === 'rejected' && (
+                          <div className="bg-red-100 text-red-800 px-4 py-2 rounded-lg text-center text-sm font-medium">
+                            <XCircle className="w-4 h-4 inline mr-1" />
+                            Rejected
+                          </div>
+                        )}
+                        <button 
+                          onClick={() => {
+                            // Add view details functionality
+                            alert(`Withdrawal Details:\nUser: ${withdrawal.user?.fullName}\nAmount: ₹${withdrawal.amountRs?.toFixed(2)}\nBank: ${withdrawal.bankDetails?.bankName}\nAccount: ${withdrawal.bankDetails?.accountNumber}\nStatus: ${withdrawal.status}\n${withdrawal.adminNotes ? 'Notes: ' + withdrawal.adminNotes : ''}`)
+                          }}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded text-xs font-medium transition-colors"
+                        >
+                          <Eye className="w-4 h-4 inline mr-1" />
+                          View Details
+                        </button>
                       </div>
                     </td>
                   </tr>

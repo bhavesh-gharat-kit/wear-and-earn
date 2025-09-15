@@ -110,6 +110,8 @@ export async function POST(request) {
       })
 
       return withdrawal
+    }, {
+      timeout: 10000 // 10 second timeout
     })
 
     return NextResponse.json({
