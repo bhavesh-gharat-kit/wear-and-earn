@@ -72,32 +72,49 @@ export async function GET(request) {
     // Get total count for pagination
     const totalCount = await prisma.user.count({ where });
 
-    // Format user referral data
-    const formattedData = users.map((user) => ({
-      id: user.id,
-      leaderName: user.fullName,
-      leaderEmail: user.email,
-      level: user.level,
-      teamCount: user.teamCount,
-      directTeams: user.directTeams,
-      isActive: user.isActive,
-      eligibleReferrals: user.referrals.length,
-      referrals: user.referrals.map((referral) => ({
-        id: referral.id,
-        name: referral.fullName,
-        email: referral.email,
-        firstPurchaseDate: referral.purchases[0]?.createdAt || null,
-        mlmAmount: referral.purchases[0]?.mlmAmount || 0,
-        isEligible: true // All these referrals are eligible (made first purchase)
-      })),
-      totalReferralValue: user.referrals.reduce((sum, ref) => 
-        sum + (ref.purchases[0]?.mlmAmount || 0), 0
-      )
-    }));
+    // Format user referral data with team status
+    const formattedData = users.map((user) => {
+      const eligibleReferrals = user.referrals.length;
+      const isTeamComplete = eligibleReferrals >= 3;
+      
+      return {
+        id: user.id,
+        leaderName: user.fullName,
+        leaderEmail: user.email,
+        level: user.level,
+        teamCount: user.teamCount,
+        directTeams: user.directTeams,
+        isActive: user.isActive,
+        
+        // Team Status Information
+        teamStatus: isTeamComplete ? 'COMPLETE' : 'INCOMPLETE',
+        eligibleReferrals: eligibleReferrals,
+        requiredReferrals: 3,
+        progressPercentage: Math.min((eligibleReferrals / 3) * 100, 100),
+        
+        referrals: user.referrals.map((referral) => ({
+          id: referral.id,
+          name: referral.fullName,
+          email: referral.email,
+          firstPurchaseDate: referral.purchases[0]?.createdAt || null,
+          mlmAmount: (referral.purchases[0]?.mlmAmount || 0) / 100, // Convert paisa to rupees
+          isEligible: true // All these referrals are eligible (made first purchase)
+        })),
+        totalReferralValue: user.referrals.reduce((sum, ref) => 
+          sum + (ref.purchases[0]?.mlmAmount || 0), 0
+        ) / 100 // Convert paisa to rupees
+      };
+    });
+
+    // Separate complete and incomplete teams
+    const completeTeams = formattedData.filter(user => user.teamStatus === 'COMPLETE');
+    const incompleteTeams = formattedData.filter(user => user.teamStatus === 'INCOMPLETE');
 
     return NextResponse.json({
       success: true,
-      users: formattedData,
+      completeTeams,
+      incompleteTeams,
+      allUsers: formattedData, // For backward compatibility
       pagination: {
         page,
         limit,
@@ -106,12 +123,18 @@ export async function GET(request) {
       },
       summary: {
         totalEligibleUsers: totalCount,
+        totalCompleteTeams: completeTeams.length,
+        totalIncompleteTeams: incompleteTeams.length,
         totalReferrals: formattedData.reduce((sum, user) => sum + user.eligibleReferrals, 0),
         levelBreakdown: formattedData.reduce((acc, user) => {
           const levelKey = `L${user.level}`;
           acc[levelKey] = (acc[levelKey] || 0) + 1;
           return acc;
-        }, {})
+        }, {}),
+        teamStatusBreakdown: {
+          complete: completeTeams.length,
+          incomplete: incompleteTeams.length
+        }
       }
     });
   } catch (error) {

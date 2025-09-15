@@ -418,7 +418,7 @@ export default function PoolManagementPanel() {
                 <div className="space-y-2">
                   <p>Total Amount: <span className="font-bold text-green-600 dark:text-green-400">{poolDistribution ? formatCurrency(poolDistribution.totalAmount || 0) : '₹0'}</span></p>
                   <p>Eligible Users: <span className="font-bold text-blue-600 dark:text-blue-400">{poolDistribution ? poolDistribution.eligibleUsers || 0 : 0}</span></p>
-                  <p>Last Distribution: <span className="font-medium dark:text-gray-200">{poolDistribution ? new Date(poolDistribution.lastDistribution).toLocaleDateString() : 'Never'}</span></p>
+                  <p>Last Distribution: <span className="font-medium dark:text-gray-200">{poolDistribution?.lastDistribution?.date ? new Date(poolDistribution.lastDistribution.date).toLocaleDateString() : 'Never'}</span></p>
                 </div>
               </div>
               
