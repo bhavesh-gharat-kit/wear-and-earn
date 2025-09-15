@@ -64,7 +64,7 @@ export default function PoolWithdrawalsPage() {
         body: JSON.stringify({
           withdrawalId,
           action,
-          remarks
+          adminNotes: remarks
         })
       })
 
@@ -92,10 +92,12 @@ export default function PoolWithdrawalsPage() {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case 'approved':
       case 'completed':
         return 'bg-green-100 text-green-800'
       case 'rejected':
         return 'bg-red-100 text-red-800'
+      case 'requested':
       case 'pending':
         return 'bg-yellow-100 text-yellow-800'
       case 'processing':
@@ -107,10 +109,12 @@ export default function PoolWithdrawalsPage() {
 
   const getStatusIcon = (status) => {
     switch (status) {
+      case 'approved':
       case 'completed':
         return <CheckCircle className="w-4 h-4" />
       case 'rejected':
         return <XCircle className="w-4 h-4" />
+      case 'requested':
       case 'pending':
       case 'processing':
         return <Clock className="w-4 h-4" />
@@ -287,7 +291,7 @@ export default function PoolWithdrawalsPage() {
                         <button className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
                           <Eye className="w-4 h-4" />
                         </button>
-                        {withdrawal.status === 'pending' && (
+                        {(withdrawal.status === 'requested' || withdrawal.status === 'pending') && (
                           <>
                             <button
                               onClick={() => handleWithdrawalAction(withdrawal.id, 'approve')}

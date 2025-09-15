@@ -109,16 +109,14 @@ export async function POST(request) {
           }
         });
 
-        // Update wallet transaction
-        await tx.wallet.updateMany({
-          where: {
-            userId: withdrawal.userId,
-            reference: `withdrawal_${withdrawal.id}`,
-            type: 'withdrawal'
-          },
+        // Create ledger entry for approved withdrawal
+        await tx.ledger.create({
           data: {
-            status: 'completed',
-            processedAt: new Date()
+            userId: withdrawal.userId,
+            type: 'withdrawal_approved',
+            amount: -withdrawal.amount, // Negative for completed withdrawal
+            note: `Withdrawal #${withdrawal.id} approved by admin. ${adminNotes || ''}`,
+            ref: `withdrawal_approved_${withdrawal.id}`
           }
         });
 
@@ -143,28 +141,14 @@ export async function POST(request) {
           }
         });
 
-        // Update wallet transaction
-        await tx.wallet.updateMany({
-          where: {
-            userId: withdrawal.userId,
-            reference: `withdrawal_${withdrawal.id}`,
-            type: 'withdrawal'
-          },
-          data: {
-            status: 'cancelled',
-            processedAt: new Date()
-          }
-        });
-
-        // Create refund wallet entry
-        await tx.wallet.create({
+        // Create ledger entry for rejected withdrawal (refund)
+        await tx.ledger.create({
           data: {
             userId: withdrawal.userId,
-            type: 'withdrawal',
+            type: 'withdrawal_refund',
             amount: withdrawal.amount, // Positive for refund
-            status: 'completed',
-            reference: `refund_${withdrawal.id}`,
-            description: `Withdrawal rejected - Amount refunded`
+            note: `Withdrawal #${withdrawal.id} rejected - Amount refunded. ${adminNotes || ''}`,
+            ref: `withdrawal_refund_${withdrawal.id}`
           }
         });
 

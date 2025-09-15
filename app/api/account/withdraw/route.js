@@ -54,11 +54,10 @@ export async function POST(request) {
     }
 
     // Check for pending withdrawal requests
-    const pendingRequest = await prisma.ledger.findFirst({
+    const pendingRequest = await prisma.newWithdrawal.findFirst({
       where: {
         userId,
-        type: 'withdrawal_request',
-        note: { contains: 'pending' }
+        status: 'requested'
       }
     })
 
@@ -68,23 +67,57 @@ export async function POST(request) {
       }, { status: 400 })
     }
 
-    // Create withdrawal request (not deducting balance yet)
-    const withdrawalRequest = await prisma.ledger.create({
-      data: {
-        userId,
-        type: 'withdrawal_request',
-        amount: amountInPaisa,
-        note: `Withdrawal request - pending admin approval. Bank: ${user.kycData.bankName}, Account: ${user.kycData.bankAccountNumber.slice(-4)}`,
-        ref: `withdrawal_req_${Date.now()}`
-      }
+    // Prepare bank details from KYC data
+    const bankDetails = {
+      bankName: user.kycData.bankName,
+      accountNumber: user.kycData.bankAccountNumber,
+      ifsc: user.kycData.ifscCode,
+      accountHolderName: user.kycData.fullName,
+      branchName: user.kycData.branchName
+    }
+
+    // Create withdrawal request and deduct balance in transaction
+    const withdrawalRequest = await prisma.$transaction(async (tx) => {
+      // Deduct amount from wallet balance immediately
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          walletBalance: {
+            decrement: amountInPaisa
+          }
+        }
+      })
+
+      // Create withdrawal request in NewWithdrawal table
+      const withdrawal = await tx.newWithdrawal.create({
+        data: {
+          userId,
+          amount: amountInPaisa,
+          status: 'requested',
+          bankDetails: JSON.stringify(bankDetails)
+        }
+      })
+
+      // Also create ledger entry for tracking
+      await tx.ledger.create({
+        data: {
+          userId,
+          type: 'withdrawal_debit',
+          amount: -amountInPaisa, // Negative for debit
+          note: `Withdrawal request #${withdrawal.id} - Amount deducted from wallet`,
+          ref: `withdrawal_${withdrawal.id}`
+        }
+      })
+
+      return withdrawal
     })
 
     return NextResponse.json({
       success: true,
-      message: 'Withdrawal request submitted successfully. It will be processed within 24-48 hours after admin approval.',
+      message: 'Withdrawal request submitted successfully. Amount has been deducted from your wallet and will be processed within 24-48 hours.',
       requestId: withdrawalRequest.id,
       amount: amount,
-      status: 'pending'
+      status: 'requested'
     })
 
   } catch (error) {
@@ -107,37 +140,29 @@ export async function GET(request) {
     const page = parseInt(searchParams.get('page')) || 1
     const limit = parseInt(searchParams.get('limit')) || 10
 
-    const withdrawals = await prisma.ledger.findMany({
+    const withdrawals = await prisma.newWithdrawal.findMany({
       where: {
-        userId,
-        type: {
-          in: ['withdrawal_request', 'withdrawal_debit', 'withdrawal_approved', 'withdrawal_rejected']
-        }
+        userId
       },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * limit,
       take: limit
     })
 
-    const total = await prisma.ledger.count({
+    const total = await prisma.newWithdrawal.count({
       where: {
-        userId,
-        type: {
-          in: ['withdrawal_request', 'withdrawal_debit', 'withdrawal_approved', 'withdrawal_rejected']
-        }
+        userId
       }
     })
 
     const formattedWithdrawals = withdrawals.map(withdrawal => ({
       id: withdrawal.id,
       amount: withdrawal.amount / 100, // Convert to rupees
-      type: withdrawal.type,
-      status: withdrawal.note.includes('pending') ? 'pending' : 
-              withdrawal.note.includes('approved') ? 'approved' : 
-              withdrawal.note.includes('rejected') ? 'rejected' : 'processed',
-      note: withdrawal.note,
+      status: withdrawal.status,
+      bankDetails: withdrawal.bankDetails ? JSON.parse(withdrawal.bankDetails) : null,
+      adminNotes: withdrawal.adminNotes,
       createdAt: withdrawal.createdAt,
-      ref: withdrawal.ref
+      processedAt: withdrawal.processedAt
     }))
 
     return NextResponse.json({
