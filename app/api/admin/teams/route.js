@@ -27,9 +27,9 @@ export async function GET(request) {
     }
 
     if (status === "active") {
-      where.isComplete = true;
+      where.status = 'COMPLETE';
     } else if (status === "inactive") {
-      where.isComplete = false;
+      where.status = 'FORMING';
     }
 
     // Get teams with pagination
@@ -76,7 +76,7 @@ export async function GET(request) {
       level: team.teamLeader.level,
       teamCount: team.teamLeader.teamCount,
       isActive: team.teamLeader.isActive,
-      isComplete: team.isComplete,
+      status: team.status,
       memberCount: team.members.length,
       createdAt: team.formationDate,
       members: team.members.map((m) => ({
