@@ -7,7 +7,6 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Eye,
   Filter,
   RefreshCw,
   Download
@@ -329,16 +328,6 @@ export default function PoolWithdrawalsPage() {
                             Rejected
                           </div>
                         )}
-                        <button 
-                          onClick={() => {
-                            // Add view details functionality
-                            alert(`Withdrawal Details:\nUser: ${withdrawal.user?.fullName}\nAmount: ₹${withdrawal.amountRs?.toFixed(2)}\nBank: ${withdrawal.bankDetails?.bankName}\nAccount: ${withdrawal.bankDetails?.accountNumber}\nStatus: ${withdrawal.status}\n${withdrawal.adminNotes ? 'Notes: ' + withdrawal.adminNotes : ''}`)
-                          }}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded text-xs font-medium transition-colors"
-                        >
-                          <Eye className="w-4 h-4 inline mr-1" />
-                          View Details
-                        </button>
                       </div>
                     </td>
                   </tr>

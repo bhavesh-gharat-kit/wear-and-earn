@@ -46,10 +46,10 @@ export async function POST(request) {
       }, { status: 400 })
     }
 
-    // Minimum withdrawal amount check (₹500)
-    if (amountInPaisa < 50000) { // 500 * 100 paisa
+    // Minimum withdrawal amount check (₹300)
+    if (amountInPaisa < 30000) { // 300 * 100 paisa
       return NextResponse.json({ 
-        error: 'Minimum withdrawal amount is ₹500' 
+        error: 'Minimum withdrawal amount is ₹300' 
       }, { status: 400 })
     }
 

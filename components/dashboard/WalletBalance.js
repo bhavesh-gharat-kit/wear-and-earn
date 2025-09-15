@@ -60,7 +60,7 @@ const WalletBalance = () => {
     }
 
     if (parseFloat(withdrawAmount) < 500) {
-      alert('Minimum withdrawal amount is ₹500')
+      alert('Minimum withdrawal amount is ₹300')
       return
     }
 
@@ -247,7 +247,7 @@ const WalletBalance = () => {
             <div className="flex-1">
               <input
                 type="number"
-                placeholder="Enter amount (Min ₹500)"
+                placeholder="Enter amount (Min ₹300)"
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -323,7 +323,7 @@ const WalletBalance = () => {
                   <div className="flex items-center">
                     <AlertCircle className="w-5 h-5 text-yellow-600 mr-2" />
                     <span className="text-sm text-yellow-800">
-                      Minimum withdrawal amount is ₹500. Current balance: ₹{formatAmount(balance)}
+                      Minimum withdrawal amount is ₹300. Current balance: ₹{formatAmount(balance)}
                     </span>
                   </div>
                 </div>
