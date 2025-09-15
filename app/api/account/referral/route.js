@@ -54,7 +54,7 @@ export async function GET(request) {
 
     // Generate referral URL - use the correct login-register page with spid parameter
     const baseUrl = process.env.NEXTAUTH_URL || 'https://wearandearn.vercel.app'
-    const referralUrl = `${baseUrl}/login-register?spid=${user.referralCode}`
+    const referralUrl = `${baseUrl}/login?spid=${user.referralCode}`
 
     console.log('✅ Returning referral data:', user.referralCode)
 
