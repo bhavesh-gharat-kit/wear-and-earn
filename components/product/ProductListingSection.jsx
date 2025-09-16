@@ -102,11 +102,11 @@ function ProductListingSection() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
+    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 px-3 sm:px-4 lg:px-6 py-4 lg:py-8">
       
       {/* Desktop Sidebar - Categories */}
       <aside className="hidden lg:block lg:w-80 lg:min-w-80 lg:flex-shrink-0">
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sticky top-8 w-full">
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 lg:p-6 sticky top-8 w-full">
           {/* Quick Cart Access */}
           <Link
             href="/cart"
@@ -189,62 +189,62 @@ function ProductListingSection() {
         </div>
       </aside>
 
-      {/* Mobile Filter Toggle */}
-      <div className="lg:hidden mb-6">
+      {/* Mobile Filter Toggle - Enhanced */}
+      <div className="lg:hidden mb-4 sm:mb-6">
         <button
           onClick={() => setShowMobileFilters(!showMobileFilters)}
-          className="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg shadow-sm text-gray-700 dark:text-gray-300"
+          className="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 px-4 py-3 rounded-lg shadow-sm text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
           <Filter className="h-5 w-5" />
-          Filters & Categories
+          <span className="text-base">Filters & Categories</span>
           <ChevronDown className={`h-4 w-4 transition-transform ${showMobileFilters ? 'rotate-180' : ''}`} />
         </button>
 
-        {/* Mobile Categories Dropdown */}
+        {/* Mobile Categories Dropdown - Enhanced */}
         {showMobileFilters && (
-          <div className="mt-4 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Categories</h3>
+          <div className="mt-3 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-3 sm:p-4">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Categories</h3>
               {selectedCategoryName && (
                 <button
                   onClick={clearCategoryFilter}
-                  className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                  className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1 px-2 py-1 rounded"
                 >
                   <X className="h-4 w-4" />
-                  Clear
+                  <span className="hidden sm:inline">Clear</span>
                 </button>
               )}
             </div>
             
-            <div className="grid grid-cols-1 gap-3 max-h-64 overflow-y-auto">
+            <div className="grid grid-cols-1 gap-2 sm:gap-3 max-h-60 sm:max-h-64 overflow-y-auto">
               {productCategory.map((category, i) => {
                 const isSelected = category.name.toLowerCase() === selectedCategoryName?.toLowerCase();
                 return (
                   <button
                     key={i}
                     onClick={() => handleSetFilterCategory(category.id, category.name)}
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                    className={`flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg transition-all active:scale-95 ${
                       isSelected ? 'bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-800' : 'border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >
                     {category.products[0]?.images && category.products[0].images.length > 0 ? (
                       <Image
-                        width={40}
-                        height={40}
-                        className="h-10 w-10 object-cover rounded-lg flex-shrink-0"
+                        width={32}
+                        height={32}
+                        className="h-8 w-8 sm:h-10 sm:w-10 object-cover rounded-lg flex-shrink-0"
                         src={category.products[0].images[0].imageUrl}
                         alt={category.name}
                       />
                     ) : (
-                      <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Package className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Package className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500" />
                       </div>
                     )}
                     <div className="flex-1 text-left min-w-0">
-                      <span className={`font-medium ${isSelected ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'} truncate block`}>
+                      <span className={`text-sm sm:text-base font-medium ${isSelected ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'} truncate block`}>
                         {category.name}
                       </span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                         {category.productCount || 0} items
                       </span>
                     </div>
@@ -259,35 +259,38 @@ function ProductListingSection() {
         )}
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Content Area - Mobile Enhanced */}
       <main className="flex-1 min-w-0">
-        {/* View Toggle & Product Count */}
-        <div className="flex items-center justify-between mb-6 bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-2">
-            <span className="text-gray-600 dark:text-gray-400 font-medium">View:</span>
-            <div className="flex border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2.5 transition-colors ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2.5 transition-colors ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
-              >
-                <List className="h-4 w-4" />
-              </button>
+        {/* Mobile-Optimized View Toggle & Product Count */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 bg-white dark:bg-gray-900 p-3 sm:p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between sm:justify-start gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-medium">View:</span>
+              <div className="flex border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 sm:p-2.5 transition-colors ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 sm:p-2.5 transition-colors ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                >
+                  <List className="h-4 w-4" />
+                </button>
+              </div>
             </div>
+            
+            {/* Mobile Cart Button */}
+            <Link
+              href="/cart"
+              className="lg:hidden flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors text-sm font-medium"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span className="hidden xs:inline">Cart</span> ({addToCartList.length})
+            </Link>
           </div>
-          
-          <Link
-            href="/cart"
-            className="lg:hidden flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            Cart ({addToCartList.length})
-          </Link>
         </div>
 
         {/* Product Content */}

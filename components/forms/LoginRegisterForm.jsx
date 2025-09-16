@@ -21,11 +21,11 @@ function LoginRegisterForm() {
   }, [searchParams]);
 
   return (
-    <div className="py-8 flex flex-col items-center w-full max-w-6xl mx-auto px-4 min-h-screen">
-      <div className="mb-8 flex flex-col items-center">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-2 mb-6 border border-gray-200 dark:border-gray-700">
+    <div className="py-4 sm:py-6 md:py-8 flex flex-col items-center w-full max-w-6xl mx-auto px-3 sm:px-4 min-h-screen">
+      <div className="mb-6 sm:mb-8 flex flex-col items-center">
+        <div className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-lg p-1 sm:p-2 mb-4 sm:mb-6 border border-gray-200 dark:border-gray-700">
           <button
-            className={`px-6 py-3 mr-2 cursor-pointer rounded-lg font-medium transition-all ${
+            className={`px-4 sm:px-6 py-2 sm:py-3 mr-1 sm:mr-2 cursor-pointer rounded-lg font-medium transition-all text-sm sm:text-base ${
               isLogin 
                 ? 'bg-blue-600 dark:bg-blue-500 text-white shadow-md' 
                 : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -35,7 +35,7 @@ function LoginRegisterForm() {
             Login
           </button>
           <button
-            className={`px-6 py-3 cursor-pointer rounded-lg font-medium transition-all ${
+            className={`px-4 sm:px-6 py-2 sm:py-3 cursor-pointer rounded-lg font-medium transition-all text-sm sm:text-base ${
               !isLogin 
                 ? 'bg-blue-600 dark:bg-blue-500 text-white shadow-md' 
                 : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'

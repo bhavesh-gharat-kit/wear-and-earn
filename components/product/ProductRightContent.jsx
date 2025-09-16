@@ -84,20 +84,20 @@ function ProductRightContent({setSelectedFilterCategoryId, setSelectedCategoryNa
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Filter Bar */}
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 lg:p-6">
-        <div className="space-y-4">
-          {/* Search Bar - Full Width and Prominent */}
+      {/* Mobile-Enhanced Filter Bar */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-4 lg:p-6">
+        <div className="space-y-3 sm:space-y-4">
+          {/* Mobile-Optimized Search Bar */}
           <div className="w-full">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-5 w-5" />
+              <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4 sm:h-5 sm:w-5" />
               <input
                 type="text"
                 name="search"
                 value={productFilters.search}
                 onChange={handleChange}
-                className="w-full pl-12 pr-4 py-4 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-                placeholder="Search for products, brands, categories..."
+                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 text-base sm:text-lg border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+                placeholder="Search products..."
               />
             </div>
           </div>
@@ -222,34 +222,32 @@ function ProductRightContent({setSelectedFilterCategoryId, setSelectedCategoryNa
         )}
       </div>
 
-      {/* Results Header */}
-      <div className="flex items-center justify-between bg-white dark:bg-gray-900 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Products</h2>
-          <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
-            {productList.length} items found
-          </span>
-        </div>
+      {/* Mobile-Optimized Results Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 bg-white dark:bg-gray-900 p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Products</h2>
+        <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 sm:px-3 py-1 rounded-full self-start sm:self-auto">
+          {productList.length} items found
+        </span>
       </div>
 
-      {/* PRODUCT LISTING SECTION */}
+      {/* MOBILE-ENHANCED PRODUCT LISTING SECTION */}
       {productList.length <= 0 ? (
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-          <Package className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No products found</h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">Try adjusting your filters or search terms</p>
+        <div className="bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8 md:p-12 text-center">
+          <Package className="h-12 w-12 sm:h-16 sm:w-16 text-gray-300 dark:text-gray-600 mx-auto mb-3 sm:mb-4" />
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">No products found</h3>
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-4 sm:mb-6">Try adjusting your filters or search terms</p>
           <button
             onClick={handleReset}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base active:scale-95"
           >
             <X className="h-4 w-4 mr-2" />
             Clear all filters
           </button>
         </div>
       ) : (
-        <div className={`grid gap-6 ${
+        <div className={`grid gap-3 sm:gap-4 md:gap-6 ${
           viewMode === 'grid' 
-            ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+            ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4'
             : 'grid-cols-1'
         }`}>
           {productList.map((product) => (
@@ -262,10 +260,10 @@ function ProductRightContent({setSelectedFilterCategoryId, setSelectedCategoryNa
         </div>
       )}
 
-      {/* Load More Button (if pagination is needed) */}
+      {/* Mobile-Optimized Load More Button */}
       {productList.length > 0 && productList.length >= 20 && (
-        <div className="text-center mt-8">
-          <button className="px-6 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+        <div className="text-center mt-6 sm:mt-8">
+          <button className="w-full sm:w-auto px-6 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium active:scale-95">
             Load More Products
           </button>
         </div>

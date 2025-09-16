@@ -75,48 +75,49 @@ function AdminNavAsideBar({ showMenus, setShowMenus }) {
 
   return (
     <aside
-      className={`lg:w-1/4 w-full grow 
-      max-sm:absolute max-sm:top-0 max-sm:left-0 transition-all duration-300
-      max-sm:border max-sm:border-slate-300/30 
-      max-sm:w-10/12 
+      className={`w-full lg:w-1/4 grow 
+      sm:absolute sm:top-0 sm:left-0 lg:relative transition-all duration-300 z-40
+      sm:border sm:border-slate-300/30 sm:bg-white/95 sm:backdrop-blur-sm dark:sm:bg-gray-900/95
+      sm:w-80 md:w-96 lg:bg-transparent lg:border-0 lg:backdrop-blur-none
       ${
-        showMenus ? "max-sm:-translate-x-[100%]" : "max-sm:-translate-x-[0%] "
+        showMenus ? "sm:-translate-x-full lg:translate-x-0" : "sm:translate-x-0"
       } `}
     >
-      <div className="bg-base-100 dark:bg-gray-800 rounded-box shadow p-4 h-full ">
-        {/* close btn on screeen start */}
-        <button
-          onClick={() => setShowMenus(true)}
-          className="w-fit ml-auto p-2 bg-slate-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 z-50 hidden max-sm:flex"
-        >
-          <i>
-            <RiCloseLargeLine />
-          </i>
-        </button>
-        {/* close btn on screeen end */}
+      <div className="bg-base-100 dark:bg-gray-800 rounded-none sm:rounded-r-xl lg:rounded-box shadow-none sm:shadow-xl lg:shadow p-3 sm:p-4 h-full min-h-screen lg:min-h-auto">
+        {/* Enhanced close button */}
+        <div className="flex justify-between items-center mb-4 sm:mb-6 lg:hidden">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Admin Menu</h2>
+          <button
+            onClick={() => setShowMenus(true)}
+            className="p-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
+          >
+            <RiCloseLargeLine className="text-lg" />
+          </button>
+        </div>
 
-        <ul className="menu w-full space-y-3.5">
+        <ul className="menu w-full space-y-2 sm:space-y-3">
           {asideMenus.map((menu, i) => (
-            <li className="border-b border-slate-200 dark:border-gray-600" key={i}>
+            <li className="border-b border-slate-200 dark:border-gray-600 last:border-b-0" key={i}>
               <Link
                 onClick={() => setShowMenus(true)}
                 href={menu.path}
                 className={`${
                   menu.path === pathname 
-                    ? "bg-slate-900 dark:bg-gray-700 text-white" 
+                    ? "bg-slate-900 dark:bg-gray-700 text-white shadow-md" 
                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                } p-3 transition-colors duration-200`}
+                } flex items-center gap-3 p-3 sm:p-4 rounded-lg transition-all duration-200 font-medium text-sm sm:text-base`}
               >
-                <i className="text-xl">{menu.icon}</i> {menu.title}
+                <i className="text-lg sm:text-xl flex-shrink-0">{menu.icon}</i> 
+                <span className="truncate">{menu.title}</span>
               </Link>
             </li>
           ))}
-          <li>
+          <li className="mt-4 sm:mt-6">
             <button
               onClick={handleUserLogOut}
-              className="flex items-center gap-1.5 rounded text-white btn bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700"
+              className="flex items-center justify-center gap-2 w-full rounded-lg text-white font-medium bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 p-3 sm:p-4 transition-colors text-sm sm:text-base"
             >
-              <MdLogout fontSize={20} /> Logout
+              <MdLogout className="text-lg" /> Logout
             </button>
           </li>
         </ul>

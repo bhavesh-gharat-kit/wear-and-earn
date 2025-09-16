@@ -107,23 +107,21 @@ const Register = ({ setIsLogin }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] px-4">
-      <div className="w-full max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-12 flex flex-col items-center">
-        <Image src={"/images/brand-logo.png"} width={100} height={100} alt="WearEarn Logo" className="mb-6 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" />
-        <h1 className="text-4xl font-bold text-amber-600 dark:text-amber-400 mb-3 tracking-tight">Join WearEarn</h1>
-        <p className="text-gray-600 dark:text-gray-300 mb-8 text-center text-lg">Create your account</p>
-        {/* <h2 className="text-2xl font-semibold text-center mb-6">Register</h2> */}
+    <div className="flex flex-col items-center justify-center min-h-[80vh] px-3 sm:px-4">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl md:rounded-2xl shadow-xl sm:shadow-2xl p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col items-center">
+        <Image src={"/images/brand-logo.png"} width={80} height={80} className="sm:w-[100px] sm:h-[100px] mb-4 sm:mb-6 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" alt="WearEarn Logo" />
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-600 dark:text-amber-400 mb-2 sm:mb-3 tracking-tight text-center">Join WearEarn</h1>
+        <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 text-center">Create your account</p>
 
-        {/* FORM DETAILS INCLUDES IN USER -> FULLNAME , CONTACT , EMAIL,ADDRESS , PASSWORD , CREATED-AT, SPONSER-ID AND ID */}
-
-        <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-5xl">
-          {/* Grid Layout for Form Fields */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
+        {/* Mobile-Enhanced Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl">
+          {/* Responsive Grid Layout for Form Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-4 sm:mb-6">
             {/* Full Name */}
-            <div className="mb-5">
+            <div className="mb-4 sm:mb-5">
               <label
                 htmlFor="fullName"
-                className="block text-base font-medium text-gray-700 dark:text-gray-200 mb-2"
+                className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1 sm:mb-2"
               >
                 Full Name
               </label>
@@ -131,7 +129,7 @@ const Register = ({ setIsLogin }) => {
                 type="text"
                 id="fullName"
                 {...register("fullName")}
-                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 sm:p-4 md:p-5 text-base sm:text-lg border border-gray-300 dark:border-gray-700 rounded-lg sm:rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter your full name"
               />
               {errors.fullName && (
@@ -153,7 +151,7 @@ const Register = ({ setIsLogin }) => {
                 type="email"
                 id="email"
                 {...register("email")}
-                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 sm:p-4 md:p-5 text-base sm:text-lg border border-gray-300 dark:border-gray-700 rounded-lg sm:rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter your email"
               />
               {errors.email && (
@@ -175,7 +173,7 @@ const Register = ({ setIsLogin }) => {
                 type="text"
                 id="phone"
                 {...register("phone")}
-                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 sm:p-4 md:p-5 text-base sm:text-lg border border-gray-300 dark:border-gray-700 rounded-lg sm:rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter your phone number"
               />
               {errors.phone && (
@@ -197,7 +195,7 @@ const Register = ({ setIsLogin }) => {
                 type="text"
                 id="referralCode"
                 {...register("referralCode")}
-                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 sm:p-4 md:p-5 text-base sm:text-lg border border-gray-300 dark:border-gray-700 rounded-lg sm:rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter referral code"
               />
               {sponsorInfo && (
@@ -226,7 +224,7 @@ const Register = ({ setIsLogin }) => {
                 type="password"
                 id="password"
                 {...register("password")}
-                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 sm:p-4 md:p-5 text-base sm:text-lg border border-gray-300 dark:border-gray-700 rounded-lg sm:rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter your password"
               />
               {errors.password && (
@@ -248,7 +246,7 @@ const Register = ({ setIsLogin }) => {
                 type="password"
                 id="confirmPassword"
                 {...register("confirmPassword")}
-                className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 sm:p-4 md:p-5 text-base sm:text-lg border border-gray-300 dark:border-gray-700 rounded-lg sm:rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Confirm your password"
               />
               {errors.confirmPassword && (
@@ -260,10 +258,10 @@ const Register = ({ setIsLogin }) => {
           </div>
 
           {/* Address - Full Width */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <label
               htmlFor="address"
-              className="block text-base font-medium text-gray-700 dark:text-gray-200 mb-2"
+              className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-1 sm:mb-2"
             >
               Address
             </label>
@@ -271,7 +269,7 @@ const Register = ({ setIsLogin }) => {
               type="text"
               id="address"
               {...register("address")}
-              className="w-full p-5 text-lg border border-gray-300 dark:border-gray-700 rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 sm:p-4 md:p-5 text-base sm:text-lg border border-gray-300 dark:border-gray-700 rounded-lg sm:rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter your address"
             />
             {errors.address && (
@@ -285,7 +283,7 @@ const Register = ({ setIsLogin }) => {
           <div className="text-center">
             <button
               type="submit"
-              className="px-12 py-4 text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 shadow-lg"
+              className="w-full sm:w-auto px-8 sm:px-12 py-3 sm:py-4 text-base sm:text-lg bg-blue-600 hover:bg-blue-700 text-white rounded-lg sm:rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 shadow-lg"
             >
               Create Account
             </button>

@@ -39,18 +39,18 @@ function AdminDashBoard() {
     allDatabaseDetails;
 
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 mx-auto">
+    <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100">
       <section>
-        <section className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 text-gray-800 dark:text-gray-100 font-sans">
+        <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-4 md:p-6 text-gray-800 dark:text-gray-100 font-sans">
           {/* Header */}
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-bold text-blue-700 dark:text-blue-400">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-700 dark:text-blue-400">
               Welcome Admin,
             </h1>
             <button
               onClick={fetchAllDatabasesDetails}
               disabled={isRefreshing}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg shadow hover:shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-700 dark:hover:bg-blue-800"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 sm:px-4 rounded-lg shadow hover:shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-700 dark:hover:bg-blue-800 text-sm sm:text-base w-full sm:w-auto justify-center"
             >
               <svg 
                 className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`}
@@ -66,19 +66,18 @@ function AdminDashBoard() {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Orders */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-gray-100 dark:border-gray-800">
+            <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-md transition group border border-gray-100 dark:border-gray-800">
               <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-semibold text-blue-600 dark:text-blue-400">Total Orders</h2>
-                  <p className="text-xl md:text-2xl font-bold mt-2 text-blue-900 dark:text-blue-200">
-                    {" "}
-                    {totalOrders}{" "}
+                <div className="flex-1">
+                  <h2 className="font-semibold text-blue-600 dark:text-blue-400 text-sm sm:text-base">Total Orders</h2>
+                  <p className="text-lg sm:text-xl md:text-2xl font-bold mt-1 sm:mt-2 text-blue-900 dark:text-blue-200">
+                    {totalOrders}
                   </p>
                 </div>
                 <svg
-                  className="w-10 h-10 text-blue-500 group-hover:scale-110 transition"
+                  className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500 group-hover:scale-110 transition flex-shrink-0"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -95,9 +94,9 @@ function AdminDashBoard() {
             </div>
 
             {/* Users */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-md transition group border border-gray-100 dark:border-gray-800">
+            <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-md transition group border border-gray-100 dark:border-gray-800">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1">
                   <h2 className="font-semibold text-blue-600 dark:text-blue-400">Total Users</h2>
                   <p className="text-xl md:text-2xl font-bold mt-2 text-blue-900 dark:text-blue-200">
                     {totalUsers}

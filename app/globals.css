@@ -4,10 +4,22 @@
 
 html{
     scroll-behavior: smooth;
+    /* Prevent zoom issues across different browsers */
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* Ensure consistent zoom behavior */
+    zoom: 1;
 }
+
 body{
     /* Prevent accidental horizontal scroll due to wide children */
     overflow-x: hidden;
+    /* Fix for zoom issues in some browsers */
+    min-width: 320px;
+    /* Ensure consistent rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Fluid layout overrides: make container/max-w-screen-* span full width */
@@ -16,6 +28,40 @@ body{
 }
 [class*="max-w-screen-"] {
     max-width: 100% !important;
+}
+
+/* Fix browser zoom issues */
+* {
+    box-sizing: border-box;
+}
+
+/* Prevent zoom on iOS when tapping inputs */
+@media screen and (max-width: 767px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="search"],
+    textarea,
+    select {
+        font-size: 16px !important;
+    }
+}
+
+/* Ensure consistent viewport across browsers */
+@media (max-width: 768px) {
+    html {
+        width: 100vw;
+        overflow-x: hidden;
+    }
+}
+
+/* Fix for Safari zoom issues */
+@supports (-webkit-touch-callout: none) {
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
 }
 
 

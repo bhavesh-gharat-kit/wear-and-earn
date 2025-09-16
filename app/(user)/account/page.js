@@ -2292,69 +2292,69 @@ const AccountDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-6">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Page Header */}
-        <div className="mb-6">
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-sm">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-              <div>
-                <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-3 sm:py-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4">
+        {/* Mobile-Enhanced Page Header */}
+        <div className="mb-4 sm:mb-6">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 sm:p-6 rounded-lg sm:rounded-xl shadow-sm">
+            <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center">
+              <div className="flex-1">
+                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">
                   Welcome back, {userData?.fullName || session?.user?.name || 'User'}!
                 </h1>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
                   {userData?.isActive ? 'Your MLM account is active and earning!' : 'Complete your first purchase to unlock earnings'}
                 </p>
               </div>
-              <div className="mt-6 md:mt-0">
-                <div className="text-center bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
-                  <Wallet className="w-8 h-8 mx-auto mb-2 text-blue-600 dark:text-blue-400" />
-                  <div className="text-xl font-semibold text-gray-900 dark:text-white">
+              <div className="flex-shrink-0">
+                <div className="text-center bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-3 sm:p-4 rounded-lg">
+                  <Wallet className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-blue-600 dark:text-blue-400" />
+                  <div className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                     ₹{walletData?.balance?.rupees?.toFixed(2) || '0.00'}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Available Balance</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Available Balance</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="mb-6">
+        {/* Mobile-Optimized Navigation Tabs */}
+        <div className="mb-4 sm:mb-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1 sm:gap-2">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center px-4 py-3 rounded-lg font-medium transition-all ${
+                  className={`flex items-center justify-center sm:justify-start px-2 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-sm sm:text-base flex-1 sm:flex-none ${
                     activeTab === tab.id
                       ? 'bg-blue-500 text-white shadow-md'
                       : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-100'
                   }`}
                 >
-                  <tab.icon className="w-4 h-4 mr-2" />
-                  {tab.label}
+                  <tab.icon className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline ml-1">{tab.label}</span>
                 </button>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-8 min-h-96">
+        {/* Mobile-Enhanced Content Area */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl shadow-sm p-4 sm:p-6 md:p-8 min-h-96">
           {activeTab === 'wallet' && (
             <div>
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">My Wallet</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-gray-900 dark:text-white">My Wallet</h2>
               
-              {/* Balance Card */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-800 p-6 rounded-lg mb-6">
+              {/* Mobile-Enhanced Balance Card */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-800 p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
                 <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Available Balance</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white">₹{walletData?.balance?.rupees?.toFixed(2) || '0.00'}</p>
+                  <div className="flex-1">
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-1">Available Balance</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">₹{walletData?.balance?.rupees?.toFixed(2) || '0.00'}</p>
                   </div>
-                  <Wallet className="w-12 h-12 text-blue-500 dark:text-blue-400" />
+                  <Wallet className="w-10 h-10 sm:w-12 sm:h-12 text-blue-500 dark:text-blue-400 flex-shrink-0" />
                 </div>
               </div>
 

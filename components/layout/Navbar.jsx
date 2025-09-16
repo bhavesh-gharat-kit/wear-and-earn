@@ -70,28 +70,29 @@ function Navbar() {
   };
 
   return (
-  <header id="header" className="w-full sticky top-0 z-50" data-theme="light">
+  <header id="header" className="w-full sticky top-0 z-50 shadow-md" data-theme="light">
       <div className="w-full mx-auto">
         {/* NAVBAR HEADER TOP (single row) */}
-  <div className="navbar min-h-20 md:min-h-24 py-2 md:py-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-gray-900/80 text-slate-800 dark:text-gray-100 shadow-sm border-b border-gray-100 dark:border-gray-800 gap-4 px-4 sm:px-6 md:px-8 lg:px-10">
+  <div className="navbar min-h-14 sm:min-h-16 md:min-h-20 lg:min-h-24 py-2 sm:py-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 dark:supports-[backdrop-filter]:bg-gray-900/90 text-slate-800 dark:text-gray-100 border-b border-gray-200/30 dark:border-gray-700/30 shadow-sm gap-1 sm:gap-2 md:gap-4 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 justify-between">
           {/* Left: Logo */}
-          <div className="navbar-start">
-            <Link href={"/"}>
+          <div className="navbar-start flex-shrink-0">
+            <Link href={"/"} className="group">
               <Image
                 alt="brand-logo"
                 src={"/images/brand-logo.png"}
-                className="rounded-xl h-14 md:h-16 w-auto object-contain transition-opacity hover:opacity-90 drop-shadow-sm"
+                className="rounded-lg sm:rounded-xl h-10 xs:h-11 sm:h-12 md:h-14 lg:h-16 w-auto object-contain transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-md"
                 width={200}
                 height={200}
+                priority
               />
             </Link>
           </div>
 
           {/* Center: Nav items (desktop) */}
           <div className="navbar-center hidden lg:flex">
-            <ul className="menu menu-horizontal px-1 gap-10">
+            <ul className="menu menu-horizontal px-1 gap-10" style={{ display: 'flex', flexDirection: 'row' }}>
               {navMenus.map((menu, i) => (
-                <li key={i} className="m-0">
+                <li key={i} className="m-0" style={{ display: 'inline-flex' }}>
                   <Link
                     style={{ backgroundColor: "transparent" }}
                     href={menu.path}
@@ -109,34 +110,34 @@ function Navbar() {
           </div>
 
           {/* Right: Download, Cart, Profile, Mobile menu button */}
-          <div className="navbar-end gap-2">
-            <PWAInstallButton />
+          <div className="navbar-end gap-1 sm:gap-2">
+            <div className="hidden sm:block">
+              <PWAInstallButton />
+            </div>
 
             <div className="dropdown dropdown-end">
               <div
                 tabIndex={0}
                 role="button"
-                className="btn btn-ghost btn-circle mr-2 hover:bg-slate-100 dark:hover:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700 transition"
+                className="btn btn-ghost btn-circle mr-1 sm:mr-2 hover:bg-slate-100 dark:hover:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700 transition-all p-1 sm:p-2"
               >
                 <div className="indicator">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-7 w-7"
+                    className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    {" "}
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
                       d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                    />{" "}
+                    />
                   </svg>
-                  <span className="badge badge-sm indicator-item rounded-full bg-blue-600 text-white">
-                    {" "}
-                    {addToCartList?.length}{" "}
+                  <span className="badge badge-xs sm:badge-sm indicator-item rounded-full bg-blue-600 text-white text-xs font-medium min-h-4 h-4 sm:min-h-5 sm:h-5">
+                    {addToCartList?.length}
                   </span>
                 </div>
               </div>
@@ -166,12 +167,11 @@ function Navbar() {
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost btn-circle avatar hover:bg-slate-100 dark:hover:bg-gray-800 transition"
+              className="btn btn-ghost btn-circle avatar hover:bg-slate-100 dark:hover:bg-gray-800 transition-all p-1 sm:p-2"
             >
-              <div className="w-10 md:w-11 rounded-full ring-1 ring-gray-200 dark:ring-gray-700 hover:ring-blue-300 dark:hover:ring-yellow-400 transition">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full ring-1 ring-gray-200 dark:ring-gray-700 hover:ring-blue-300 dark:hover:ring-yellow-400 transition-all">
                 <span className="flex justify-center items-center h-full">
-                  {" "}
-                  <FaUserCog style={{ width: 24, height: 24 }} className="text-slate-600 dark:text-gray-200" />
+                  <FaUserCog className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-slate-600 dark:text-gray-200" />
                 </span>
               </div>
             </div>
@@ -235,57 +235,79 @@ function Navbar() {
               </button>
             )}
 
-            <div className="text-3xl lg:hidden block" onClick={handleSetOpenMenu}>
-              <button>
-                <i>
-                  <MdOutlineMenuOpen />{" "}
-                </i>
+            <div className="lg:hidden block" onClick={handleSetOpenMenu}>
+              <button className="btn btn-ghost btn-circle p-1 sm:p-2 hover:bg-slate-100 dark:hover:bg-gray-800 transition-all">
+                <MdOutlineMenuOpen className="text-2xl sm:text-3xl" />
               </button>
             </div>
           </div>
         </div>
 
         {/* Mobile slide-out menu */}
-  <nav className="lg:hidden shadow-sm mb-0.5 bg-white dark:bg-gray-900 relative border-b border-gray-100 dark:border-gray-800">
+  <nav className="lg:hidden relative">
           <div
-      className={` shadow-sm justify-start transition-all duration-300 absolute right-0 z-50 px-4 sm:px-6 md:px-8 py-3 items-center text-slate-800 dark:text-gray-100 bg-white dark:bg-gray-900 w-12/12 ${
-              isMenuOpen ? "max-sm:right-0" : "max-sm:right-[700px]"
+      className={`shadow-lg justify-start transition-all duration-300 ease-in-out absolute right-0 z-50 px-4 sm:px-6 py-4 sm:py-6 text-slate-800 dark:text-gray-100 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-l border-gray-200 dark:border-gray-700 min-h-screen w-80 max-w-[85vw] ${
+              isMenuOpen ? "translate-x-0" : "translate-x-full"
             }`}
           >
-            <div className="block">
-              <ul
-  className="menu px-1 flex-col justify-start gap-4 p-0 m-0 w-full pr-4"
+            {/* Close button */}
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Menu</h3>
+              <button 
                 onClick={handleSetOpenMenu}
+                className="btn btn-ghost btn-sm btn-circle hover:bg-gray-100 dark:hover:bg-gray-800"
               >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div className="block">
+              <ul className="menu flex-col justify-start gap-2 p-0 m-0 w-full">
                 {navMenus.map((menu, i) => (
-                  <li key={i} className=" m-0">
+                  <li key={i} className="m-0 w-full">
                     <Link
-                      style={{ backgroundColor: "transparent" }}
                       href={menu.path}
-            className={` text-[17px] md:text-[18px] font-medium ${
-                        pathname === menu.path &&
-                        "text-[#007bff] dark:text-yellow-400 border-b-2 border-[#007bff] dark:border-yellow-400 rounded-none"
-            } flex items-center justify-start hover:text-blue-700 dark:hover:text-yellow-400 transition-all nav-link-hover-effect py-3 px-0 hover:bg-transparent rounded-none bg-none active:bg-none active:bg-white dark:active:bg-gray-900`}
+                      onClick={handleSetOpenMenu}
+            className={`text-base font-medium w-full ${
+                        pathname === menu.path 
+                        ? "text-blue-600 dark:text-yellow-400 bg-blue-50 dark:bg-yellow-400/10 border-r-2 border-blue-600 dark:border-yellow-400" 
+                        : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-yellow-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+            } flex items-center justify-start transition-all py-3 px-4 rounded-lg`}
                     >
-            <span className="text-[20px] mr-2.5 text-slate-600 dark:text-gray-200"> {menu.icon} </span>
-                      <span className="capitalize"> {menu.title} </span>
+            <span className="text-lg mr-3 flex-shrink-0"> {menu.icon} </span>
+                      <span className="capitalize font-medium"> {menu.title} </span>
                     </Link>
                   </li>
                 ))}
               </ul>
 
-              <div>
+              {/* Mobile-specific actions */}
+              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4">
+                <div className="block sm:hidden">
+                  <PWAInstallButton />
+                </div>
+                
                 {loginSession === "user" && (
                   <button
                     onClick={handleUserLogOut}
-                    className=" flex items-center gap-1.5 rounded text-white btn bg-amber-500 dark:bg-yellow-500 hover:bg-amber-600 dark:hover:bg-yellow-400 transition-colors"
+                    className="flex items-center gap-2 rounded text-white btn bg-amber-500 dark:bg-yellow-500 hover:bg-amber-600 dark:hover:bg-yellow-400 transition-colors w-full justify-center"
                   >
-                    <MdLogout fontSize={20} /> Logout
+                    <MdLogout fontSize={18} /> Logout
                   </button>
                 )}
               </div>
             </div>
           </div>
+          
+          {/* Mobile menu overlay */}
+          {isMenuOpen && (
+            <div 
+              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              onClick={handleSetOpenMenu}
+            />
+          )}
   </nav>
       </div>
     </header>

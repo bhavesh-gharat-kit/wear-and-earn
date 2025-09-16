@@ -32,25 +32,29 @@ function AdminNavbar({ setShowMenus }) {
       <header id="header" className="w-full">
         <div className="w-full">
           {/* NAVBAR HEADER TOP */}
-          <div className="navbar shadow-sm gap-4 px-4 sm:px-6 lg:px-8 top-header-bg-color-animtion max-h-20 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-            <div className="text-3xl max-sm:block hidden">
-              <button onClick={handleShowMenus}>
+          <div className="navbar shadow-sm gap-2 sm:gap-4 px-3 sm:px-4 md:px-6 lg:px-8 min-h-16 sm:min-h-20 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+            <div className="text-2xl sm:text-3xl sm:hidden">
+              <button 
+                onClick={handleShowMenus}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
                 <FaBars />
               </button>
             </div>
-            <div className="flex-1 ">
-              <Link href={"/admin"}>
+            <div className="flex-1">
+              <Link href={"/admin"} className="block">
                 <Image
                   alt="brand-logo"
                   src={"/images/brand-logo.png"}
-                  className="rounded-2xl h-16"
+                  className="rounded-xl h-12 sm:h-14 md:h-16 w-auto"
                   width={200}
                   height={200}
+                  priority
                 />
               </Link>
             </div>
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold text-blue-700 dark:text-blue-400 max-sm:text-xl max-sm:hidden">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-700 dark:text-blue-400 hidden sm:block">
                 Admin Dashboard
               </h1>
               
@@ -59,27 +63,27 @@ function AdminNavbar({ setShowMenus }) {
                 <div className="relative">
                   <button
                     onClick={() => setShowDropdown(!showDropdown)}
-                    className="flex items-center gap-2 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 px-4 py-2 rounded-lg transition-colors"
+                    className="flex items-center gap-1 sm:gap-2 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 px-2 sm:px-3 md:px-4 py-2 rounded-lg transition-colors"
                   >
-                    <FaUser className="text-blue-600 dark:text-blue-400" />
-                    <span className="text-blue-800 dark:text-blue-200 font-medium max-sm:hidden">
+                    <FaUser className="text-blue-600 dark:text-blue-400 text-sm sm:text-base" />
+                    <span className="text-blue-800 dark:text-blue-200 font-medium text-sm sm:text-base hidden sm:inline">
                       {session?.user?.name || "Admin"}
                     </span>
                   </button>
                   
                   {showDropdown && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
-                      <div className="p-3 border-b border-gray-200 dark:border-gray-700">
-                        <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                    <div className="absolute right-0 mt-2 w-44 sm:w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+                      <div className="p-2 sm:p-3 border-b border-gray-200 dark:border-gray-700">
+                        <p className="text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
                           {session?.user?.name || "Administrator"}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">Admin Panel Access</p>
                       </div>
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
+                        className="w-full flex items-center gap-2 px-3 sm:px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 transition-colors text-sm sm:text-base"
                       >
-                        <FaSignOutAlt />
+                        <FaSignOutAlt className="text-sm" />
                         Sign Out
                       </button>
                     </div>

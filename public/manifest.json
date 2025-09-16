@@ -1,12 +1,16 @@
 {
-  "name": "Wear and Earn",
+  "name": "Wear and Earn - Premium Clothing & MLM Rewards",
   "short_name": "WearEarn",
-  "description": "Premium clothing marketplace with MLM rewards",
+  "description": "Shop premium clothing and earn rewards through our innovative MLM program. Install for the best mobile experience.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#ffffff",
   "theme_color": "#ffc107",
   "orientation": "portrait-primary",
+  "categories": ["shopping", "lifestyle", "business"],
+  "lang": "en-US",
   "icons": [
     {
       "src": "/images/icons/icon-72x72.png",
@@ -49,7 +53,6 @@
       "type": "image/png"
     }
   ],
-  "categories": ["shopping", "business", "finance"],
   "screenshots": [
     {
       "src": "/images/screenshots/screenshot1.png",
