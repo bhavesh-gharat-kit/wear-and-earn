@@ -50,6 +50,25 @@ export const GET = async () => {
             console.error('Ledger query error:', ledgerError);
             totalCommissionAmount = 0;
         }
+
+        // Calculate company earnings (30% of all MLM sales)
+        let totalCompanyEarnings = 0;
+        try {
+            const mlmSalesResult = await prisma.order.aggregate({
+                _sum: {
+                    commissionAmount: true
+                },
+                where: {
+                    status: 'delivered' // Only count delivered orders
+                }
+            });
+            const totalMLMSales = mlmSalesResult?._sum?.commissionAmount || 0;
+            // Company gets 30% of MLM sales (commissionAmount is in paisa, so convert and calculate)
+            totalCompanyEarnings = Math.floor(totalMLMSales * 0.30);
+        } catch (companyEarningsError) {
+            console.error('Company earnings calculation error:', companyEarningsError);
+            totalCompanyEarnings = 0;
+        }
         
         return Response.json({
             totalOrders,
@@ -60,6 +79,10 @@ export const GET = async () => {
                 activeMLMUsers,
                 totalCommissionAmount,
                 totalReferrals
+            },
+            companyEarnings: {
+                totalEarnings: totalCompanyEarnings, // In paisa
+                totalEarningsRupees: totalCompanyEarnings / 100 // In rupees for display
             }
         });
     } catch (error) {

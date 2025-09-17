@@ -23,11 +23,11 @@ import { useSession, signOut } from "next-auth/react";
 import toast from "react-hot-toast";
 
 function Navbar() {
-  const [isMounted, setIsMounted] = useState(false);
-  const { data, status } = useSession();
-  const id = data?.user?.id;
-  const loginSession = data?.user?.role; // Use session data directly instead of local state
+  const { data: session, status } = useSession();
+  const id = session?.user?.id;
+  const loginSession = session?.user?.role;
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -42,6 +42,8 @@ function Navbar() {
   ];
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cartDropdownOpen, setCartDropdownOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   const { addToCartList, setAddtoCartList } = useContext(CreateContext);
   const pathname = usePathname();
@@ -58,9 +60,25 @@ function Navbar() {
   const handleSetOpenMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+  const handleCartDropdown = () => {
+    setCartDropdownOpen((prev) => !prev);
+    setProfileDropdownOpen(false);
+  };
+  const handleProfileDropdown = () => {
+    setProfileDropdownOpen((prev) => !prev);
+    setCartDropdownOpen(false);
+  };
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const closeDropdowns = (e) => {
+      if (!e.target.closest('.cart-dropdown') && cartDropdownOpen) setCartDropdownOpen(false);
+      if (!e.target.closest('.profile-dropdown') && profileDropdownOpen) setProfileDropdownOpen(false);
+    };
+    document.addEventListener('mousedown', closeDropdowns);
+    return () => document.removeEventListener('mousedown', closeDropdowns);
+  }, [cartDropdownOpen, profileDropdownOpen]);
 
   const router = useRouter();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleUserLogOut = async () => {
     setIsLoggingOut(true);
@@ -82,9 +100,9 @@ function Navbar() {
   <header id="header" className="w-full sticky top-0 z-50 shadow-md" data-theme="light">
       <div className="w-full mx-auto">
         {/* NAVBAR HEADER TOP (single row) */}
-  <div className="navbar min-h-14 sm:min-h-16 md:min-h-20 lg:min-h-24 py-2 sm:py-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/90 dark:supports-[backdrop-filter]:bg-gray-900/90 text-slate-800 dark:text-gray-100 border-b border-gray-200/30 dark:border-gray-700/30 shadow-sm gap-1 sm:gap-2 md:gap-4 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 justify-between">
+  <div className="flex items-center min-h-14 sm:min-h-16 md:min-h-20 lg:min-h-24 py-2 sm:py-3 bg-white dark:bg-gray-900 backdrop-blur-xl text-slate-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 shadow-sm gap-1 sm:gap-2 md:gap-4 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 justify-between">
           {/* Left: Logo */}
-          <div className="navbar-start flex-shrink-0">
+          <div className="flex-shrink-0 flex items-center">
             <Link href={"/"} className="group">
               <Image
                 alt="brand-logo"
@@ -98,8 +116,8 @@ function Navbar() {
           </div>
 
           {/* Center: Nav items (desktop) */}
-          <div className="navbar-center hidden lg:flex">
-            <ul className="menu menu-horizontal px-1 gap-10" style={{ display: 'flex', flexDirection: 'row' }}>
+          <div className="hidden lg:flex flex-1 justify-center">
+            <ul className="flex flex-row gap-10 px-1">
               {navMenus.map((menu, i) => (
                 <li key={i} className="m-0" style={{ display: 'inline-flex' }}>
                   <Link
@@ -119,18 +137,22 @@ function Navbar() {
           </div>
 
           {/* Right: Download, Cart, Profile, Mobile menu button */}
-          <div className="navbar-end gap-1 sm:gap-2">
-            <div className="hidden sm:block">
-              <PWAInstallButton />
-            </div>
+          <div className="flex items-center gap-1 sm:gap-2">
+            {isMounted && (
+              <div className="hidden sm:block">
+                <PWAInstallButton />
+              </div>
+            )}
 
-            <div className="dropdown dropdown-end">
-              <div
-                tabIndex={0}
-                role="button"
+            {/* Cart Dropdown */}
+            <div className="relative cart-dropdown">
+              <button
+                type="button"
+                aria-label="Cart"
                 className="btn btn-ghost btn-circle mr-1 sm:mr-2 hover:bg-slate-100 dark:hover:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700 transition-all p-1 sm:p-2"
+                onClick={handleCartDropdown}
               >
-                <div className="indicator">
+                <div className="relative">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7"
@@ -145,11 +167,13 @@ function Navbar() {
                       d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                     />
                   </svg>
-                  <span className="badge badge-xs sm:badge-sm indicator-item rounded-full bg-blue-600 text-white text-xs font-medium min-h-4 h-4 sm:min-h-5 sm:h-5">
-                    {addToCartList?.length}
-                  </span>
+                  {isMounted && (
+                    <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[18px] h-4 flex items-center justify-center shadow">
+                      {addToCartList?.length || 0}
+                    </span>
+                  )}
                 </div>
-              </div>
+              </button>
               <div
                 tabIndex={0}
                 className="card card-compact dropdown-content bg-base-100 dark:bg-gray-900 z-1 mt-3 w-52 shadow"
@@ -169,16 +193,41 @@ function Navbar() {
                       View cart
                     </Link>
                   </div>
+                </div>
+              </div>
+            </div>
+            {/* Profile Dropdown */}
+            <div className="relative profile-dropdown">
+              <button
+                type="button"
+                aria-label="Profile"
+                className="btn btn-ghost btn-circle avatar hover:bg-slate-100 dark:hover:bg-gray-800 transition-all p-1 sm:p-2"
+                onClick={handleProfileDropdown}
+              >
+                <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full ring-1 ring-gray-200 dark:ring-gray-700 hover:ring-blue-300 dark:hover:ring-yellow-400 transition-all">
+                  <span className="flex justify-center items-center h-full">
+                    <FaUserCog className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-slate-600 dark:text-gray-200" />
+                  </span>
+                </div>
+              </button>
+              {profileDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-900 rounded-lg shadow-lg z-50 border border-gray-200 dark:border-gray-700 p-4">
+                  <div className="p-3 text-[#e9b008] dark:text-yellow-400 font-medium text-lg">
+                    Welcome to wearearn
+                    <p className="text-sm text-black dark:text-gray-200 font-normal mt-1">
+                      Access account & manage orders
+                    </p>
+                  </div>
                   <ul className="mt-2">
                     <li>
-                      {status === "loading" ? (
+                      {!isMounted ? (
                         <div className="flex items-center gap-3 py-3 px-2 text-base opacity-50">
                           <i className="text-lg">
                             <FiUser />
                           </i>
                           <span>Loading...</span>
                         </div>
-                      ) : status === "unauthenticated" || !id ? (
+                      ) : !id ? (
                         <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
                           <i className="text-lg">
                             <FiUser />
@@ -195,14 +244,14 @@ function Navbar() {
                       )}
                     </li>
                     <li>
-                      {status === "loading" ? (
+                      {!isMounted ? (
                         <div className="flex items-center gap-3 py-3 px-2 text-base opacity-50">
                           <i className="text-lg">
                             <FaUserPlus />
                           </i>
                           <span>Loading...</span>
                         </div>
-                      ) : status === "unauthenticated" || !id ? (
+                      ) : !id ? (
                         <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
                           <i className="text-lg">
                             <FaUserPlus />
@@ -212,87 +261,20 @@ function Navbar() {
                       ) : (
                         <button 
                           onClick={handleUserLogOut}
-                          disabled={isLoggingOut}
-                          className="flex items-center gap-3 py-3 px-2 text-base hover:bg-red-500 hover:text-white dark:hover:bg-red-600 rounded-lg transition-colors w-full text-left disabled:opacity-50 disabled:cursor-not-allowed">
+                          className="flex items-center gap-3 py-3 px-2 text-base hover:bg-red-500 hover:text-white dark:hover:bg-red-600 rounded-lg transition-colors w-full text-left">
                           <i className="text-lg">
-                            {isLoggingOut ? (
-                              <div className="animate-spin border-2 border-current border-t-transparent rounded-full w-4 h-4"></div>
-                            ) : (
-                              <IoLogOut />
-                            )}
+                            <IoLogOut />
                           </i>
-                          <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
+                          <span>Logout</span>
                         </button>
                       )}
                     </li>
                   </ul>
                 </div>
-              </div>
+              )}
             </div>
-            <div className="dropdown dropdown-end">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle avatar hover:bg-slate-100 dark:hover:bg-gray-800 transition-all p-1 sm:p-2"
-            >
-              <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full ring-1 ring-gray-200 dark:ring-gray-700 hover:ring-blue-300 dark:hover:ring-yellow-400 transition-all">
-                <span className="flex justify-center items-center h-full">
-                  <FaUserCog className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-slate-600 dark:text-gray-200" />
-                </span>
-              </div>
-            </div>
-              <ul
-                tabIndex={0}
-                className="menu menu-sm dropdown-content bg-base-100 dark:bg-gray-900 rounded-box z-1 mt-3 w-72 p-4 shadow-lg"
-              >
-                <div className="p-3 text-[#e9b008] dark:text-yellow-400 font-medium text-lg">
-                  Welcome to wearearn
-                  <p className="text-sm text-black dark:text-gray-200 font-normal mt-1">
-                    Access account & manage orders
-                  </p>
-                </div>
-                <li>
-                  {!id ? (
-                    <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-                      <i className="text-lg">
-                        <FiUser />
-                      </i>
-                      <span>Login</span>
-                    </Link>
-                  ) : (
-                    <>
-                      <Link href={"/account"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-                        <i className="text-lg">
-                          <FiUser />
-                        </i>
-                        <span>My Account</span>
-                      </Link>
-                    </>
-                  )}
-                </li>
-                <li>
-                  {!id ? (
-                    <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-                      <i className="text-lg">
-                        <FaUserPlus />
-                      </i>
-                      <span>Register</span>
-                    </Link>
-                  ) : (
-                    <button 
-                    onClick={handleUserLogOut}
-                    className="flex items-center gap-3 py-3 px-2 text-base hover:bg-red-500 hover:text-white dark:hover:bg-red-600 rounded-lg transition-colors w-full text-left">
-                      <i className="text-lg">
-                        <IoLogOut />
-                      </i>
-                      <span>Logout</span>
-                    </button>
-                  )}
-                </li>
-              </ul>
-              </div>
 
-            {status === "authenticated" && loginSession === "user" && (
+            {loginSession === "user" && (
               <button
                 onClick={handleUserLogOut}
                 disabled={isLoggingOut}
@@ -394,7 +376,7 @@ function Navbar() {
               onClick={handleSetOpenMenu}
             />
           )}
-  </nav>
+        </nav>
       </div>
     </header>
   );

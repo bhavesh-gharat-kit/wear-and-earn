@@ -62,7 +62,7 @@ export default function LandingPageSlider() {
   }, []);
 
   return (
-    <section className="w-full h-[35vh] xs:h-[40vh] sm:h-[45vh] md:h-screen relative overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+  <section className="w-full h-[35vh] xs:h-[40vh] sm:h-[45vh] md:h-[70vh] relative overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <Swiper
         slidesPerView={1}
         spaceBetween={0}
@@ -91,14 +91,14 @@ export default function LandingPageSlider() {
 
           return (
             <SwiperSlide key={id} className={isActive ? "fade-in-slide" : "hidden"} >
-              <div className="relative w-full h-[35vh] xs:h-[40vh] sm:h-[45vh] md:h-screen overflow-hidden">
+              <div className="relative w-full h-[35vh] xs:h-[40vh] sm:h-[45vh] md:h-[70vh] overflow-hidden">
                 <Image
                   src={imageUrl}
                   alt={title || "banner"}
                   fill
                   priority={index === 0}
                   sizes="(max-width: 480px) 100vw, (max-width: 768px) 100vw, 100vw"
-                  className="select-none object-contain sm:object-cover object-center bg-gray-100 dark:bg-gray-800 transition-transform duration-700 hover:scale-105"
+                  className="h-full w-full object-cover select-none bg-gray-100 dark:bg-gray-800 transition-transform duration-700 hover:scale-105"
                 />
                 
                 {/* Enhanced gradient overlays */}
@@ -108,14 +108,7 @@ export default function LandingPageSlider() {
                 {/* Enhanced content overlay */}
                 <div className="absolute inset-0 flex items-end justify-center pb-6 sm:pb-8 md:items-center md:pb-0">
                   <div className="text-center text-white px-4 sm:px-6 md:px-8 max-w-5xl mx-auto">
-                    {title && title.trim() && title !== "2nd" && (
-                      <div className="space-y-2 sm:space-y-3 md:space-y-4">
-                        <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-bold drop-shadow-2xl leading-tight animate-fade-up">
-                          {title}
-                        </h1>
-                        <div className="w-16 sm:w-20 md:w-24 h-1 bg-white/80 mx-auto rounded-full"></div>
-                      </div>
-                    )}
+                    {/* No heading will be shown for any banner */}
                   </div>
                 </div>
 
