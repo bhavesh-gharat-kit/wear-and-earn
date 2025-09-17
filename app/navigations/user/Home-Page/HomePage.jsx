@@ -6,7 +6,7 @@ function HomePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Compact Mobile Hero for Rectangle Images */}
-      <div className="w-full h-[35vh] xs:h-[40vh] sm:h-[45vh] md:h-screen overflow-hidden">
+  <div className="w-full h-[35vh] xs:h-[40vh] sm:h-[45vh] md:h-[70vh] overflow-hidden">
         <HeroSlider/>
       </div>
       
@@ -14,14 +14,7 @@ function HomePage() {
       <div className="px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 bg-white dark:bg-gray-900">
         {/* Product Section with Mobile Title */}
         <section className="py-6 sm:py-8 md:py-12">
-          <div className="text-center mb-6 sm:mb-8">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4">
-              Featured Products
-            </h2>
-            <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-2">
-              Discover our premium collection designed for your success
-            </p>
-          </div>
+          {/* Removed Featured Products heading and subtitle */}
           <ProductSlider />
         </section>
         

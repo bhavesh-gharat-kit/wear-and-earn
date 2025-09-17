@@ -10,8 +10,14 @@ const PWAInstallButton = () => {
   const [isInstalled, setIsInstalled] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
     // Check if app is already installed (multiple methods for better detection)
     const checkInstallation = () => {
       // Method 1: Check display mode
@@ -127,6 +133,16 @@ const PWAInstallButton = () => {
       setIsInstalling(false);
     }
   };
+
+  // Don't render anything until mounted (prevents hydration mismatch)
+  if (!isMounted) {
+    return (
+      <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gray-300 rounded-lg opacity-50 cursor-not-allowed">
+        <FaDownload className="w-4 h-4" />
+        <span className="text-sm font-semibold">Loading...</span>
+      </button>
+    );
+  }
 
   // Don't show button if app is already installed
   if (isInstalled) {
