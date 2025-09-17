@@ -177,25 +177,29 @@ function Navbar() {
               {cartDropdownOpen && (
                 <div
                   tabIndex={0}
-                  className="card card-compact dropdown-content bg-base-100 dark:bg-gray-900 z-1 mt-3 w-52 shadow"
+                  className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
                 >
-                <div className="card-body">
-                  <span className="text-lg font-bold">
-                    {addToCartList?.length} Items
-                  </span>
-                  <span className="text-info">
-                    Subtotal: ₹{subTotal.toLocaleString("en-IN")} {" "}
-                  </span>
-                  <div className="card-actions">
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-lg font-bold text-gray-900 dark:text-white">
+                        Cart ({addToCartList?.length || 0})
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                      Subtotal: <span className="font-semibold text-blue-600 dark:text-blue-400">₹{subTotal.toLocaleString("en-IN")}</span>
+                    </div>
                     <Link
                       href={"/cart"}
-                      className="btn btn-primary btn-block"
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                      onClick={() => setCartDropdownOpen(false)}
                     >
-                      View cart
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 12H6L5 9z"/>
+                      </svg>
+                      View Cart
                     </Link>
                   </div>
                 </div>
-              </div>
               )}
             </div>
             {/* Profile Dropdown */}

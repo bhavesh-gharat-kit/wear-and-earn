@@ -38,14 +38,14 @@ export default function ProductSlider({ title = "Top Trending", showModal, setSh
     <section className="w-full py-8 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4">
         {/* Mobile-Optimized Top Trending Products Header */}
-        <div className="text-center mb-6 sm:mb-8 md:mb-12 trending-header">
+        <div className="text-center mb-6 sm:mb-8 md:mb-12 border-t-4 border-purple-500 dark:border-purple-400 pt-6 rounded-t-lg bg-gradient-to-b from-purple-50 to-white dark:from-purple-900/20 dark:to-gray-900">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-4 text-purple-700 dark:text-purple-400 px-4">
             Top Trending Products
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-4">
             Discover the most popular products customers are loving right now
           </p>
-          <div className="w-16 sm:w-20 md:w-24 h-1 trending-divider mx-auto mt-3 sm:mt-4 rounded-full bg-amber-500 dark:bg-amber-400"></div>
+          <div className="w-16 sm:w-20 md:w-24 h-1 mx-auto mt-3 sm:mt-4 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 dark:from-amber-300 dark:via-amber-400 dark:to-amber-300 shadow-lg"></div>
         </div>
         <Swiper
           slidesPerView={2} // Mobile: 2 compact cards
@@ -62,29 +62,29 @@ export default function ProductSlider({ title = "Top Trending", showModal, setSh
           loop={true}
           breakpoints={{
           360: {
-            slidesPerView: 2, // Very small mobile: 2 cards
-            spaceBetween: 8,
-          },
-          480: {
-            slidesPerView: 2, // Small mobile: 2 cards
+            slidesPerView: 2, // Very small mobile: 2 full cards
             spaceBetween: 12,
           },
-          640: {
-            slidesPerView: 2, // Tablet: 2 cards
+          480: {
+            slidesPerView: 2, // Small mobile: 2 full cards
             spaceBetween: 16,
+          },
+          640: {
+            slidesPerView: 2, // Tablet: 2 full cards
+            spaceBetween: 20,
           },
           768: {
             slidesPerView: 3, // Tablet landscape: 3 cards
-            spaceBetween: 20,
+            spaceBetween: 24,
             navigation: true, // Enable navigation on larger screens
           },
           1024: {
-            slidesPerView: 3, // Desktop: 3 cards
-            spaceBetween: 24,
+            slidesPerView: 4, // Desktop: 4 cards
+            spaceBetween: 28,
           },
           1280: {
-            slidesPerView: 4, // Large screens: 4 cards
-            spaceBetween: 30,
+            slidesPerView: 5, // Large screens: 5 cards
+            spaceBetween: 32,
           },
         }}
           modules={[Pagination, Navigation, Autoplay]}

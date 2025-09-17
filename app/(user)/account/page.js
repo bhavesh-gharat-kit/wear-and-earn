@@ -578,13 +578,6 @@ const ReferralSection = ({ userData }) => {
             {copying ? 'Copied!' : 'Copy'}
           </button>
         </div>
-        
-        <div className="text-sm text-gray-600 dark:text-gray-300">
-          <p className="mb-2 font-medium">Share this URL:</p>
-          <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-3 py-2 rounded text-xs break-all">
-            {referralData.referralUrl}
-          </div>
-        </div>
       </div>
 
       {/* Share Options */}
