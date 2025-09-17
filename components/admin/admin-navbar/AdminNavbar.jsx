@@ -10,6 +10,7 @@ import { FaBars, FaSignOutAlt, FaUser } from "react-icons/fa";
 
 function AdminNavbar({ setShowMenus }) {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -18,12 +19,14 @@ function AdminNavbar({ setShowMenus }) {
   };
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await signOut({ redirect: false });
       toast.success("Logged out successfully");
       router.push("/admin/login");
     } catch (error) {
       toast.error("Error logging out");
+      setIsLoggingOut(false);
     }
   };
 
@@ -81,10 +84,15 @@ function AdminNavbar({ setShowMenus }) {
                       </div>
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-2 px-3 sm:px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 transition-colors text-sm sm:text-base"
+                        disabled={isLoggingOut}
+                        className="w-full flex items-center gap-2 px-3 sm:px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <FaSignOutAlt className="text-sm" />
-                        Sign Out
+                        {isLoggingOut ? (
+                          <div className="animate-spin border-2 border-current border-t-transparent rounded-full w-3 h-3"></div>
+                        ) : (
+                          <FaSignOutAlt className="text-sm" />
+                        )}
+                        {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
                       </button>
                     </div>
                   )}

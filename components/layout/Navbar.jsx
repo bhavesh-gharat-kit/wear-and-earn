@@ -23,14 +23,15 @@ import { useSession, signOut } from "next-auth/react";
 import toast from "react-hot-toast";
 
 function Navbar() {
-  const [loginSession, setLoginSession] = useState(null);
-  const { data } = useSession();
+  const [isMounted, setIsMounted] = useState(false);
+  const { data, status } = useSession();
   const id = data?.user?.id;
-  const session = data?.user?.role;
+  const loginSession = data?.user?.role; // Use session data directly instead of local state
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
-    setLoginSession(session);
-  }, [session]);
+    setIsMounted(true);
+  }, []);
 
   // Navigation (center) — login/account removed; use profile icon only
   const navMenus = [
@@ -59,14 +60,22 @@ function Navbar() {
   };
 
   const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleUserLogOut = async () => {
-    await signOut({ redirect: false });
-    toast.success("Log Out Successfully", { duration: 1000 });
-    setTimeout(() => {
-      router.push("/login-register");
-    }, 1200);
-    location.href = location.href;
+    setIsLoggingOut(true);
+    try {
+      await signOut({ redirect: false });
+      toast.success("Logged out successfully", { duration: 1000 });
+      // Redirect to login page after a brief delay
+      setTimeout(() => {
+        router.push("/login");
+      }, 1200);
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Error logging out");
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -160,6 +169,63 @@ function Navbar() {
                       View cart
                     </Link>
                   </div>
+                  <ul className="mt-2">
+                    <li>
+                      {status === "loading" ? (
+                        <div className="flex items-center gap-3 py-3 px-2 text-base opacity-50">
+                          <i className="text-lg">
+                            <FiUser />
+                          </i>
+                          <span>Loading...</span>
+                        </div>
+                      ) : status === "unauthenticated" || !id ? (
+                        <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                          <i className="text-lg">
+                            <FiUser />
+                          </i>
+                          <span>Login</span>
+                        </Link>
+                      ) : (
+                        <Link href={"/account"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                          <i className="text-lg">
+                            <FiUser />
+                          </i>
+                          <span>My Account</span>
+                        </Link>
+                      )}
+                    </li>
+                    <li>
+                      {status === "loading" ? (
+                        <div className="flex items-center gap-3 py-3 px-2 text-base opacity-50">
+                          <i className="text-lg">
+                            <FaUserPlus />
+                          </i>
+                          <span>Loading...</span>
+                        </div>
+                      ) : status === "unauthenticated" || !id ? (
+                        <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                          <i className="text-lg">
+                            <FaUserPlus />
+                          </i>
+                          <span>Register</span>
+                        </Link>
+                      ) : (
+                        <button 
+                          onClick={handleUserLogOut}
+                          disabled={isLoggingOut}
+                          className="flex items-center gap-3 py-3 px-2 text-base hover:bg-red-500 hover:text-white dark:hover:bg-red-600 rounded-lg transition-colors w-full text-left disabled:opacity-50 disabled:cursor-not-allowed">
+                          <i className="text-lg">
+                            {isLoggingOut ? (
+                              <div className="animate-spin border-2 border-current border-t-transparent rounded-full w-4 h-4"></div>
+                            ) : (
+                              <IoLogOut />
+                            )}
+                          </i>
+                          <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
+                        </button>
+                      )}
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -226,12 +292,22 @@ function Navbar() {
               </ul>
               </div>
 
-            {loginSession === "user" && (
+            {status === "authenticated" && loginSession === "user" && (
               <button
                 onClick={handleUserLogOut}
-                className="hidden lg:flex items-center gap-1.5 rounded text-white btn bg-amber-500 dark:bg-yellow-500 hover:bg-amber-600 dark:hover:bg-yellow-400 transition-colors"
+                disabled={isLoggingOut}
+                className="hidden lg:flex items-center gap-1.5 rounded text-white btn bg-amber-500 dark:bg-yellow-500 hover:bg-amber-600 dark:hover:bg-yellow-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <MdLogout fontSize={20} /> Logout
+                {isLoggingOut ? (
+                  <>
+                    <div className="animate-spin border-2 border-current border-t-transparent rounded-full w-4 h-4"></div>
+                    Logging out...
+                  </>
+                ) : (
+                  <>
+                    <MdLogout fontSize={20} /> Logout
+                  </>
+                )}
               </button>
             )}
 
@@ -289,12 +365,22 @@ function Navbar() {
                   <PWAInstallButton />
                 </div>
                 
-                {loginSession === "user" && (
+                {status === "authenticated" && loginSession === "user" && (
                   <button
                     onClick={handleUserLogOut}
-                    className="flex items-center gap-2 rounded text-white btn bg-amber-500 dark:bg-yellow-500 hover:bg-amber-600 dark:hover:bg-yellow-400 transition-colors w-full justify-center"
+                    disabled={isLoggingOut}
+                    className="flex items-center gap-2 rounded text-white btn bg-amber-500 dark:bg-yellow-500 hover:bg-amber-600 dark:hover:bg-yellow-400 transition-colors w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <MdLogout fontSize={18} /> Logout
+                    {isLoggingOut ? (
+                      <>
+                        <div className="animate-spin border-2 border-current border-t-transparent rounded-full w-4 h-4"></div>
+                        Logging out...
+                      </>
+                    ) : (
+                      <>
+                        <MdLogout fontSize={18} /> Logout
+                      </>
+                    )}
                   </button>
                 )}
               </div>

@@ -23,6 +23,7 @@ const AddressUpadte = () => {
     pinCode: "",
     state: "",
   });
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Handle change in form inputs
   const handleChange = (e) => {
@@ -64,6 +65,7 @@ const AddressUpadte = () => {
   // Handle form submission (Just for demo, doesn't do anything)
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsUpdating(true);
     try {
       const payload = {
         ...formData,
@@ -89,6 +91,8 @@ const AddressUpadte = () => {
     } catch (error) {
       console.log("Internal Sever Error While Updating the Address", error);
       toast.error("Internal Sever Error While Updating the Address")
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -311,9 +315,17 @@ const AddressUpadte = () => {
           <div className="flex justify-end mt-6">
             <button
               type="submit"
-              className="btn-save bg-blue-600 text-white py-2 px-6 rounded-md shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isUpdating}
+              className="btn-save bg-blue-600 text-white py-2 px-6 rounded-md shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              Save Address Changes
+              {isUpdating ? (
+                <>
+                  <div className="animate-spin border-2 border-current border-t-transparent rounded-full w-4 h-4"></div>
+                  Updating Address...
+                </>
+              ) : (
+                'Save Address Changes'
+              )}
             </button>
           </div>
         </form>

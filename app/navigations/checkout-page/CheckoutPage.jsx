@@ -493,13 +493,20 @@ export default function CheckoutPage() {
               <button
                 onClick={handlePlaceOrder}
                 disabled={isPlacingOrder || !userAddress}
-                className={`w-full mt-6 py-3 px-6 rounded-lg font-medium transition-colors ${
+                className={`w-full mt-6 py-3 px-6 rounded-lg font-medium transition-colors flex items-center justify-center ${
                   isPlacingOrder || !userAddress
                     ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                     : 'bg-green-600 hover:bg-green-700 text-white'
                 }`}
               >
-                {isPlacingOrder ? 'Placing Order...' : `Place Order - ₹${Math.round(total)}`}
+                {isPlacingOrder ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Placing Order...
+                  </>
+                ) : (
+                  `Place Order - ₹${Math.round(total)}`
+                )}
               </button>
             </div>
           </div>

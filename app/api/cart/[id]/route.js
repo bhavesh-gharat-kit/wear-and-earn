@@ -1,7 +1,11 @@
 import { NextResponse as res } from "next/server";
-import prisma from "@/lib/prisma";
+import { safeQuery } from "@/lib/db-utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
+// Force nodejs runtime to prevent edge runtime issues
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 
 export const GET = async (request, {params}) => {
@@ -13,7 +17,9 @@ export const GET = async (request, {params}) => {
             return res.json({ message: "User ID is required" }, { status: 400 });
         }
 
-    const response = await prisma.cart.findMany({
+    const response = await safeQuery(async () => {
+        const { default: prisma } = await import("@/lib/prisma");
+        return prisma.cart.findMany({
             where: {
                 userId: Number(id),
             },
@@ -25,6 +31,7 @@ export const GET = async (request, {params}) => {
                 },    // Include product details
             },
         });
+    });
 
         return res.json({ status: "ok", data: response });
     } catch (error) {
@@ -54,11 +61,14 @@ export const DELETE = async (request, { params }) => {
         }
 
         // Delete the cart item for the logged-in user and the given product
-    const deletedItem = await prisma.cart.deleteMany({
-            where: {
-                userId: Number(loggedUserId),           // Ensure the user is the owner of the cart item
-                productId: Number(productId),     // The specific product to remove
-            },
+        const deletedItem = await safeQuery(async () => {
+            const { default: prisma } = await import("@/lib/prisma");
+            return prisma.cart.deleteMany({
+                where: {
+                    userId: Number(loggedUserId),           // Ensure the user is the owner of the cart item
+                    productId: Number(productId),     // The specific product to remove
+                },
+            });
         });
 
         // If no rows were deleted, it means the product wasn't found in the user's cart

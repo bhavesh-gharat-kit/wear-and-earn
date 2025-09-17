@@ -15,6 +15,7 @@ function ContactUs() {
     message: "",
   };
   const [contactForm, setContactForm] = useState(contactFormInitilizer);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleContactFormInput = (e) => {
     const { name, value } = e.target;
@@ -26,6 +27,7 @@ function ContactUs() {
 
   const handleContactFormSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const response = await axios.post("/api/contact", contactForm);
       if (response.status === 201) {
@@ -37,6 +39,8 @@ function ContactUs() {
     } catch (error) {
       console.log("Internal Error While Sending Form", error);
       toast.error("Internal Error While Sending Form");
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -182,10 +186,18 @@ function ContactUs() {
                     <button
                       type="submit"
                       onSubmit={handleContactFormSubmit}
+                      disabled={isSubmitting}
                       id="sendBtn"
-                      className="btn btn-primary px-6 py-3 text-white bg-purple-700 dark:bg-purple-600 rounded-md hover:bg-purple-600 dark:hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400"
+                      className="btn btn-primary px-6 py-3 text-white bg-purple-700 dark:bg-purple-600 rounded-md hover:bg-purple-600 dark:hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      Send Message
+                      {isSubmitting ? (
+                        <>
+                          <div className="animate-spin border-2 border-current border-t-transparent rounded-full w-4 h-4"></div>
+                          Sending...
+                        </>
+                      ) : (
+                        'Send Message'
+                      )}
                     </button>
                   </div>
                 </div>

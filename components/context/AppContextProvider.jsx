@@ -39,8 +39,10 @@ function AppContextProvider({ children }) {
     if (status === "authenticated" && loggedInUserId) {
       fetchUserProductCartDetails();
     } else if (status === "unauthenticated") {
+      // Only clear cart if user is actually unauthenticated, not during loading
       setAddtoCartList([]);
     }
+    // Don't do anything during "loading" status to prevent clearing cart during page refresh
   }, [loggedInUserId, status]);
 
   return (

@@ -1,33 +1,108 @@
-import prisma from "@/lib/prisma";
 import { NextResponse as res } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
+// Force nodejs runtime to prevent edge runtime issues
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 
 
 export async function GET(request, { params }) {
-
-
     try {
-        const { id } = await params;
+        // TODO: Add authentication check later
+        // const session = await getServerSession(authOptions);
+        // if (!session || session.user.role !== 'admin') {
+        //     return res.json({
+        //         success: false,
+        //         message: "Unauthorized access"
+        //     }, { status: 401 });
+        // }
 
-    const user = await prisma.user.findUnique({
-            where: { id: Number(id) }, // ensure it's a number if your ID is int
+        const { id } = await params;
+        console.log('Fetching user with ID:', id);
+
+        if (!id || isNaN(Number(id))) {
+            return res.json({
+                success: false,
+                message: "Invalid user ID"
+            }, { status: 400 });
+        }
+
+        // Import Prisma dynamically to ensure it's available
+        const { default: prisma } = await import("@/lib/prisma");
+
+        // First, try to fetch user with basic info only
+        const user = await prisma.user.findUnique({
+            where: { id: Number(id) }
         });
 
         if (!user) {
+            console.log('User not found with ID:', id);
             return res.json({
                 success: false,
                 message: "User not found"
             }, { status: 404 });
         }
 
+        console.log('User found, fetching related data...');
+
+        // Try to fetch address separately to handle potential errors
+        let address = null;
+        try {
+            address = await prisma.address.findUnique({
+                where: { userId: Number(id) }
+            });
+        } catch (addressError) {
+            console.log('Address fetch error:', addressError.message);
+        }
+
+        // Try to fetch KYC data separately
+        let kycData = null;
+        try {
+            kycData = await prisma.kycData.findUnique({
+                where: { userId: Number(id) }
+            });
+        } catch (kycError) {
+            console.log('KYC fetch error:', kycError.message);
+        }
+
+        // Try to fetch orders separately
+        let orders = [];
+        try {
+            orders = await prisma.order.findMany({
+                where: { userId: Number(id) },
+                take: 5,
+                orderBy: { createdAt: 'desc' },
+                select: {
+                    id: true,
+                    totalAmount: true,
+                    status: true,
+                    createdAt: true
+                }
+            });
+        } catch (orderError) {
+            console.log('Orders fetch error:', orderError.message);
+        }
+
+        // Combine all data
+        const completeUser = {
+            ...user,
+            address,
+            kycData,
+            orders
+        };
+
+        console.log('Returning complete user data');
         return res.json({
             success: true,
             message: "User fetched successfully",
-            data: user
+            data: completeUser
         }, { status: 200 });
 
     } catch (error) {
         console.error("Error fetching user:", error);
+        console.error("Error stack:", error.stack);
         return res.json({
             success: false,
             message: "Failed to fetch user",

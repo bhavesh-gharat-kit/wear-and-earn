@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../auth/[...nextauth]/route'
-import prisma from "@/lib/prisma";
+import { safeQuery } from "@/lib/db-utils";
 
 export async function GET(request) {
   try {
@@ -22,16 +22,19 @@ export async function GET(request) {
     const userId = parseInt(session.user.id)
     console.log('🔍 Looking for user:', userId)
     
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        referralCode: true,
-        isActive: true,
-        fullName: true,
-        email: true
-      }
-    })
+    const user = await safeQuery(async () => {
+      const { default: prisma } = await import("@/lib/prisma");
+      return prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          referralCode: true,
+          isActive: true,
+          fullName: true,
+          email: true
+        }
+      });
+    });
 
     console.log('🔍 Found user:', user)
 

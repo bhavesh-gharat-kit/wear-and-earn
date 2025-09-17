@@ -22,8 +22,11 @@ export default function CartPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const { addToCartList, setAddtoCartList, fetchUserProductCartDetails, cartLoading } = useContext(CreateContext)
+  const [loadingItems, setLoadingItems] = useState(new Set())
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
 
   const handleRemoveItemFromCart = async (productId) => {
+    setLoadingItems(prev => new Set(prev.add(`remove-${productId}`)))
     try {
       const response = await axios.delete(`/api/cart/${productId}`)
       if (response.status === 200) {
@@ -33,12 +36,19 @@ export default function CartPage() {
     } catch (error) {
       console.error("Error removing item from cart", error)
       toast.error("Failed to remove item")
+    } finally {
+      setLoadingItems(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(`remove-${productId}`)
+        return newSet
+      })
     }
   }
 
   const handleQuantityChange = async (productId, newQuantity) => {
     if (newQuantity < 1) return
     
+    setLoadingItems(prev => new Set(prev.add(`quantity-${productId}`)))
     try {
       const response = await axios.put(
         `/api/cart/${productId}`,
@@ -53,6 +63,12 @@ export default function CartPage() {
     } catch (error) {
       console.error("Error updating quantity", error)
       toast.error("Failed to update quantity")
+    } finally {
+      setLoadingItems(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(`quantity-${productId}`)
+        return newSet
+      })
     }
   }
 
@@ -92,6 +108,7 @@ export default function CartPage() {
       return
     }
 
+    setCheckoutLoading(true)
     router.push('/checkout')
   }
 
@@ -232,27 +249,46 @@ export default function CartPage() {
                           <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded">
                             <button
                               onClick={() => handleQuantityChange(productId, quantity - 1)}
-                              disabled={quantity <= 1}
+                              disabled={quantity <= 1 || loadingItems.has(`quantity-${productId}`)}
                               className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                              <Minus className="h-3 w-3 text-gray-700 dark:text-gray-200" />
+                              {loadingItems.has(`quantity-${productId}`) ? (
+                                <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <Minus className="h-3 w-3 text-gray-700 dark:text-gray-200" />
+                              )}
                             </button>
                             <span className="px-3 py-1 font-medium text-gray-900 dark:text-gray-100 text-sm min-w-[2rem] text-center">{quantity}</span>
                             <button
                               onClick={() => handleQuantityChange(productId, quantity + 1)}
-                              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                              disabled={loadingItems.has(`quantity-${productId}`)}
+                              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                              <Plus className="h-3 w-3 text-gray-700 dark:text-gray-200" />
+                              {loadingItems.has(`quantity-${productId}`) ? (
+                                <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <Plus className="h-3 w-3 text-gray-700 dark:text-gray-200" />
+                              )}
                             </button>
                           </div>
                         </div>
                         
                         <button
                           onClick={() => handleRemoveItemFromCart(productId)}
-                          className="inline-flex items-center px-2 py-1 border border-red-300 dark:border-red-400 text-xs font-medium rounded text-red-700 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-600 transition-colors"
+                          disabled={loadingItems.has(`remove-${productId}`)}
+                          className="inline-flex items-center px-2 py-1 border border-red-300 dark:border-red-400 text-xs font-medium rounded text-red-700 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                          <Trash2 className="h-3 w-3 mr-1" />
-                          Remove
+                          {loadingItems.has(`remove-${productId}`) ? (
+                            <>
+                              <div className="w-3 h-3 border border-red-400 border-t-transparent rounded-full animate-spin mr-1"></div>
+                              Removing...
+                            </>
+                          ) : (
+                            <>
+                              <Trash2 className="h-3 w-3 mr-1" />
+                              Remove
+                            </>
+                          )}
                         </button>
                       </div>
                     </div>
@@ -296,10 +332,20 @@ export default function CartPage() {
             <div className="mt-4">
               <button
                 onClick={handleProceedToCheckout}
-                className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 transition-colors"
+                disabled={checkoutLoading}
+                className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                <CreditCard className="h-4 w-4 mr-2" />
-                Proceed to Checkout
+                {checkoutLoading ? (
+                  <>
+                    <div className="w-4 h-4 border border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Redirecting...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Proceed to Checkout
+                  </>
+                )}
               </button>
             </div>
             
