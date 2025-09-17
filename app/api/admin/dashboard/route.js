@@ -56,14 +56,14 @@ export const GET = async () => {
         try {
             const mlmSalesResult = await prisma.order.aggregate({
                 _sum: {
-                    mlmAmount: true
+                    commissionAmount: true
                 },
                 where: {
                     status: 'delivered' // Only count delivered orders
                 }
             });
-            const totalMLMSales = mlmSalesResult?._sum?.mlmAmount || 0;
-            // Company gets 30% of MLM sales (amounts are in paisa, so we keep in paisa)
+            const totalMLMSales = mlmSalesResult?._sum?.commissionAmount || 0;
+            // Company gets 30% of MLM sales (commissionAmount is already in paisa)
             totalCompanyEarnings = Math.floor(totalMLMSales * 0.30);
         } catch (companyEarningsError) {
             console.error('Company earnings calculation error:', companyEarningsError);
