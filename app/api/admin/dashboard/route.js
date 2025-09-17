@@ -63,7 +63,7 @@ export const GET = async () => {
                 }
             });
             const totalMLMSales = mlmSalesResult?._sum?.commissionAmount || 0;
-            // Company gets 30% of MLM sales (commissionAmount is already in paisa)
+            // Company gets 30% of MLM sales (commissionAmount is in paisa, so convert and calculate)
             totalCompanyEarnings = Math.floor(totalMLMSales * 0.30);
         } catch (companyEarningsError) {
             console.error('Company earnings calculation error:', companyEarningsError);

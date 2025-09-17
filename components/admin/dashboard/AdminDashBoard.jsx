@@ -1,6 +1,7 @@
 "use client";
 
 import LoaderEffect from "@/components/ui/LoaderEffect";
+import MonthlyCompanyEarnings from "./MonthlyCompanyEarnings";
 import axios from "axios";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -178,12 +179,12 @@ function AdminDashBoard() {
               <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl shadow-lg p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold mb-2">💰 Company Earnings</h2>
+                    <h2 className="text-lg font-semibold mb-2">💰 Company Earnings (Total)</h2>
                     <p className="text-3xl font-bold">
                       ₹{companyEarnings.totalEarningsRupees?.toLocaleString('en-IN') || '0'}
                     </p>
                     <p className="text-green-100 text-sm mt-1">
-                      30% commission from MLM sales
+                      30% commission from delivered MLM orders
                     </p>
                   </div>
                   <div className="text-right">
@@ -209,6 +210,9 @@ function AdminDashBoard() {
               </div>
             </div>
           )}
+
+          {/* Monthly Company Earnings Component */}
+          <MonthlyCompanyEarnings />
 
 
 
