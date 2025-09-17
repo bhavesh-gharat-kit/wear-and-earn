@@ -1,18 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export const GET = async (request) => {
     try {
-        const session = await getServerSession(authOptions);
-        
-        if (!session || !session.user?.isAdmin) {
-            return NextResponse.json(
-                { error: "Unauthorized - Admin access required" },
-                { status: 401 }
-            );
-        }
 
         const { searchParams } = new URL(request.url);
         const year = searchParams.get('year') ? parseInt(searchParams.get('year')) : new Date().getFullYear();
