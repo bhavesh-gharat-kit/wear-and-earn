@@ -72,57 +72,70 @@ export async function GET(request) {
     // Get total count for pagination
     const totalCount = await prisma.user.count({ where });
 
-    // Format user referral data with team status
-    const formattedData = users.map((user) => {
-      const eligibleReferrals = user.referrals.length;
-      const isTeamComplete = eligibleReferrals >= 3;
+    // Format user referral data and split into multiple teams
+    const allTeams = [];
+    
+    users.forEach((user) => {
+      const eligibleReferrals = user.referrals.map((referral) => ({
+        id: referral.id,
+        name: referral.fullName,
+        email: referral.email,
+        firstPurchaseDate: referral.purchases[0]?.createdAt || null,
+        mlmAmount: (referral.purchases[0]?.mlmAmount || 0) / 100, // Convert paisa to rupees
+        isEligible: true // All these referrals are eligible (made first purchase)
+      }));
+
+      // Split referrals into teams of 3
+      const teamsCount = Math.ceil(eligibleReferrals.length / 3);
       
-      return {
-        id: user.id,
-        leaderName: user.fullName,
-        leaderEmail: user.email,
-        level: user.level,
-        teamCount: user.teamCount,
-        directTeams: user.directTeams,
-        isActive: user.isActive,
+      for (let i = 0; i < teamsCount; i++) {
+        const teamMembers = eligibleReferrals.slice(i * 3, (i + 1) * 3);
+        const isTeamComplete = teamMembers.length >= 3;
         
-        // Team Status Information
-        teamStatus: isTeamComplete ? 'COMPLETE' : 'INCOMPLETE',
-        eligibleReferrals: eligibleReferrals,
-        requiredReferrals: 3,
-        progressPercentage: Math.min((eligibleReferrals / 3) * 100, 100),
-        
-        referrals: user.referrals.map((referral) => ({
-          id: referral.id,
-          name: referral.fullName,
-          email: referral.email,
-          firstPurchaseDate: referral.purchases[0]?.createdAt || null,
-          mlmAmount: (referral.purchases[0]?.mlmAmount || 0) / 100, // Convert paisa to rupees
-          isEligible: true // All these referrals are eligible (made first purchase)
-        })),
-        totalReferralValue: user.referrals.reduce((sum, ref) => 
-          sum + (ref.purchases[0]?.mlmAmount || 0), 0
-        ) / 100 // Convert paisa to rupees
-      };
+        allTeams.push({
+          id: `${user.id}_team_${i + 1}`, // Unique team ID
+          leaderName: user.fullName,
+          leaderEmail: user.email,
+          level: user.level,
+          teamNumber: i + 1, // Team number for this user
+          totalTeamsForUser: teamsCount, // Total teams for this user
+          userId: user.id, // Original user ID
+          isActive: user.isActive,
+          
+          // Team Status Information
+          teamStatus: isTeamComplete ? 'COMPLETE' : 'INCOMPLETE',
+          eligibleReferrals: teamMembers.length,
+          requiredReferrals: 3,
+          progressPercentage: Math.min((teamMembers.length / 3) * 100, 100),
+          
+          referrals: teamMembers,
+          totalReferralValue: teamMembers.reduce((sum, ref) => 
+            sum + (ref.mlmAmount || 0), 0
+          )
+        });
+      }
     });
+
+    const formattedData = allTeams;
 
     // Separate complete and incomplete teams
     const completeTeams = formattedData.filter(user => user.teamStatus === 'COMPLETE');
     const incompleteTeams = formattedData.filter(user => user.teamStatus === 'INCOMPLETE');
 
     // Format data for frontend compatibility
-    const teams = formattedData.map(user => ({
-      id: user.id,
-      leaderName: user.leaderName,
-      leaderEmail: user.leaderEmail,
-      level: user.level,
-      teamCount: user.teamCount || 0,
-      directTeams: user.directTeams || 0,
-      isActive: user.isActive,
-      isComplete: user.teamStatus === 'COMPLETE',
-      memberCount: user.eligibleReferrals,
+    const teams = formattedData.map(team => ({
+      id: team.id,
+      leaderName: team.leaderName,
+      leaderEmail: team.leaderEmail,
+      level: team.level,
+      teamCount: team.totalTeamsForUser, // Show total teams for this user
+      teamNumber: team.teamNumber, // Which team number this is (1, 2, 3, etc.)
+      directTeams: team.totalTeamsForUser,
+      isActive: team.isActive,
+      isComplete: team.teamStatus === 'COMPLETE',
+      memberCount: team.eligibleReferrals,
       createdAt: new Date().toISOString(), // Format as ISO string for frontend
-      members: user.referrals.map(ref => ({
+      members: team.referrals.map(ref => ({
         id: ref.id,
         name: ref.name,
         email: ref.email

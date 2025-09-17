@@ -4,6 +4,7 @@ import "./globals.css";
 // import 'swiper/css/pagination';
 import Providers from "./Providers";
 import { Toaster } from "react-hot-toast";
+import FloatingWhatsAppButton from "@/components/ui/FloatingWhatsAppButton";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -55,6 +56,7 @@ export default function RootLayout({ children }) {
           {children}
         </Providers>
         <Toaster position="top-right" />
+        <FloatingWhatsAppButton />
         
         {/* PWA Service Worker Registration */}
         <script

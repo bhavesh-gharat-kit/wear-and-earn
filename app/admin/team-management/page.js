@@ -198,7 +198,14 @@ export default function TeamManagementPage() {
                       
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{team.leaderName}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                            {team.leaderName}
+                            {team.teamNumber && (
+                              <span className="text-sm text-blue-600 dark:text-blue-400 ml-2">
+                                (Team {team.teamNumber})
+                              </span>
+                            )}
+                          </h3>
                           <div className="flex items-center space-x-1">
                             <Crown className={`w-4 h-4 ${team.level >= 4 ? 'text-yellow-500' : 'text-gray-400 dark:text-gray-500'}`} />
                             <span className="text-sm font-medium text-gray-600 dark:text-gray-300">L{team.level}</span>
@@ -234,10 +241,17 @@ export default function TeamManagementPage() {
                         {team.isActive ? 'Active' : 'Inactive'}
                       </span>
                       
-                      <div className="text-2xl font-bold text-gray-600 dark:text-gray-100">
-                        {team.teamCount}
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-gray-600 dark:text-gray-100">
+                          {team.teamCount}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-300">total teams</div>
+                        {team.teamNumber && (
+                          <div className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                            Team #{team.teamNumber}
+                          </div>
+                        )}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-300">teams</div>
                       
                       {expandedTeams.has(team.id) ? (
                         <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-500" />

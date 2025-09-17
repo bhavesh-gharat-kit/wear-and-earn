@@ -35,7 +35,7 @@ function AdminDashBoard() {
     return <LoaderEffect />;
   }
 
-  const { totalInStockQuantity, totalOrders, totalProducts, totalUsers } =
+  const { totalInStockQuantity, totalOrders, totalProducts, totalUsers, companyEarnings } =
     allDatabaseDetails;
 
   return (
@@ -171,6 +171,44 @@ function AdminDashBoard() {
               </div>
             </div>
           </div>
+
+          {/* Company Earnings Section */}
+          {companyEarnings && (
+            <div className="mt-8">
+              <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl shadow-lg p-6 text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold mb-2">💰 Company Earnings</h2>
+                    <p className="text-3xl font-bold">
+                      ₹{companyEarnings.totalEarningsRupees?.toLocaleString('en-IN') || '0'}
+                    </p>
+                    <p className="text-green-100 text-sm mt-1">
+                      30% commission from MLM sales
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <svg
+                      className="w-12 h-12 text-green-200 mb-2"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                      />
+                    </svg>
+                    <div className="text-xs text-green-100">
+                      Total Revenue Share
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
 
 
