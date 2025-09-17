@@ -174,10 +174,11 @@ function Navbar() {
                   )}
                 </div>
               </button>
-              <div
-                tabIndex={0}
-                className="card card-compact dropdown-content bg-base-100 dark:bg-gray-900 z-1 mt-3 w-52 shadow"
-              >
+              {cartDropdownOpen && (
+                <div
+                  tabIndex={0}
+                  className="card card-compact dropdown-content bg-base-100 dark:bg-gray-900 z-1 mt-3 w-52 shadow"
+                >
                 <div className="card-body">
                   <span className="text-lg font-bold">
                     {addToCartList?.length} Items
@@ -195,6 +196,7 @@ function Navbar() {
                   </div>
                 </div>
               </div>
+              )}
             </div>
             {/* Profile Dropdown */}
             <div className="relative profile-dropdown">
@@ -274,7 +276,7 @@ function Navbar() {
               )}
             </div>
 
-            {loginSession === "user" && (
+            {status === "authenticated" && loginSession === "user" && (
               <button
                 onClick={handleUserLogOut}
                 disabled={isLoggingOut}
