@@ -138,6 +138,9 @@ const RegisterWithOTP = ({ setIsLogin }) => {
       }
     } catch (error) {
       console.error('Registration completion error:', error);
+      console.error('Error response data:', error.response?.data);
+      console.error('Error response status:', error.response?.status);
+      console.error('Registration data sent:', { ...registrationData, otp: verifiedOTP });
       toast.error(error.response?.data?.error || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);

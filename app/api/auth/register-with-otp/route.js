@@ -59,29 +59,50 @@ export async function POST(request) {
 
     // Validate email format if provided
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      console.log("❌ Email validation failed:", email);
       return NextResponse.json(
         { error: 'Invalid email format' },
         { status: 400 }
       )
     }
 
-    // Validate mobile number format
-    if (!/^[6-9]\d{9}$/.test(mobileNo)) {
+    // Clean and validate mobile number format
+    console.log("📱 Original mobile number:", mobileNo, "Type:", typeof mobileNo);
+    
+    // Clean mobile number: remove spaces, + and country code
+    let cleanMobileNo = mobileNo.toString().trim().replace(/\s+/g, '');
+    if (cleanMobileNo.startsWith('+91')) {
+      cleanMobileNo = cleanMobileNo.substring(3);
+    } else if (cleanMobileNo.startsWith('91') && cleanMobileNo.length === 12) {
+      cleanMobileNo = cleanMobileNo.substring(2);
+    }
+    
+    console.log("📱 Cleaned mobile number:", cleanMobileNo);
+    
+    if (!/^[6-9]\d{9}$/.test(cleanMobileNo)) {
+      console.log("❌ Mobile number validation failed:", cleanMobileNo);
       return NextResponse.json(
-        { error: 'Invalid mobile number format' },
+        { error: 'Invalid mobile number format. Please enter a 10-digit mobile number starting with 6-9.' },
         { status: 400 }
       )
     }
+    
+    // Use cleaned mobile number
+    mobileNo = cleanMobileNo;
 
     // Validate password strength
     if (password.length < 6) {
+      console.log("❌ Password validation failed - too short:", password.length);
       return NextResponse.json(
         { error: 'Password must be at least 6 characters long' },
         { status: 400 }
       )
     }
 
+    console.log("✅ All validations passed - proceeding with registration");
+
     // Check for existing user
+    console.log("🔍 Checking for existing user with:", { mobileNo, email });
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [
@@ -93,11 +114,14 @@ export async function POST(request) {
 
     if (existingUser) {
       const field = existingUser.mobileNo === mobileNo ? 'Mobile number' : 'Email'
+      console.log("❌ User already exists:", { field, mobileNo: existingUser.mobileNo, email: existingUser.email });
       return NextResponse.json(
         { error: `${field} already registered` },
         { status: 409 }
       )
     }
+
+    console.log("✅ No existing user found - proceeding with registration");
 
         // Handle sponsor identification (spid takes precedence over referralCode)
     let sponsorId = null
