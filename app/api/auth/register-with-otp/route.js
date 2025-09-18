@@ -88,8 +88,8 @@ export async function POST(request) {
       )
     }
     
-    // Use cleaned mobile number
-    mobileNo = cleanMobileNo;
+    // Use cleaned mobile number for database operations
+    const finalMobileNo = cleanMobileNo;
 
     // Validate password strength
     if (password.length < 6) {
@@ -103,18 +103,18 @@ export async function POST(request) {
     console.log("✅ All validations passed - proceeding with registration");
 
     // Check for existing user
-    console.log("🔍 Checking for existing user with:", { mobileNo, email });
+    console.log("🔍 Checking for existing user with:", { mobileNo: finalMobileNo, email });
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [
-          { mobileNo: mobileNo },
+          { mobileNo: finalMobileNo },
           ...(email ? [{ email: email }] : [])
         ]
       }
     })
 
     if (existingUser) {
-      const field = existingUser.mobileNo === mobileNo ? 'Mobile number' : 'Email'
+      const field = existingUser.mobileNo === finalMobileNo ? 'Mobile number' : 'Email'
       console.log("❌ User already exists:", { field, mobileNo: existingUser.mobileNo, email: existingUser.email });
       return NextResponse.json(
         { error: `${field} already registered` },
@@ -197,7 +197,7 @@ export async function POST(request) {
       console.log("👤 Creating new user with data:", {
         fullName: fullName.trim(),
         email: email?.trim() || null,
-        mobileNo: mobileNo.trim(),
+        mobileNo: finalMobileNo.trim(),
         sponsorId: sponsorId,
         referralCode: referralCode,
         isVerified: true,
@@ -209,7 +209,7 @@ export async function POST(request) {
         data: {
           fullName: fullName.trim(),
           email: email?.trim() || null,
-          mobileNo: mobileNo.trim(),
+          mobileNo: finalMobileNo.trim(),
           password: hashedPassword,
           sponsorId: sponsorId,
           referralCode: referralCode,
