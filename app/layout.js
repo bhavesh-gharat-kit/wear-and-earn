@@ -5,6 +5,7 @@ import "./globals.css";
 import Providers from "./Providers";
 import { Toaster } from "react-hot-toast";
 import FloatingWhatsAppButton from "@/components/ui/FloatingWhatsAppButton";
+import FloatingCallButton from "@/components/ui/FloatingCallButton";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -57,6 +58,7 @@ export default function RootLayout({ children }) {
         </Providers>
         <Toaster position="top-right" />
         <FloatingWhatsAppButton />
+        <FloatingCallButton />
         
         {/* PWA Service Worker Registration */}
         <script
