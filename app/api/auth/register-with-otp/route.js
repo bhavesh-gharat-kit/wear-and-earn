@@ -23,6 +23,9 @@ export async function POST(request) {
       )
     }
 
+    const requestBody = await request.json()
+    console.log("📝 Registration request body:", requestBody)
+    
     const { 
       fullName, 
       email, 
@@ -31,10 +34,11 @@ export async function POST(request) {
       referralCode, 
       spid, 
       otp 
-    } = await request.json()
+    } = requestBody
 
     // Validate required fields
     if (!fullName || !password || !mobileNo || !otp) {
+      console.log("❌ Missing required fields:", { fullName: !!fullName, password: !!password, mobileNo: !!mobileNo, otp: !!otp })
       return NextResponse.json(
         { error: 'Full Name, Password, Mobile Number, and OTP are required' },
         { status: 400 }
@@ -42,8 +46,11 @@ export async function POST(request) {
     }
 
     // Verify OTP first
+    console.log("🔐 Verifying OTP for:", { email, mobileNo, otp: otp ? "PROVIDED" : "MISSING" })
     const otpResult = await verifyOTP(email, mobileNo, otp)
+    console.log("🔐 OTP verification result:", otpResult)
     if (!otpResult.success) {
+      console.log("❌ OTP verification failed:", otpResult.message)
       return NextResponse.json(
         { error: otpResult.message },
         { status: 400 }
@@ -92,15 +99,17 @@ export async function POST(request) {
       )
     }
 
-    // Handle sponsor identification (spid takes precedence over referralCode)
+        // Handle sponsor identification (spid takes precedence over referralCode)
     let sponsorId = null
     let sponsor = null
 
     const sponsorIdentifier = spid || referralCode
+    console.log("👥 Looking for sponsor:", { spid, referralCode, sponsorIdentifier });
 
     if (sponsorIdentifier) {
-      // Try to find sponsor by ID first, then by referral code
-      if (!isNaN(parseInt(sponsorIdentifier))) {
+      // First try to find by user ID (spid)
+      if (!isNaN(sponsorIdentifier)) {
+        console.log("🔍 Searching sponsor by ID:", sponsorIdentifier);
         sponsor = await prisma.user.findFirst({
           where: {
             id: parseInt(sponsorIdentifier),
@@ -112,6 +121,7 @@ export async function POST(request) {
 
       // If not found by ID, try referral code
       if (!sponsor) {
+        console.log("🔍 Searching sponsor by referral code:", sponsorIdentifier);
         sponsor = await prisma.user.findFirst({
           where: {
             referralCode: sponsorIdentifier,
@@ -121,7 +131,10 @@ export async function POST(request) {
         })
       }
 
+      console.log("👥 Sponsor found:", sponsor ? { id: sponsor.id, referralCode: sponsor.referralCode } : "NONE");
+
       if (!sponsor) {
+        console.log("❌ Invalid sponsor identifier:", sponsorIdentifier);
         return NextResponse.json(
           { error: 'Invalid or inactive sponsor' },
           { status: 400 }
@@ -129,11 +142,15 @@ export async function POST(request) {
       }
 
       sponsorId = sponsor.id
+    } else {
+      console.log("👤 No sponsor provided - registering without sponsor");
     }
 
     // Start transaction for user creation
+    console.log("🔄 Starting user creation transaction");
     const result = await prisma.$transaction(async (tx) => {
       // Hash password
+      console.log("🔐 Hashing password");
       const hashedPassword = await bcrypt.hash(password, 10);
       
       // Generate unique referral code
@@ -152,6 +169,17 @@ export async function POST(request) {
       const referralCode = generateReferralCode(fullName, nextId);
 
       // Create new user
+      console.log("👤 Creating new user with data:", {
+        fullName: fullName.trim(),
+        email: email?.trim() || null,
+        mobileNo: mobileNo.trim(),
+        sponsorId: sponsorId,
+        referralCode: referralCode,
+        isVerified: true,
+        role: 'user',
+        isActive: true,
+      });
+      
       const newUser = await tx.user.create({
         data: {
           fullName: fullName.trim(),
@@ -165,6 +193,7 @@ export async function POST(request) {
           isActive: true,
         },
       });
+      console.log("✅ User created successfully:", newUser.id);
 
       // Update sponsor's direct teams if sponsor exists
       if (sponsorId) {
@@ -203,9 +232,24 @@ export async function POST(request) {
     }, { status: 201 });
 
   } catch (error) {
-    console.error('Error in OTP registration:', error);
+    console.error('❌ Error in OTP registration:', error);
+    console.error('❌ Error details:', {
+      name: error.name,
+      message: error.message,
+      code: error.code,
+      meta: error.meta
+    });
+    
+    // Return more specific error message
+    let errorMessage = 'Registration failed. Please try again.';
+    if (error.code === 'P2002') {
+      errorMessage = 'User already exists with this information';
+    } else if (error.code === 'P2003') {
+      errorMessage = 'Invalid referral information';
+    }
+    
     return NextResponse.json(
-      { error: 'Registration failed. Please try again.' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
