@@ -57,17 +57,16 @@ function AddStockModal({ productsStockDetails, fetchproductsStockDetails }) {
   };
 
   return (
-    <dialog id="my_modal_3" className="modal">
-      <div className="modal-box dark:bg-gray-800">
-        <form method="dialog">
-          {/* if there is a button in form, it will close the modal */}
-          <button
-            id="closeBtn"
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-600 dark:text-gray-300"
-          >
-            ✕
-          </button>
-        </form>
+    <div id="my_modal_3" className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+        <button
+          type="button"
+          id="closeBtn"
+          className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-600 dark:text-gray-300"
+          onClick={() => document.getElementById('my_modal_3').style.display = 'none'}
+        >
+          ✕
+        </button>
         <h3 className="font-bold text-lg py-4 text-gray-900 dark:text-white">Add Product Stocks!</h3>
         <form
           className="space-y-4"
@@ -109,10 +108,10 @@ function AddStockModal({ productsStockDetails, fetchproductsStockDetails }) {
             />
           </div>
 
-          <button className="btn btn-primary">Add to Stock</button>
+          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-semibold shadow">Add to Stock</button>
         </form>
       </div>
-    </dialog>
+    </div>
   );
 }
 
