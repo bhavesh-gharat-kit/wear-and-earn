@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from "@/lib/prisma"
 import bcrypt from "bcryptjs"
-import { verifyOTP } from "@/lib/otp"
+import { verifyOTP, deleteOTP } from "@/lib/otp"
 import { rateLimit } from '@/lib/rate-limit'
 
 // Rate limiting for OTP registration
@@ -45,9 +45,9 @@ export async function POST(request) {
       )
     }
 
-    // Verify OTP first
+    // Verify OTP first (but don't delete it yet)
     console.log("🔐 Verifying OTP for:", { email, mobileNo, otp: otp ? "PROVIDED" : "MISSING" })
-    const otpResult = await verifyOTP(email, mobileNo, otp)
+    const otpResult = await verifyOTP(email, mobileNo, otp, false) // Don't delete OTP yet
     console.log("🔐 OTP verification result:", otpResult)
     if (!otpResult.success) {
       console.log("❌ OTP verification failed:", otpResult.message)
@@ -217,6 +217,13 @@ export async function POST(request) {
 
       return newUser;
     });
+
+    // Delete the OTP after successful user creation
+    if (otpResult.otpId) {
+      await deleteOTP(otpResult.otpId);
+    }
+
+    console.log("✅ Registration completed successfully for user:", result.id);
 
     return NextResponse.json({
       success: true,
