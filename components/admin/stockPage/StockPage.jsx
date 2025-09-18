@@ -76,7 +76,10 @@ function StockPage() {
         <h1 className="text-xl text-blue-700 dark:text-blue-400 font-bold">Stock Management</h1>
         <div className="flex gap-2">
           <button
-            onClick={() => document.getElementById("my_modal_3").showModal()}
+            onClick={() => {
+              const modal = document.getElementById("my_modal_3");
+              if (modal) modal.style.display = "flex";
+            }}
             className="flex items-center gap-2 btn btn-primary font-semibold"
           >
             <i className="text-xl">
@@ -85,7 +88,10 @@ function StockPage() {
             <span>Add Stock</span>
           </button>
           <button
-            onClick={() => document.getElementById("reduce_stock_modal").showModal()}
+            onClick={() => {
+              const modal = document.getElementById("reduce_stock_modal");
+              if (modal) modal.style.display = "flex";
+            }}
             className="flex items-center gap-2 btn btn-secondary font-semibold bg-red-600 hover:bg-red-700 text-white border-red-600"
           >
             <i className="text-xl">
