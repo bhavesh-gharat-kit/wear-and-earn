@@ -89,69 +89,71 @@ function ManageCategoryModal({
   };
 
   return (
-    <dialog id="category_modal" className="modal modal-open">
-      <div className="modal-box max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold text-blue-700">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div className="flex justify-between items-center mb-4 p-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-xl font-semibold text-blue-700 dark:text-blue-400">
             {mode === "edit" ? "Edit Category" : "Add Category"}
           </h3>
           <button
             onClick={onClose}
             id="close-btn"
-            className="btn btn-sm btn-circle btn-ghost text-gray-600 hover:text-black"
+            className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <IoMdClose size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleFormSubmit} className="space-y-4 text-sm">
-          {/* Hidden ID */}
-          <input type="hidden" name="id" value={formData.id} />
+        <div className="p-6">
+          <form onSubmit={handleFormSubmit} className="space-y-4 text-sm">
+            {/* Hidden ID */}
+            <input type="hidden" name="id" value={formData.id} />
 
-          {/* Name Field */}
-          <div>
-            <label htmlFor="catName" className="text-gray-700">
-              Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="catName"
-              required
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-            />
-          </div>
+            {/* Name Field */}
+            <div>
+              <label htmlFor="catName" className="text-gray-700 dark:text-gray-300 block mb-1">
+                Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                id="catName"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+              />
+            </div>
 
-          {/* Description Field */}
-          <div>
-            <label htmlFor="catDescription" className="text-gray-700">
-              Description
-            </label>
-            <textarea
-              name="description"
-              id="catDescription"
-              rows="3"
-              value={formData.description}
-              onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-            ></textarea>
-          </div>
+            {/* Description Field */}
+            <div>
+              <label htmlFor="catDescription" className="text-gray-700 dark:text-gray-300 block mb-1">
+                Description
+              </label>
+              <textarea
+                name="description"
+                id="catDescription"
+                rows="3"
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+              ></textarea>
+            </div>
 
-          {/* Actions */}
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="flex items-center gap-2 bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded"
-            >
-              <BiSave size={18} />
-              {mode === "edit" ? "Update" : "Save"}
-            </button>
-          </div>
-        </form>
+            {/* Actions */}
+            <div className="flex justify-end pt-4">
+              <button
+                type="submit"
+                className="flex items-center gap-2 bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded transition-colors"
+              >
+                <BiSave size={18} />
+                {mode === "edit" ? "Update" : "Save"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </dialog>
+    </div>
   );
 }
 
