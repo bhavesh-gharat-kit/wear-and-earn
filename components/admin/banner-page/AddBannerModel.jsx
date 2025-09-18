@@ -70,21 +70,18 @@ function AddBannerModel({ fetchAllBannersDetails }) {
   };
 
   return (
-    <dialog id="my_modal_3" className="modal">
-      <div className="modal-box dark:bg-gray-800">
-        <form method="dialog">
-          <button
-            id="close-btn"
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-600 dark:text-gray-300"
-          >
-            ✕
-          </button>
-        </form>
-
+    <div id="my_modal_3" className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+        <button
+          id="close-btn"
+          className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-600 dark:text-gray-300"
+        >
+          ✕
+        </button>
         {/* Add Banner form */}
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-lg space-y-4 text-sm"
+          className="space-y-4 text-sm"
         >
           <h3 className="text-xl font-semibold text-indigo-700 dark:text-indigo-400">Add Banner</h3>
 
@@ -134,7 +131,7 @@ function AddBannerModel({ fetchAllBannersDetails }) {
           </div>
         </form>
       </div>
-    </dialog>
+    </div>
   );
 }
 
