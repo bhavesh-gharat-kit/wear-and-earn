@@ -6,6 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
+import ForgotPasswordModal from "@/components/ui/ForgotPasswordModal";
 
 // Validation schema using Yup
 const schema = Yup.object().shape({
@@ -19,6 +20,7 @@ const schema = Yup.object().shape({
 
 const Login = () => {
   const [error, setError] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -104,6 +106,17 @@ const Login = () => {
             )}
           </div>
 
+          {/* Forgot Password Link */}
+          <div className="text-center mb-4 sm:mb-6">
+            <button
+              type="button"
+              onClick={() => setShowForgotPassword(true)}
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm sm:text-base font-medium transition-colors"
+            >
+              Forgot your password?
+            </button>
+          </div>
+
           {/* Mobile-Enhanced Submit Button */}
           <div className="text-center">
             <button
@@ -115,6 +128,16 @@ const Login = () => {
           </div>
         </form>
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        onSuccess={() => {
+          setError("");
+          // Optional: Show success message
+        }}
+      />
     </div>
   );
 };

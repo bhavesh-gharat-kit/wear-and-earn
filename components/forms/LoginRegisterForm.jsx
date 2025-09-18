@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Register from './Register';
+import RegisterWithOTP from './RegisterWithOTP';
 import Login from './Login';
 
 function LoginRegisterForm() {
@@ -48,7 +49,7 @@ function LoginRegisterForm() {
       </div>
 
       {/* Show Login or Register based on state */}
-      {isLogin ? <Login /> : <Register setIsLogin={setIsLogin} />}
+      {isLogin ? <Login /> : <RegisterWithOTP setIsLogin={setIsLogin} />}
     </div>
   );
 }

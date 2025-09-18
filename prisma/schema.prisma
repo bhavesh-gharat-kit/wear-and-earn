@@ -632,3 +632,16 @@ enum TeamStatus {
   COMPLETE
   DISBANDED
 }
+
+model OTP {
+  id        Int      @id @default(autoincrement())
+  email     String?
+  contact   String?
+  otpHash   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([email])
+  @@index([contact])
+  @@index([expiresAt])
+}
