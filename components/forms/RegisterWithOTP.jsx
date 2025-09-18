@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 import OTPModal from "@/components/ui/OTPModal";
 
@@ -128,11 +129,32 @@ const RegisterWithOTP = ({ setIsLogin }) => {
       });
 
       if (response.data.success) {
-        toast.success('Registration successful! You can now login.');
+        toast.success('Registration successful! Logging you in...');
+        
+        // Automatically log the user in after successful registration
+        try {
+          const loginResult = await signIn("credentials", {
+            email: registrationData.email || registrationData.mobileNo,
+            password: registrationData.password,
+            redirect: false,
+          });
+
+          if (loginResult?.ok) {
+            toast.success('Welcome! Redirecting to dashboard...');
+            router.push('/dashboard'); // Redirect to dashboard
+          } else {
+            toast.success('Registration successful! Please login manually.');
+            setIsLogin(true); // Fallback to login form
+          }
+        } catch (loginError) {
+          console.error('Auto-login failed:', loginError);
+          toast.success('Registration successful! Please login manually.');
+          setIsLogin(true); // Fallback to login form
+        }
+        
         reset();
         setRegistrationData(null);
         setShowOTPModal(false);
-        setIsLogin(true); // Switch to login form
       } else {
         toast.error(response.data.error || 'Registration failed');
       }
