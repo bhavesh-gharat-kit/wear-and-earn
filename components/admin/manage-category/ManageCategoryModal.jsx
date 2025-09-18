@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { BiSave } from "react-icons/bi";
 import { IoMdClose } from "react-icons/io";
+import toast from "react-hot-toast";
 
 function ManageCategoryModal({
   defaultValues = { id: "", name: "", description: "" },
@@ -25,8 +26,18 @@ function ManageCategoryModal({
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!formData.name.trim()) {
+      toast.error("Category name is required");
+      return;
+    }
+    
+    const toastId = toast.loading(mode === "add" ? "Adding category..." : "Updating category...");
+    
     if (mode === "add") {
       try {
+        console.log("Sending POST request with data:", formData);
         const response = await axios.post(
           "/api/admin/manage-category",
           formData,
@@ -37,16 +48,21 @@ function ManageCategoryModal({
           }
         );
 
+        console.log("Response received:", response);
+        
         if (response.status === 201) {
-          const closeBtn = document.querySelector("#close-btn");
-          closeBtn.click();
+          toast.success("Category added successfully", { id: toastId });
+          onClose();
           fetchAllCategoryDetails();
         }
       } catch (error) {
-        console.log("Internal Serevr Error", error);
+        console.error("Error adding category:", error);
+        console.error("Response data:", error.response?.data);
+        toast.error(error.response?.data?.message || "Failed to add category", { id: toastId });
       }
     } else {
       try {
+        console.log("Sending PUT request with data:", formData);
         const response = await axios.put(
           `/api/admin/manage-category/${defaultValues.id}`,
           formData,
@@ -57,13 +73,17 @@ function ManageCategoryModal({
           }
         );
 
+        console.log("Response received:", response);
+        
         if (response.status === 200) {
-          const closeBtn = document.querySelector("#close-btn");
-          closeBtn.click();
+          toast.success("Category updated successfully", { id: toastId });
+          onClose();
           fetchAllCategoryDetails();
         }
       } catch (error) {
-        console.log("Internal Serevr Error", error);
+        console.error("Error updating category:", error);
+        console.error("Response data:", error.response?.data);
+        toast.error(error.response?.data?.message || "Failed to update category", { id: toastId });
       }
     }
   };

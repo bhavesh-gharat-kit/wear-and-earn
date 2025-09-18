@@ -38,7 +38,7 @@ export const POST = async (request) => {
 
         // Basic validation
         if (!name) {
-            return res.status(400).json({ message: "Category name is required" });
+            return res.json({ message: "Category name is required" }, { status: 400 });
         }
 
         const newCategory = await prisma.category.create({

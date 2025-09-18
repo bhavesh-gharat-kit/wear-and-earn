@@ -26,8 +26,10 @@ function AdminManageCategoryPage() {
   const totalPages = Math.ceil(totalCategoriesCount / rowsPage);
 
   const openAddModal = () => {
+    console.log("openAddModal called");
     setEditData(null);
     setShowModal(true);
+    console.log("Modal should be showing, showModal:", true);
   };
 
   const openEditModal = (category) => {
@@ -121,12 +123,13 @@ function AdminManageCategoryPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-xl text-blue-700 font-bold">Manage Categories</h1>
         <button
-          onClick={openAddModal}
-          className="flex items-center gap-2 btn btn-primary font-semibold"
+          onClick={() => {
+            console.log("Add Category button clicked");
+            openAddModal();
+          }}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold transition-colors"
         >
-          <i className="text-xl">
-            <IoMdAdd fontSize={22} />
-          </i>
+          <IoMdAdd fontSize={22} />
           <span>Add Category</span>
         </button>
       </div>
