@@ -45,9 +45,10 @@ export async function POST(request) {
       )
     }
 
-    // Verify OTP first (but don't delete it yet)
-    console.log("🔐 Verifying OTP for:", { email, mobileNo, otp: otp ? "PROVIDED" : "MISSING" })
-    const otpResult = await verifyOTP(email, mobileNo, otp, false) // Don't delete OTP yet
+    // Verify OTP first (but don't delete it yet) - use original mobile number
+    const originalMobileNo = mobileNo; // Keep original for OTP verification
+    console.log("🔐 Verifying OTP for:", { email, mobileNo: originalMobileNo, otp: otp ? "PROVIDED" : "MISSING" })
+    const otpResult = await verifyOTP(email, originalMobileNo, otp, false) // Don't delete OTP yet
     console.log("🔐 OTP verification result:", otpResult)
     if (!otpResult.success) {
       console.log("❌ OTP verification failed:", otpResult.message)
