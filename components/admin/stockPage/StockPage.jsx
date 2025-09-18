@@ -16,6 +16,8 @@ function StockPage() {
   const [error, setError] = useState(false);
   const [productsStockDetails, setProductsStockDetails] = useState([]);
   const [searchProduct, setSearchProduct] = useState("");
+  const [showAddStockModal, setShowAddStockModal] = useState(false);
+  const [showReduceStockModal, setShowReduceStockModal] = useState(false);
 
   // pagination logic here
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,10 +78,7 @@ function StockPage() {
         <h1 className="text-xl text-blue-700 dark:text-blue-400 font-bold">Stock Management</h1>
         <div className="flex gap-2">
           <button
-            onClick={() => {
-              const modal = document.getElementById("my_modal_3");
-              if (modal) modal.style.display = "flex";
-            }}
+            onClick={() => setShowAddStockModal(true)}
             className="flex items-center gap-2 btn btn-primary font-semibold"
           >
             <i className="text-xl">
@@ -88,10 +87,7 @@ function StockPage() {
             <span>Add Stock</span>
           </button>
           <button
-            onClick={() => {
-              const modal = document.getElementById("reduce_stock_modal");
-              if (modal) modal.style.display = "flex";
-            }}
+            onClick={() => setShowReduceStockModal(true)}
             className="flex items-center gap-2 btn btn-secondary font-semibold bg-red-600 hover:bg-red-700 text-white border-red-600"
           >
             <i className="text-xl">
@@ -160,14 +156,20 @@ function StockPage() {
         />
         {/* PAGINATION COMPONENT END*/}
       </div>
-      <AddStockModal
-        fetchproductsStockDetails={fetchproductsStockDetails}
-        productsStockDetails={productsStockDetails}
-      />
-      <ReduceStockModal
-        fetchproductsStockDetails={fetchproductsStockDetails}
-        productsStockDetails={productsStockDetails}
-      />
+      {showAddStockModal && (
+        <AddStockModal
+          fetchproductsStockDetails={fetchproductsStockDetails}
+          productsStockDetails={productsStockDetails}
+          onClose={() => setShowAddStockModal(false)}
+        />
+      )}
+      {showReduceStockModal && (
+        <ReduceStockModal
+          fetchproductsStockDetails={fetchproductsStockDetails}
+          productsStockDetails={productsStockDetails}
+          onClose={() => setShowReduceStockModal(false)}
+        />
+      )}
       
     </div>
   );
