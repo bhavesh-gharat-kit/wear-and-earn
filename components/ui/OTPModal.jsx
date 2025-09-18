@@ -45,6 +45,16 @@ const OTPModal = ({
       return;
     }
 
+    // For registration, just pass the OTP to parent without verifying here
+    // The verification will happen in the registration endpoint
+    if (type === 'registration') {
+      toast.success('OTP entered successfully!');
+      onVerified && onVerified(otp);
+      onClose();
+      return;
+    }
+
+    // For other types (like password reset), verify the OTP
     setIsVerifying(true);
     try {
       const response = await axios.post('/api/auth/verify-otp', {
