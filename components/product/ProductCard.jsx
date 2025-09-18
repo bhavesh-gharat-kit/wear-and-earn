@@ -84,8 +84,8 @@ function ProductCard({ product, variant = "default", setShowModal }) {
   // Variant for grid layout (like V2)
   if (variant === "grid") {
     return (
-      <div className="w-64 mb-4 m-4 transition-all duration-200 hover:-translate-y-1.5">
-  <div className="flex flex-col text-center border rounded-lg overflow-hidden group bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 ring-2 ring-purple-500/70 shadow-[0_0_16px_4px_rgba(139,92,246,0.25)]">
+    <div className="w-64 mb-4 m-4 transition-all duration-200 hover:-translate-y-1.5">
+  <div className="flex flex-col text-center border rounded-lg overflow-hidden group bg-white dark:bg-gray-900 border-t-4 border-purple-500 dark:border-purple-400 ring-2 ring-purple-500/70 shadow-[0_0_16px_4px_rgba(139,92,246,0.25)]">
           {/* Product Thumbnail */}
           <div className="relative group">
             {/* Product Label */}
@@ -167,7 +167,7 @@ function ProductCard({ product, variant = "default", setShowModal }) {
 
   // Default card layout
   return (
-  <div className="group/card card h-full bg-base-100 dark:bg-gray-900 w-72 max-sm:w-full border border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-400 transition-all duration-200 hover:-translate-y-0.5 ring-2 ring-purple-500/70 shadow-[0_0_16px_4px_rgba(139,92,246,0.25)]">
+  <div className="group/card card h-full bg-base-100 dark:bg-gray-900 w-72 max-sm:w-full border-t-4 border-purple-500 dark:border-purple-400 hover:border-blue-200 dark:hover:border-blue-400 transition-all duration-200 hover:-translate-y-0.5 ring-2 ring-purple-500/70 shadow-[0_0_16px_4px_rgba(139,92,246,0.25)]">
       {/* Uniform image area using aspect ratio */}
       <div className="relative w-full aspect-[4/5] overflow-hidden bg-gray-50 dark:bg-gray-800">
         <Image

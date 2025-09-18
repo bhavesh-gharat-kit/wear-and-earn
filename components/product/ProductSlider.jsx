@@ -62,11 +62,11 @@ export default function ProductSlider({ title = "Top Trending", showModal, setSh
           loop={true}
           breakpoints={{
           360: {
-            slidesPerView: 2, // Very small mobile: 2 full cards
+            slidesPerView: 2.0, // Very small mobile: 2 full cards
             spaceBetween: 12,
           },
           480: {
-            slidesPerView: 2, // Small mobile: 2 full cards
+            slidesPerView: 2.1, // Small mobile: 2 full cards
             spaceBetween: 16,
           },
           640: {
