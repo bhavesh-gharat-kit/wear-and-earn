@@ -6,6 +6,7 @@ import { generateAndAssignReferralCode } from '@/lib/referral';
 
 
 export async function POST() {
+
   try {
     const session = await getServerSession(authOptions);
     
@@ -14,7 +15,7 @@ export async function POST() {
     }
 
     const userId = parseInt(session.user.id);
-
+    console.log(`Activating user ${userId}`);
     // Get user and their orders
     const user = await prisma.user.findUnique({
       where: { id: userId },

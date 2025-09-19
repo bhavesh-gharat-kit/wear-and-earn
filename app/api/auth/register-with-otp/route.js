@@ -178,20 +178,8 @@ export async function POST(request) {
       console.log("🔐 Hashing password");
       const hashedPassword = await bcrypt.hash(password, 10);
       
-      // Generate unique referral code
-      const generateReferralCode = (name, id) => {
-        const namePart = name.replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase();
-        const idPart = String(id).padStart(4, '0');
-        return `${namePart}${idPart}`;
-      };
-
-      // Get next user ID for referral code generation
-      const lastUser = await tx.user.findFirst({
-        orderBy: { id: 'desc' },
-        select: { id: true }
-      });
-      const nextId = (lastUser?.id || 0) + 1;
-      const referralCode = generateReferralCode(fullName, nextId);
+      // Note: Referral code will be generated when user makes their first purchase
+      // This ensures users only get referral codes after they become active customers
 
       // Create new user
       console.log("👤 Creating new user with data:", {
@@ -199,10 +187,10 @@ export async function POST(request) {
         email: email?.trim() || null,
         mobileNo: finalMobileNo.trim(),
         sponsorId: sponsorId,
-        referralCode: referralCode,
+        referralCode: null, // Will be generated on first purchase
         isVerified: true,
         role: 'user',
-        isActive: true,
+        isActive: false, // Will be activated on first purchase
       });
       
       const newUser = await tx.user.create({
@@ -212,10 +200,10 @@ export async function POST(request) {
           mobileNo: finalMobileNo.trim(),
           password: hashedPassword,
           sponsorId: sponsorId,
-          referralCode: referralCode,
+          referralCode: null, // Will be generated when user makes first purchase
           isVerified: true, // Mark as verified since OTP was verified
           role: 'user',
-          isActive: true,
+          isActive: false, // Will be activated when user makes first purchase
         },
       });
       console.log("✅ User created successfully:", newUser.id);
@@ -258,7 +246,7 @@ export async function POST(request) {
         fullName: result.fullName,
         email: result.email,
         mobileNo: result.mobileNo,
-        referralCode: result.referralCode,
+        referralCode: result.referralCode, // Will be null until first purchase
         sponsorId: result.sponsorId
       }
     }, { status: 201 });
