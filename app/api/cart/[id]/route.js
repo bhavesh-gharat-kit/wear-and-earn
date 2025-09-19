@@ -87,6 +87,7 @@ export const DELETE = async (request, { params }) => {
 
 
 export const PUT = async (request, params) => {
+    const { default: prisma } = await import("@/lib/prisma");
     try {
         // Get the session to get the logged in user's id
         const session = await getServerSession(authOptions);
