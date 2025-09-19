@@ -38,6 +38,8 @@ const RegisterWithOTP = ({ setIsLogin }) => {
   const [showOTPModal, setShowOTPModal] = useState(false);
   const [registrationData, setRegistrationData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -263,12 +265,32 @@ const RegisterWithOTP = ({ setIsLogin }) => {
             <label className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-2">
               Password *
             </label>
-            <input
-              type="password"
-              {...register("password")}
-              className="w-full p-3 sm:p-4 text-base border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-              placeholder="Create a secure password"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                {...register("password")}
+                className="w-full p-3 sm:p-4 text-base border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12"
+                placeholder="Create a secure password"
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 2.001 12c1.73 4.556 6.1 7.5 10.999 7.5 2.042 0 3.98-.488 5.657-1.354M19.07 15.607A10.45 10.45 0 0 0 21 12c-1.73-4.556-6.1-7.5-10.999-7.5a11.05 11.05 0 0 0-4.118.797M9.88 9.88a3 3 0 1 1 4.24 4.24M15 12a3 3 0 0 1-3 3m0 0a3 3 0 0 1-3-3m3 3L3 3" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.001 12C3.73 7.444 8.1 4.5 13 4.5c4.899 0 9.269 2.944 10.999 7.5-1.73 4.556-6.1 7.5-10.999 7.5-4.899 0-9.269-2.944-10.999-7.5z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                  </svg>
+                )}
+              </button>
+            </div>
             {errors.password && (
               <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                 {errors.password.message}
@@ -281,12 +303,32 @@ const RegisterWithOTP = ({ setIsLogin }) => {
             <label className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-2">
               Confirm Password *
             </label>
-            <input
-              type="password"
-              {...register("confirmPassword")}
-              className="w-full p-3 sm:p-4 text-base border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-              placeholder="Confirm your password"
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                {...register("confirmPassword")}
+                className="w-full p-3 sm:p-4 text-base border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12"
+                placeholder="Confirm your password"
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              >
+                {showConfirmPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 2.001 12c1.73 4.556 6.1 7.5 10.999 7.5 2.042 0 3.98-.488 5.657-1.354M19.07 15.607A10.45 10.45 0 0 0 21 12c-1.73-4.556-6.1-7.5-10.999-7.5a11.05 11.05 0 0 0-4.118.797M9.88 9.88a3 3 0 1 1 4.24 4.24M15 12a3 3 0 0 1-3 3m0 0a3 3 0 0 1-3-3m3 3L3 3" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.001 12C3.73 7.444 8.1 4.5 13 4.5c4.899 0 9.269 2.944 10.999 7.5-1.73 4.556-6.1 7.5-10.999 7.5-4.899 0-9.269-2.944-10.999-7.5z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                  </svg>
+                )}
+              </button>
+            </div>
             {errors.confirmPassword && (
               <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                 {errors.confirmPassword.message}

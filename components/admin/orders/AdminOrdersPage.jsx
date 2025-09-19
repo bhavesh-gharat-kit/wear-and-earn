@@ -8,6 +8,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import LoaderEffect from "@/components/ui/LoaderEffect";
 import PaginationComponent from "@/components/ui/PaginationComponent";
+import OrderDetailsModal from "./OrderDetailsModal";
 import moment from "moment";
 
 function AdminOrdersPage() {
@@ -21,6 +22,10 @@ function AdminOrdersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPage, setRowsPage] = useState(20);
   const [totalOrdersCount, setTotalOrdersCount] = useState(0);
+  
+  // Modal state
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const totalPages = Math.ceil(totalOrdersCount / rowsPage);
 
@@ -89,6 +94,11 @@ function AdminOrdersPage() {
       if (response.data.success) {
         toast.success("Order status updated successfully");
         fetchOrders(currentPage, rowsPage);
+        
+        // Update the selected order if it's currently being viewed in the modal
+        if (selectedOrder && selectedOrder.id === orderId) {
+          setSelectedOrder(prev => ({ ...prev, status: newStatus }));
+        }
       } else {
         toast.error(response.data.message || "Failed to update order status");
       }
@@ -102,6 +112,18 @@ function AdminOrdersPage() {
         toast.error(error.response?.data?.message || "Failed to update order status");
       }
     }
+  };
+
+  // Open order details modal
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  // Close order details modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrder(null);
   };
 
   // Handle search
@@ -240,7 +262,14 @@ function AdminOrdersPage() {
                       {moment(order.createdAt).format('DD/MM/YYYY')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium dark:text-gray-100">
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-2 items-center">
+                        <button
+                          onClick={() => handleViewOrder(order)}
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                          title="View Order Details"
+                        >
+                          <FaEye size={16} />
+                        </button>
                         <select
                           value={order.status}
                           onChange={(e) => updateOrderStatus(order.id, e.target.value)}
@@ -273,6 +302,14 @@ function AdminOrdersPage() {
           )}
         </div>
       )}
+
+      {/* Order Details Modal */}
+      <OrderDetailsModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        order={selectedOrder}
+        onStatusUpdate={updateOrderStatus}
+      />
     </section>
   );
 }
