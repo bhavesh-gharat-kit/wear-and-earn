@@ -222,8 +222,8 @@ export async function POST(request) {
           data: {
             referrerId: sponsorId,
             referredUserId: newUser.id,
-            level: 1,
-            status: 'ACTIVE'
+            referralCodeUsed: sponsorIdentifier,
+            teamContributionStatus: 'pending' // User hasn't made first purchase yet
           }
         });
       }
