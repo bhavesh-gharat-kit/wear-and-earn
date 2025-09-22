@@ -17,7 +17,9 @@ function ProductPage() {
                 Our Products
               </h1>
               <p className="text-lg text-blue-900 dark:text-gray-200 max-w-2xl">
-                Discover our curated collection of premium products designed for modern lifestyle
+                <span className="hidden sm:inline">
+                  Discover our curated collection of premium products designed for modern lifestyle
+                </span>
               </p>
             </div>
             <div className="flex items-center space-x-2 text-blue-900 dark:text-blue-200">

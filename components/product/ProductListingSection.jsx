@@ -103,6 +103,33 @@ function ProductListingSection() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 px-3 sm:px-4 lg:px-6 py-4 lg:py-8">
+      {/*
+      <div>
+        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+        <select name="category" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+          <option value="">All Categories</option>
+          <option value="2">shirt </option>
+          <option value="3">lehenga </option>
+          <option value="4">jeans </option>
+        </select>
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Sort by</label>
+        <select name="sortBy" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+          <option value="">Default</option>
+          <option value="name">Name A-Z</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="newest">Newest First</option>
+        </select>
+      </div>
+      <div className="flex items-end">
+        <button type="button" className="w-full px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x h-4 w-4" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+          Clear Filters
+        </button>
+      </div>
+      */}
       
       {/* Desktop Sidebar - Categories */}
       <aside className="hidden lg:block lg:w-80 lg:min-w-80 lg:flex-shrink-0">
@@ -262,11 +289,11 @@ function ProductListingSection() {
       {/* Main Content Area - Mobile Enhanced */}
       <main className="flex-1 min-w-0">
         {/* Mobile-Optimized View Toggle & Product Count */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 bg-white dark:bg-gray-900 p-3 sm:p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-0 sm:gap-4 mb-0 sm:mb-6 sm:bg-white sm:dark:bg-gray-900 p-0 sm:p-4 sm:rounded-xl sm:shadow-sm sm:border sm:border-gray-200 sm:dark:border-gray-700">
           <div className="flex items-center justify-between sm:justify-start gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-medium">View:</span>
-              <div className="flex border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+  <div className="hidden sm:flex items-center gap-2">
+          <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-medium">View:</span>
+          <div className="flex border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2 sm:p-2.5 transition-colors ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
@@ -285,7 +312,7 @@ function ProductListingSection() {
             {/* Mobile Cart Button */}
             <Link
               href="/cart"
-              className="lg:hidden flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors text-sm font-medium"
+              className="hidden sm:flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors text-sm font-medium"
             >
               <ShoppingCart className="h-4 w-4" />
               <span className="hidden xs:inline">Cart</span> ({addToCartList.length})

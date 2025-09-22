@@ -104,8 +104,8 @@ function ProductRightContent({setSelectedFilterCategoryId, setSelectedCategoryNa
 
           {/* Secondary Filters Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Price Range */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* Price Range (spans 2 cols on desktop for wider inputs) */}
+            <div className="grid grid-cols-2 gap-2 lg:col-span-2">
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Min Price</label>
                 <div className="relative">
@@ -137,53 +137,27 @@ function ProductRightContent({setSelectedFilterCategoryId, setSelectedCategoryNa
                 </div>
               </div>
             </div>
-
-            {/* Category Dropdown */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
-              <select
-                name="category"
-                value={productFilters.category}
-                onChange={handleChange}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-              >
-                <option value="">All Categories</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Sort Dropdown */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Sort by</label>
-              <select
-                name="sortBy"
-                value={productFilters.sortBy}
-                onChange={handleChange}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-              >
-                <option value="">Default</option>
-                <option value="name">Name A-Z</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest First</option>
-              </select>
-            </div>
-
-            {/* Clear Button */}
-            <div className="flex items-end">
+            {/* Desktop-only Clear Filters button */}
+            <div className="hidden lg:flex items-center justify-end lg:mt-3.5">
               <button
-                type="button"
                 onClick={handleReset}
-                className="w-full px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300"
+                className="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <X className="h-4 w-4" />
-                Clear Filters
+                <X className="h-6 w-4 mr-1.5" />
+                <span className="hidden xl:inline">Clear Filters</span>
               </button>
             </div>
+
+            {/*
+            Category Dropdown
+            <div>...</div>
+
+            Sort Dropdown
+            <div>...</div>
+
+            Clear Button
+            <div className="flex items-end">...</div>
+            */}
           </div>
         </div>
 
@@ -223,7 +197,7 @@ function ProductRightContent({setSelectedFilterCategoryId, setSelectedCategoryNa
       </div>
 
       {/* Mobile-Optimized Results Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 bg-white dark:bg-gray-900 p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+  <div className="hidden sm:flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 sm:bg-white sm:dark:bg-gray-900 sm:p-4 sm:rounded-lg sm:shadow-sm sm:border sm:border-gray-200 sm:dark:border-gray-700">
         <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Products</h2>
         <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 sm:px-3 py-1 rounded-full self-start sm:self-auto">
           {productList.length} items found
