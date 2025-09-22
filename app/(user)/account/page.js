@@ -143,20 +143,20 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {/* Personal Information */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Personal Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">Personal Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">Full Name</label>
               <input 
                 type="text" 
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleInputChange}
                 required
-                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                 placeholder="Enter your full name" 
               />
             </div>
@@ -202,8 +202,8 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
 
         {/* Identity Documents */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Identity Documents</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">Identity Documents</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aadhar Number</label>
               <input 
@@ -238,8 +238,8 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
 
         {/* Bank Details */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Bank Account Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">Bank Account Details</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bank Account Number</label>
               <input 
@@ -295,11 +295,11 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
         </div>
 
         {/* Submit Button */}
-        <div className="pt-4">
+        <div className="pt-3 sm:pt-4">
           <button 
             type="submit"
             disabled={submitting}
-            className="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
+            className="w-full bg-blue-500 text-white py-2 sm:py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
           >
             {submitting ? 'Submitting...' : kycData?.status === 'rejected' ? 'Resubmit KYC Application' : 'Submit KYC Application'}
           </button>
@@ -552,10 +552,10 @@ const ReferralSection = ({ userData }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Referral Code Card */}
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border-2 border-purple-200 dark:border-purple-700 p-6 rounded-lg mb-6">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border-2 border-purple-200 dark:border-purple-700 p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+        <div className="flex items-center gap-3 mb-3 sm:mb-4">
           <div className="bg-purple-500 p-2 rounded-full">
             <Share2 className="w-5 h-5 text-white" />
           </div>
@@ -2263,7 +2263,7 @@ const AccountDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-3 sm:py-6">
+    <div className="bg-gray-50 dark:bg-gray-900 py-3 sm:py-6">
       <div className="max-w-7xl mx-auto px-3 sm:px-4">
         {/* Mobile-Enhanced Page Header */}
         <div className="mb-4 sm:mb-6">
@@ -2312,14 +2312,14 @@ const AccountDashboard = () => {
           </div>
         </div>
 
-        {/* Mobile-Enhanced Content Area */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl shadow-sm p-4 sm:p-6 md:p-8 min-h-96">
+  {/* Mobile-Enhanced Content Area */}
+  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-6 md:p-8 min-h-0">
           {activeTab === 'wallet' && (
             <div>
-              <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-gray-900 dark:text-white">My Wallet</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">My Wallet</h2>
               
               {/* Mobile-Enhanced Balance Card */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-800 p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-800 p-3 sm:p-6 rounded-lg mb-3 sm:mb-6">
                 <div className="flex justify-between items-center">
                   <div className="flex-1">
                     <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-1">Available Balance</p>
@@ -2331,8 +2331,6 @@ const AccountDashboard = () => {
 
               {/* Wallet Options */}
               <WalletActions walletBalance={walletData?.balance?.rupees || 0} />
-
-
             </div>
           )}
           
@@ -2345,7 +2343,7 @@ const AccountDashboard = () => {
           
           {activeTab === 'kyc' && (
             <div>
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">KYC Verification</h2>
+              <h2 className="text-2xl font-semibold mb-4 sm:mb-6 text-gray-900 dark:text-white">KYC Verification</h2>
               
               {/* KYC Status */}
               {/* Only show status row if not fully verified */}

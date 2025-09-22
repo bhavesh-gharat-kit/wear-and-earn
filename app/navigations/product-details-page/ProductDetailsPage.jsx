@@ -339,7 +339,7 @@ ${shareUrl}`;
                     : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
-                Shipping & Returns
+                Shipping
               </button>
             </nav>
           </div>
@@ -402,7 +402,7 @@ ${shareUrl}`;
                         Free shipping on orders over ₹999. Standard delivery takes 3-5 business days.
                       </p>
                     </div>
-                    <div className="space-y-3">
+                    {/* <div className="space-y-3">
                       <div className="flex items-center space-x-3">
                         <IoShieldCheckmark className="h-5 w-5 text-blue-500" />
                         <span className="font-medium text-gray-900 dark:text-gray-100">30-Day Returns</span>
@@ -410,7 +410,7 @@ ${shareUrl}`;
                       <p className="text-gray-600 dark:text-gray-300 text-sm ml-8">
                         Easy returns within 30 days of purchase. Item must be in original condition.
                       </p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

@@ -39,7 +39,7 @@ function Footer() {
   <footer className="w-full">
 
       {/* FOOTER MAIN */}
-      <div className="footer-main bg-[#ffffff] dark:bg-[#18181b] text-slate-900 dark:text-gray-200 px-4 sm:px-6 lg:px-8 py-10 transition-colors">
+  <div className="footer-main bg-[#ffffff] dark:bg-[#18181b] text-slate-900 dark:text-gray-200 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 transition-colors">
         <div className="w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {/* About Section */}
@@ -156,7 +156,7 @@ function Footer() {
         </div>
       </div>
       {/* FOOTER BOTTOM */}
-  <div className="footer-bottom bg-[#f3f3f6] dark:bg-[#232326] text-slate-800 dark:text-gray-300 py-4 px-4 sm:px-6 lg:px-8 transition-colors ">
+  <div className="footer-bottom bg-[#f3f3f6] dark:bg-[#232326] text-slate-800 dark:text-gray-300 py-3 sm:py-4 px-4 sm:px-6 lg:px-8 transition-colors ">
         <div className="w-full px-0 flex flex-col justify-center items-center">
           {/* Legal Links */}
           <div className="legal-links text-center md:text-left mb-4">

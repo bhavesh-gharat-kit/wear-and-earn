@@ -74,21 +74,21 @@ export default function UserWithdrawals() {
   const formatDate = (dateString) => new Date(dateString).toLocaleString()
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-4">
+    <div className="p-4 sm:p-6">
+      <div className="mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-2 sm:mb-4">
           <h1 className="text-2xl font-bold">My Withdrawals</h1>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            className="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 text-sm"
           >
             {showForm ? 'Cancel' : 'New Withdrawal'}
           </button>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
             <h3 className="text-sm font-medium text-green-800">Total Withdrawn</h3>
             <p className="text-2xl font-bold text-green-900">
               {formatAmount(summary.totalWithdrawn || 0)}
@@ -98,7 +98,7 @@ export default function UserWithdrawals() {
             </p>
           </div>
           
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4">
             <h3 className="text-sm font-medium text-yellow-800">Pending</h3>
             <p className="text-2xl font-bold text-yellow-900">
               {formatAmount(summary.pendingAmount || 0)}
@@ -106,7 +106,7 @@ export default function UserWithdrawals() {
             <p className="text-sm text-yellow-600">Under review</p>
           </div>
           
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
             <h3 className="text-sm font-medium text-blue-800">Available</h3>
             <p className="text-2xl font-bold text-blue-900">
               {formatAmount(0)} {/* This would come from user wallet balance */}
@@ -117,10 +117,10 @@ export default function UserWithdrawals() {
 
         {/* Withdrawal Form */}
         {showForm && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold mb-4">New Withdrawal Request</h2>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-6">
+            <h2 className="text-lg font-semibold mb-3">New Withdrawal Request</h2>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Withdrawal Amount (₹)
@@ -214,18 +214,18 @@ export default function UserWithdrawals() {
                 />
               )}
 
-              <div className="flex space-x-3">
+              <div className="flex space-x-2 sm:space-x-3">
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50 text-sm"
                 >
-                  {submitting ? 'Submitting...' : 'Submit Request'}
+                  {submitting ? 'Submitting...' : 'Submit'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400"
+                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 text-sm"
                 >
                   Cancel
                 </button>
@@ -245,19 +245,19 @@ export default function UserWithdrawals() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Method
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Requested
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Processed
                 </th>
               </tr>
@@ -278,17 +278,17 @@ export default function UserWithdrawals() {
               ) : (
                 withdrawals.map((withdrawal) => (
                   <tr key={withdrawal.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
                         {formatAmount(withdrawal.amount)}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 capitalize">
                         {withdrawal.method.replace('_', ' ')}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         withdrawal.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                         withdrawal.status === 'approved' ? 'bg-green-100 text-green-800' :
@@ -297,10 +297,10 @@ export default function UserWithdrawals() {
                         {withdrawal.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(withdrawal.requestedAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-sm text-gray-500">
                       {withdrawal.processedAt ? formatDate(withdrawal.processedAt) : '-'}
                       {withdrawal.adminNotes && (
                         <div className="text-xs text-gray-400 mt-1">
