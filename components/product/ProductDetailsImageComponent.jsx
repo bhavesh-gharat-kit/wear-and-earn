@@ -56,7 +56,7 @@ export default function ProductDetailsImageComponent({ productDetails }) {
         thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
         onSlideChange={() => resetZoom()}
         modules={[FreeMode, Navigation, Thumbs]}
-        className="main-swiper w-full h-[620px] sm:h-[580px] lg:h-[500px] rounded-lg overflow-hidden bg-gray-100"
+        className="main-swiper w-full h-[700px] sm:h-[650px] md:h-[600px] lg:h-[500px] rounded-lg overflow-hidden bg-gray-100"
       >
         {productDetails.images?.map((product, index) => (
           <SwiperSlide key={index} className="flex items-center justify-center overflow-hidden">

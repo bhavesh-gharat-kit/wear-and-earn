@@ -136,14 +136,12 @@ function ProductDetailsPage({ id }) {
       const shareUrl = `${origin}/product-details/${id}`;
       const title = productDetails?.title || 'Product';
       
-      // Create WhatsApp message with clickable link
-      const message = `🛍️ *${title}*
+      // Create WhatsApp message - simpler format for better link detection
+      const message = `${title}
 
-💰 Special Price: ₹${finalAmount?.toLocaleString("en-IN")}
+Price: ₹${finalAmount?.toLocaleString("en-IN")}
 
-Click here to view and buy: ${shareUrl}
-
-#WearAndEarn #Shopping`;
+${shareUrl}`;
       
       // Open WhatsApp with the message
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
