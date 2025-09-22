@@ -40,7 +40,6 @@ const RegisterWithOTP = ({ setIsLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [theme, setTheme] = useState('light');
 
   const {
     register,
@@ -63,35 +62,6 @@ const RegisterWithOTP = ({ setIsLogin }) => {
       setValue("referralCode", urlReferralCode);
     }
   }, [searchParams, setValue]);
-
-  // Initialize theme from localStorage or system preference
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (stored === 'dark' || (!stored && prefersDark)) {
-        document.documentElement.classList.add('dark');
-        setTheme('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        setTheme('light');
-      }
-    } catch (e) {
-      // ignore (SSR safety)
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    try {
-      const next = theme === 'dark' ? 'light' : 'dark';
-      setTheme(next);
-      if (next === 'dark') document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', next);
-    } catch (e) {
-      // ignore
-    }
-  };
 
   // Fetch sponsor info when referral code changes
   useEffect(() => {
@@ -203,26 +173,7 @@ const RegisterWithOTP = ({ setIsLogin }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] px-3 sm:px-4">
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl md:rounded-2xl shadow-xl sm:shadow-2xl p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col items-center relative">
-        {/* Theme toggle (top-right) */}
-        <button
-          type="button"
-          onClick={toggleTheme}
-          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          className="absolute top-4 right-4 bg-gray-100 dark:bg-gray-800 p-2 rounded-full shadow-sm hover:shadow-md focus:outline-none"
-        >
-          {theme === 'dark' ? (
-            // Sun icon
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-yellow-400">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364l-1.414 1.414M7.05 16.95l-1.414 1.414M18.364 18.364l-1.414-1.414M7.05 7.05L5.636 5.636M12 8a4 4 0 100 8 4 4 0 000-8z" />
-            </svg>
-          ) : (
-            // Moon icon
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-gray-700">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-            </svg>
-          )}
-        </button>
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl md:rounded-2xl shadow-xl sm:shadow-2xl p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col items-center">
         <Image 
           src={"/images/brand-logo.png"} 
           width={80} 
