@@ -88,7 +88,7 @@ export default function ProductSlider({ title = "Top Trending", showModal, setSh
           },
         }}
           modules={[Pagination, Navigation, Autoplay]}
-          className="basic-product-slider dark:swiper-dark compact-mobile"
+          className="basic-product-slider dark:swiper-dark compact-mobile w-full"
         >
           {productList?.map((product, i) => (
             <SwiperSlide key={i}>
