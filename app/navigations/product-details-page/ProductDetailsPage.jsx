@@ -1,7 +1,7 @@
 "use client";
 
 import ProductDetailsImageComponent from "@/components/product/ProductDetailsImageComponent";
-import { FaCheckCircle, FaShoppingCart, FaHeart, FaShare } from "react-icons/fa";
+import { FaCheckCircle, FaShoppingCart, FaShare } from "react-icons/fa";
 import { IoBag, IoShieldCheckmark } from "react-icons/io5";
 import { MdLocalShipping, MdSecurity } from "react-icons/md";
 
@@ -128,6 +128,35 @@ function ProductDetailsPage({ id }) {
     handleAddToCart().then(() => {
       router.push("/checkout");
     });
+  };
+
+  const handleShare = async () => {
+    try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      // Referral-style direct product link (no distractions): /product-details/<id>
+      const shareUrl = `${origin}/product-details/${id}`;
+      const title = productDetails?.title || 'Product';
+      const text = `Check out this product: ${title}`;
+      if (navigator.share) {
+        await navigator.share({ title, text, url: shareUrl });
+        toast.success('Share dialog opened');
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied to clipboard');
+      } else {
+        // Fallback: create temporary input
+        const el = document.createElement('input');
+        el.value = shareUrl;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        toast.success('Link copied to clipboard');
+      }
+    } catch (err) {
+      console.error('Share failed', err);
+      toast.error('Unable to share link');
+    }
   };
 
   return (
@@ -257,11 +286,8 @@ function ProductDetailsPage({ id }) {
 
             {/* Secondary Actions */}
             <div className="flex space-x-4">
-              <button className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors">
-                <FaHeart />
-                <span>Add to Wishlist</span>
-              </button>
-              <button className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
+              {/* Wishlist removed per requirements */}
+              <button onClick={handleShare} className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
                 <FaShare />
                 <span>Share Product</span>
               </button>

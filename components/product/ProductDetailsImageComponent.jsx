@@ -18,6 +18,10 @@ import Image from "next/image";
 
 export default function ProductDetailsImageComponent({ productDetails }) {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
+  const [zoom, setZoom] = useState(1);
+  const MIN_ZOOM = 1;
+  const MAX_ZOOM = 3;
+  const ZOOM_STEP = 0.25;
 
   if(!productDetails?.images || productDetails?.images.length <= 0){
     return (
@@ -34,8 +38,13 @@ export default function ProductDetailsImageComponent({ productDetails }) {
 
   const hasMultipleImages = productDetails.images.length > 1;
 
+  const increaseZoom = () => setZoom((z) => Math.min(MAX_ZOOM, +(z + ZOOM_STEP).toFixed(2)));
+  const decreaseZoom = () => setZoom((z) => Math.max(MIN_ZOOM, +(z - ZOOM_STEP).toFixed(2)));
+  const resetZoom = () => setZoom(1);
+
   return (
     <div className="space-y-4">
+      <div className="relative">
       <Swiper
         style={{
           "--swiper-navigation-color": "#3B82F6",
@@ -45,22 +54,50 @@ export default function ProductDetailsImageComponent({ productDetails }) {
         spaceBetween={10}
         navigation={true}
         thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+        onSlideChange={() => resetZoom()}
         modules={[FreeMode, Navigation, Thumbs]}
-        className="main-swiper w-full h-[500px] rounded-lg overflow-hidden bg-gray-100"
+        className="main-swiper w-full h-[560px] sm:h-[500px] rounded-lg overflow-hidden bg-gray-100"
       >
         {productDetails.images?.map((product, index) => (
-          <SwiperSlide key={index} className="flex items-center justify-center">
+          <SwiperSlide key={index} className="flex items-center justify-center overflow-hidden">
             <Image
               width={600}
               height={600}
               src={product.imageUrl}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              style={{ transform: `scale(${zoom})`, transition: 'transform 180ms ease' }}
+              className="w-full h-full object-cover"
               alt={`${productDetails?.title} - Image ${index + 1}`}
               priority={index === 0}
             />
           </SwiperSlide>
         ))}
       </Swiper>
+      {/* Mobile-only Zoom Controls */}
+      <div className="absolute top-3 right-3 flex items-center gap-2 sm:hidden">
+        <button
+          onClick={decreaseZoom}
+          aria-label="Zoom out"
+          className="px-3 py-2 bg-white/95 dark:bg-gray-900/80 rounded-md shadow-sm hover:bg-white transition-colors text-lg leading-none"
+        >
+          −
+        </button>
+        <div className="px-2 py-1 bg-white/90 dark:bg-gray-900/80 rounded-md text-sm font-medium shadow-sm">x{zoom}</div>
+        <button
+          onClick={increaseZoom}
+          aria-label="Zoom in"
+          className="px-3 py-2 bg-white/95 dark:bg-gray-900/80 rounded-md shadow-sm hover:bg-white transition-colors text-lg leading-none"
+        >
+          +
+        </button>
+        <button
+          onClick={resetZoom}
+          aria-label="Reset zoom"
+          className="px-2 py-2 bg-white/95 dark:bg-gray-900/80 rounded-md shadow-sm hover:bg-white transition-colors text-xs"
+        >
+          Reset
+        </button>
+      </div>
+      </div>
       
       {hasMultipleImages && (
         <Swiper
