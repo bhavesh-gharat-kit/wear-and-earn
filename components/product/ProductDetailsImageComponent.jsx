@@ -56,7 +56,7 @@ export default function ProductDetailsImageComponent({ productDetails }) {
         thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
         onSlideChange={() => resetZoom()}
         modules={[FreeMode, Navigation, Thumbs]}
-        className="main-swiper w-full h-[560px] sm:h-[500px] rounded-lg overflow-hidden bg-gray-100"
+        className="main-swiper w-full h-[620px] sm:h-[580px] lg:h-[500px] rounded-lg overflow-hidden bg-gray-100"
       >
         {productDetails.images?.map((product, index) => (
           <SwiperSlide key={index} className="flex items-center justify-center overflow-hidden">
@@ -72,31 +72,34 @@ export default function ProductDetailsImageComponent({ productDetails }) {
           </SwiperSlide>
         ))}
       </Swiper>
-      {/* Mobile-only Zoom Controls */}
-      <div className="absolute top-3 right-3 flex items-center gap-2 sm:hidden">
+      </div>
+      
+      {/* Zoom Controls - below image on mobile/tablet */}
+      <div className="flex items-center justify-center gap-2 mt-3 lg:hidden">
         <button
           onClick={decreaseZoom}
           aria-label="Zoom out"
-          className="px-3 py-2 bg-white/95 dark:bg-gray-900/80 rounded-md shadow-sm hover:bg-white transition-colors text-lg leading-none"
+          className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-lg font-bold leading-none text-gray-700 dark:text-gray-200"
         >
           −
         </button>
-        <div className="px-2 py-1 bg-white/90 dark:bg-gray-900/80 rounded-md text-sm font-medium shadow-sm">x{zoom}</div>
+        <div className="px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-800 dark:text-gray-200">
+          Zoom: {zoom}x
+        </div>
         <button
           onClick={increaseZoom}
           aria-label="Zoom in"
-          className="px-3 py-2 bg-white/95 dark:bg-gray-900/80 rounded-md shadow-sm hover:bg-white transition-colors text-lg leading-none"
+          className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-lg font-bold leading-none text-gray-700 dark:text-gray-200"
         >
           +
         </button>
         <button
           onClick={resetZoom}
           aria-label="Reset zoom"
-          className="px-2 py-2 bg-white/95 dark:bg-gray-900/80 rounded-md shadow-sm hover:bg-white transition-colors text-xs"
+          className="px-3 py-2 bg-blue-600 dark:bg-blue-700 border border-blue-600 dark:border-blue-700 rounded-md shadow-sm hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors text-sm font-medium text-white"
         >
           Reset
         </button>
-      </div>
       </div>
       
       {hasMultipleImages && (

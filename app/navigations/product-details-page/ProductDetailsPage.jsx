@@ -133,29 +133,26 @@ function ProductDetailsPage({ id }) {
   const handleShare = async () => {
     try {
       const origin = typeof window !== 'undefined' ? window.location.origin : '';
-      // Referral-style direct product link (no distractions): /product-details/<id>
       const shareUrl = `${origin}/product-details/${id}`;
       const title = productDetails?.title || 'Product';
-      const text = `Check out this product: ${title}`;
-      if (navigator.share) {
-        await navigator.share({ title, text, url: shareUrl });
-        toast.success('Share dialog opened');
-      } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(shareUrl);
-        toast.success('Link copied to clipboard');
-      } else {
-        // Fallback: create temporary input
-        const el = document.createElement('input');
-        el.value = shareUrl;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-        toast.success('Link copied to clipboard');
-      }
+      
+      // Create WhatsApp message with clickable link
+      const message = `🛍️ *${title}*
+
+💰 Special Price: ₹${finalAmount?.toLocaleString("en-IN")}
+
+Click here to view and buy: ${shareUrl}
+
+#WearAndEarn #Shopping`;
+      
+      // Open WhatsApp with the message
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+      
+      toast.success('WhatsApp opened for sharing');
     } catch (err) {
       console.error('Share failed', err);
-      toast.error('Unable to share link');
+      toast.error('Unable to open WhatsApp');
     }
   };
 
@@ -287,9 +284,9 @@ function ProductDetailsPage({ id }) {
             {/* Secondary Actions */}
             <div className="flex space-x-4">
               {/* Wishlist removed per requirements */}
-              <button onClick={handleShare} className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
+              <button onClick={handleShare} className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400 transition-colors">
                 <FaShare />
-                <span>Share Product</span>
+                <span>Share on WhatsApp</span>
               </button>
             </div>
 
