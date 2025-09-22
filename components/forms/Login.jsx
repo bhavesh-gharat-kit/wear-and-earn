@@ -50,12 +50,18 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] px-3 sm:px-4">
+    <div className="flex flex-col items-center sm:justify-center min-h-[60vh] pt-4 sm:pt-0 px-3 sm:px-4">
       <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl md:rounded-2xl shadow-xl sm:shadow-2xl p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col items-center">
-        <Image src={"/images/brand-logo.png"} width={80} height={80} className="sm:w-[100px] sm:h-[100px] mb-4 sm:mb-6 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" alt="WearEarn Logo" />
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-600 dark:text-amber-400 mb-2 sm:mb-3 tracking-tight text-center">Welcome to WearEarn</h1>
-        <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 text-center">Sign in to your account</p>
-
+        <Image src={"/images/brand-logo.png"} width={100} height={100} className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] mb-3 sm:mb-6 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" alt="WearEarn Logo" />
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-3 tracking-tight text-center">
+          <span className="block text-gray-700 dark:text-gray-200">Welcome to</span>
+          <span className="block">
+            <span className="text-amber-600 dark:text-amber-400">Wear</span>
+            <span className="mx-1 text-gray-600 dark:text-gray-300">and</span>
+            <span className="text-purple-600 dark:text-purple-300">Earn</span>
+          </span>
+        </h1>
+        <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-4 sm:mb-8 text-center">Sign in to your account</p>
         {error && (
           <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-3 sm:px-4 md:px-6 py-3 sm:py-4 rounded-lg sm:rounded-xl mb-4 sm:mb-6 text-sm sm:text-base text-center font-medium border border-red-200 dark:border-red-800">
             {error}
@@ -75,7 +81,7 @@ const Login = () => {
               type="text"
               id="mobileNo"
               {...register("mobileNo")}
-              className="w-full p-3 sm:p-4 md:p-5 text-base sm:text-lg border border-gray-300 dark:border-gray-700 rounded-lg sm:rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="w-full p-4 sm:p-5 md:p-6 text-lg sm:text-xl border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               placeholder="Enter your mobile number"
             />
             {errors.mobileNo && (
@@ -98,7 +104,7 @@ const Login = () => {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 {...register("password")}
-                className="w-full p-3 sm:p-4 md:p-5 text-base sm:text-lg border border-gray-300 dark:border-gray-700 rounded-lg sm:rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12"
+                className="w-full p-4 sm:p-5 md:p-6 text-lg sm:text-xl border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12"
                 placeholder="Enter your password"
               />
               <button
@@ -128,7 +134,7 @@ const Login = () => {
           </div>
 
           {/* Forgot Password Link */}
-          <div className="text-center mb-4 sm:mb-6">
+          <div className="text-center mb-3 sm:mb-6">
             <button
               type="button"
               onClick={() => setShowForgotPassword(true)}
@@ -142,7 +148,7 @@ const Login = () => {
           <div className="text-center">
             <button
               type="submit"
-              className="w-full sm:w-auto px-8 sm:px-10 md:px-12 py-3 sm:py-4 text-base sm:text-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-lg sm:rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 active:scale-95 shadow-lg font-semibold"
+              className="w-full sm:w-auto px-6 sm:px-10 md:px-12 py-4 sm:py-4 text-lg sm:text-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-lg sm:rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 active:scale-95 shadow-lg font-semibold"
             >
               Sign In
             </button>
