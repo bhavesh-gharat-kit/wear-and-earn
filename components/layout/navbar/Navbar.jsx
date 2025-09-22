@@ -108,17 +108,21 @@ function Navbar() {
           </div>
 
           {/* Right: Download, Cart, Profile, Mobile menu button */}
-          <div className="navbar-end gap-2">
+          <div className="navbar-end flex items-center gap-2">
+            {/* Download button: always visible, next to cart, including mobile */}
             <Link
               href={"#"}
-              className="hidden md:flex items-center justify-center h-9 gap-1.5 bg-[#ffc107] rounded px-4 py-0.5"
+              className="flex items-center justify-center h-9 gap-1.5 bg-[#ffc107] rounded px-2 py-0.5"
             >
-              <span className="max-sm:hidden">Dowload App</span>
+              {/* Show text on desktop, abbreviated on mobile */}
+              <span className="inline md:hidden text-xs font-semibold">App</span>
+              <span className="hidden md:inline">Download App</span>
               <i>
                 <FaDownload />
               </i>
             </Link>
 
+            {/* Cart icon remains next to download button */}
             <div className="dropdown dropdown-end">
               <div
                 tabIndex={0}

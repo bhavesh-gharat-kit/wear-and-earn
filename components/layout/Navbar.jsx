@@ -138,9 +138,10 @@ function Navbar() {
 
           {/* Right: Download, Cart, Profile, Mobile menu button */}
           <div className="flex items-center gap-1 sm:gap-2">
+            {/* Download button: always left of cart */}
             {isMounted && (
-              <div className="hidden sm:block">
-                <PWAInstallButton />
+              <div className="flex items-center w-8 h-5 sm:w-9 sm:h-5 justify-center mr-2 md:mr-4 lg:mr-20">
+                <PWAInstallButton iconSize={24} />
               </div>
             )}
 
@@ -347,12 +348,8 @@ function Navbar() {
                 ))}
               </ul>
 
-              {/* Mobile-specific actions */}
+              {/* Mobile-specific actions (download button removed to avoid duplication) */}
               <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4">
-                <div className="block sm:hidden">
-                  <PWAInstallButton />
-                </div>
-                
                 {status === "authenticated" && loginSession === "user" && (
                   <button
                     onClick={handleUserLogOut}
