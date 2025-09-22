@@ -91,9 +91,11 @@ export default function ProductSlider({ title = "Top Trending", showModal, setSh
       >
         {productList?.map((product, i) => (
           <SwiperSlide key={i} className="flex justify-center items-center">
-            <div className="max-w-[170px] sm:max-w-[180px] md:max-w-[220px] w-full">
+            <a href={`/product-details/${product?._id || product?.id}`}
+               className="max-w-[170px] sm:max-w-[180px] md:max-w-[220px] w-full block"
+               style={{ textDecoration: 'none' }}>
               <ProductCard setShowModal={setShowModal} product={product} compact={true} />
-            </div>
+            </a>
           </SwiperSlide>
         ))}
       </Swiper>
