@@ -13,6 +13,7 @@ const OTPInput = ({
   const [otp, setOtp] = useState(new Array(length).fill(""));
   const inputRefs = useRef([]);
   const [webOTPSupported, setWebOTPSupported] = useState(false);
+  const [debugStatus, setDebugStatus] = useState("");
 
   // Check for WebOTP API support
   useEffect(() => {
@@ -42,18 +43,15 @@ const OTPInput = ({
       
       const startWebOTP = async () => {
         try {
-          console.log('WebOTP: Starting SMS detection...');
+          setDebugStatus("🔍 Listening for SMS...");
           const credential = await navigator.credentials.get({
             otp: { transport: ['sms'] },
             signal: abortController.signal
           });
           
-          console.log('WebOTP: Received credential:', credential);
-          
           if (credential && credential.code) {
-            console.log('WebOTP: Raw code:', credential.code);
+            setDebugStatus(`📱 SMS received: "${credential.code}"`);
             const otpCode = credential.code.replace(/\D/g, '').slice(0, length);
-            console.log('WebOTP: Processed code:', otpCode, 'length:', otpCode.length);
             
             if (otpCode.length > 0) {
               const otpArray = otpCode.split('');
@@ -69,19 +67,25 @@ const OTPInput = ({
                 onComplete(otpCode);
               }
               
-              console.log('WebOTP: Successfully filled OTP');
+              setDebugStatus(`✅ OTP filled: ${otpCode}`);
+              // Clear debug status after 3 seconds
+              setTimeout(() => setDebugStatus(""), 3000);
             } else {
-              console.log('WebOTP: No digits found in SMS');
+              setDebugStatus("❌ No digits found in SMS");
+              setTimeout(() => setDebugStatus(""), 3000);
             }
           } else {
-            console.log('WebOTP: No credential received');
+            setDebugStatus("❌ No SMS credential received");
+            setTimeout(() => setDebugStatus(""), 3000);
           }
         } catch (error) {
           // WebOTP was aborted or failed - this is normal behavior
           if (error.name !== 'AbortError') {
-            console.log('WebOTP error:', error);
+            setDebugStatus(`❌ WebOTP error: ${error.message}`);
+            setTimeout(() => setDebugStatus(""), 3000);
           } else {
-            console.log('WebOTP: Aborted');
+            setDebugStatus("⏹️ WebOTP cancelled");
+            setTimeout(() => setDebugStatus(""), 2000);
           }
         }
       };
@@ -209,41 +213,52 @@ const OTPInput = ({
   };
 
   return (
-    <div className="flex gap-2 justify-center relative">
-      {/* Hidden input for SMS autofill - iOS Safari and other browsers prefer single input */}
-      <input
-        type="text"
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        style={{
-          position: 'absolute',
-          left: '-9999px',
-          width: '1px',
-          height: '1px',
-          opacity: 0,
-          pointerEvents: 'none'
-        }}
-        tabIndex={-1}
-        aria-hidden="true"
-        onChange={(e) => {
-          const value = e.target.value.replace(/\D/g, '').slice(0, length);
-          if (value.length > 0) {
-            const otpArray = value.split('');
-            const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
-            setOtp(filledArray);
-            
-            if (onChange) {
-              onChange(value);
-            }
-            
-            if (value.length === length && onComplete) {
-              onComplete(value);
-            }
-          }
-        }}
-      />
+    <div className="flex flex-col items-center gap-3">
+      {/* Debug Status Display - visible on mobile */}
+      {debugStatus && (
+        <div className="text-sm text-center px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-blue-800 dark:text-blue-200 font-medium">
+          {debugStatus}
+        </div>
+      )}
       
-      {otp.map((data, index) => {
+      <div className="flex gap-2 justify-center relative">
+        {/* Hidden input for SMS autofill - iOS Safari and other browsers prefer single input */}
+        <input
+          type="text"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          style={{
+            position: 'absolute',
+            left: '-9999px',
+            width: '1px',
+            height: '1px',
+            opacity: 0,
+            pointerEvents: 'none'
+          }}
+          tabIndex={-1}
+          aria-hidden="true"
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, '').slice(0, length);
+            if (value.length > 0) {
+              setDebugStatus(`📋 Autocomplete: ${value}`);
+              const otpArray = value.split('');
+              const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
+              setOtp(filledArray);
+              
+              if (onChange) {
+                onChange(value);
+              }
+              
+              if (value.length === length && onComplete) {
+                onComplete(value);
+              }
+              
+              setTimeout(() => setDebugStatus(""), 3000);
+            }
+          }}
+        />
+        
+        {otp.map((data, index) => {
         return (
           <input
             key={index}
@@ -272,6 +287,7 @@ const OTPInput = ({
           />
         );
       })}
+      </div>
     </div>
   );
 };
