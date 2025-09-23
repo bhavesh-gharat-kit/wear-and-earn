@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 const OTPInput = ({ 
   length = 6, 
@@ -13,7 +13,8 @@ const OTPInput = ({
   const [otp, setOtp] = useState(new Array(length).fill(""));
   const inputRefs = useRef([]);
   const [webOTPSupported, setWebOTPSupported] = useState(false);
-  const [debugStatus, setDebugStatus] = useState("");
+  const abortControllerRef = useRef(null);
+  const [webOTPActive, setWebOTPActive] = useState(false);
 
   // Check for WebOTP API support
   useEffect(() => {
@@ -36,68 +37,77 @@ const OTPInput = ({
     }
   }, [autoFocus]);
 
-  // WebOTP API for automatic SMS detection
-  useEffect(() => {
-    if (webOTPSupported && !disabled) {
-      const abortController = new AbortController();
-      
-      const startWebOTP = async () => {
-        try {
-          setDebugStatus("🔍 Listening for SMS...");
-          const credential = await navigator.credentials.get({
-            otp: { transport: ['sms'] },
-            signal: abortController.signal
-          });
+  // Function to start WebOTP listening
+  const startWebOTPListener = useCallback(() => {
+    if (!webOTPSupported || disabled || webOTPActive) return;
+
+    // Abort previous listener if exists
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    abortControllerRef.current = new AbortController();
+    setWebOTPActive(true);
+    
+    const startWebOTP = async () => {
+      try {
+        console.log('🔍 Starting WebOTP listener...');
+        const credential = await navigator.credentials.get({
+          otp: { transport: ['sms'] },
+          signal: abortControllerRef.current.signal
+        });
+        
+        if (credential && credential.code) {
+          console.log('📱 WebOTP received:', credential.code);
+          const otpCode = credential.code.replace(/\D/g, '').slice(0, length);
           
-          if (credential && credential.code) {
-            setDebugStatus(`📱 SMS received: "${credential.code}"`);
-            const otpCode = credential.code.replace(/\D/g, '').slice(0, length);
+          if (otpCode.length > 0) {
+            const otpArray = otpCode.split('');
+            const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
+            setOtp(filledArray);
             
-            if (otpCode.length > 0) {
-              const otpArray = otpCode.split('');
-              const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
-              setOtp(filledArray);
-              
-              if (onChange) {
-                onChange(otpCode);
-              }
-              
-              // Call onComplete if we have the full code
-              if (otpCode.length === length && onComplete) {
-                onComplete(otpCode);
-              }
-              
-              setDebugStatus(`✅ OTP filled: ${otpCode}`);
-              // Clear debug status after 3 seconds
-              setTimeout(() => setDebugStatus(""), 3000);
-            } else {
-              setDebugStatus("❌ No digits found in SMS");
-              setTimeout(() => setDebugStatus(""), 3000);
+            if (onChange) {
+              onChange(otpCode);
             }
-          } else {
-            setDebugStatus("❌ No SMS credential received");
-            setTimeout(() => setDebugStatus(""), 3000);
-          }
-        } catch (error) {
-          // WebOTP was aborted or failed - this is normal behavior
-          if (error.name !== 'AbortError') {
-            setDebugStatus(`❌ WebOTP error: ${error.message}`);
-            setTimeout(() => setDebugStatus(""), 3000);
-          } else {
-            setDebugStatus("⏹️ WebOTP cancelled");
-            setTimeout(() => setDebugStatus(""), 2000);
+            
+            // Call onComplete if we have the full code
+            if (otpCode.length === length && onComplete) {
+              onComplete(otpCode);
+            }
           }
         }
-      };
+      } catch (error) {
+        console.log('WebOTP ended:', error.name);
+      } finally {
+        setWebOTPActive(false);
+      }
+    };
 
-      // Start listening for SMS
-      startWebOTP();
+    startWebOTP();
+  }, [webOTPSupported, disabled, webOTPActive, length, onChange, onComplete]);
 
-      return () => {
-        abortController.abort();
-      };
+  // Start WebOTP on component mount
+  useEffect(() => {
+    if (webOTPSupported && !disabled) {
+      startWebOTPListener();
     }
-  }, [webOTPSupported, disabled, length, onChange, onComplete]);
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [startWebOTPListener, webOTPSupported, disabled]);
+
+  // Restart WebOTP when user focuses on any input (user gesture)
+  const handleInputFocus = useCallback(() => {
+    // Restart WebOTP listener if it's not active and we have support
+    if (webOTPSupported && !webOTPActive && !disabled) {
+      setTimeout(() => {
+        startWebOTPListener();
+      }, 100);
+    }
+  }, [webOTPSupported, webOTPActive, disabled, startWebOTPListener]);
 
   const handleChange = (element, index) => {
     if (disabled) return;
@@ -214,33 +224,27 @@ const OTPInput = ({
 
   return (
     <div className="flex flex-col items-center gap-3">
-      {/* Debug Status Display - visible on mobile */}
-      {debugStatus && (
-        <div className="text-sm text-center px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-blue-800 dark:text-blue-200 font-medium">
-          {debugStatus}
-        </div>
-      )}
-      
       <div className="flex gap-2 justify-center relative">
-        {/* Hidden input for SMS autofill - iOS Safari and other browsers prefer single input */}
+        {/* Hidden input for SMS autofill - better positioned for mobile browsers */}
         <input
           type="text"
           inputMode="numeric"
           autoComplete="one-time-code"
           style={{
             position: 'absolute',
-            left: '-9999px',
-            width: '1px',
-            height: '1px',
+            left: '0',
+            top: '0',
+            width: '100%',
+            height: '100%',
             opacity: 0,
-            pointerEvents: 'none'
+            pointerEvents: 'auto',
+            zIndex: 10
           }}
-          tabIndex={-1}
-          aria-hidden="true"
+          onFocus={handleInputFocus}
           onChange={(e) => {
             const value = e.target.value.replace(/\D/g, '').slice(0, length);
             if (value.length > 0) {
-              setDebugStatus(`📋 Autocomplete: ${value}`);
+              console.log('📋 Autocomplete filled:', value);
               const otpArray = value.split('');
               const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
               setOtp(filledArray);
@@ -253,7 +257,10 @@ const OTPInput = ({
                 onComplete(value);
               }
               
-              setTimeout(() => setDebugStatus(""), 3000);
+              // Focus visible inputs for better UX
+              if (inputRefs.current[0]) {
+                inputRefs.current[0].focus();
+              }
             }
           }}
         />
@@ -271,7 +278,10 @@ const OTPInput = ({
             onChange={(e) => handleChange(e.target, index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
             onPaste={handlePaste}
-            onFocus={(e) => e.target.select()}
+            onFocus={(e) => {
+              e.target.select();
+              handleInputFocus();
+            }}
             disabled={disabled}
             autoComplete="off"
             className={`
