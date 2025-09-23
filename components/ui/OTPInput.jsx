@@ -42,30 +42,46 @@ const OTPInput = ({
       
       const startWebOTP = async () => {
         try {
+          console.log('WebOTP: Starting SMS detection...');
           const credential = await navigator.credentials.get({
             otp: { transport: ['sms'] },
             signal: abortController.signal
           });
           
+          console.log('WebOTP: Received credential:', credential);
+          
           if (credential && credential.code) {
+            console.log('WebOTP: Raw code:', credential.code);
             const otpCode = credential.code.replace(/\D/g, '').slice(0, length);
-            if (otpCode.length === length) {
+            console.log('WebOTP: Processed code:', otpCode, 'length:', otpCode.length);
+            
+            if (otpCode.length > 0) {
               const otpArray = otpCode.split('');
-              setOtp(otpArray);
+              const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
+              setOtp(filledArray);
               
               if (onChange) {
                 onChange(otpCode);
               }
               
-              if (onComplete) {
+              // Call onComplete if we have the full code
+              if (otpCode.length === length && onComplete) {
                 onComplete(otpCode);
               }
+              
+              console.log('WebOTP: Successfully filled OTP');
+            } else {
+              console.log('WebOTP: No digits found in SMS');
             }
+          } else {
+            console.log('WebOTP: No credential received');
           }
         } catch (error) {
           // WebOTP was aborted or failed - this is normal behavior
           if (error.name !== 'AbortError') {
-            console.log('WebOTP not available or failed:', error);
+            console.log('WebOTP error:', error);
+          } else {
+            console.log('WebOTP: Aborted');
           }
         }
       };
