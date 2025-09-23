@@ -56,14 +56,16 @@ const OTPInput = ({
         const digits = credential.code.replace(/\D/g, '');
         const otpCode = digits.slice(0, length);
         
-        if (otpCode.length >= length) {
+        if (otpCode.length > 0) {
           console.log('✅ WebOTP extracted:', otpCode);
           const otpArray = otpCode.split('');
           const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
           setOtp(filledArray);
           
           if (onChange) onChange(otpCode);
-          if (onComplete) onComplete(otpCode);
+          if (otpCode.length === length && onComplete) {
+            onComplete(otpCode);
+          }
         }
       }
     }).catch(error => {
