@@ -224,7 +224,7 @@ const RegisterWithOTP = ({ setIsLogin }) => {
             )}
           </div>
 
-          {/* Email (Optional) */}
+          {/* Email */}
           <div>
             <label className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 mb-2">
               Email Address 

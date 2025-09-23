@@ -68,7 +68,7 @@ const ReferralShare = ({ className = "", variant = "full" }) => {
     
     const message = `🎉 Hey! I found this amazing shopping platform where you can earn money while shopping!
 
-Join WearEarn using my referral code: ${referralData.referralCode}
+Join Wear And Earn using my referral code: ${referralData.referralCode}
 
 ✨ What you get:
 • Quality products at great prices
@@ -87,7 +87,7 @@ Start earning today! 💰`
   const shareViaEmail = () => {
     if (!referralData) return
     
-    const subject = 'Join WearEarn - Start Earning While Shopping!'
+    const subject = 'Join Wear And Earn - Start Earning While Shopping!'
     const body = `Hi there!
 
 I wanted to share something exciting with you. I've been using WearEarn, a platform where you can shop for quality products AND earn money at the same time!

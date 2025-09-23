@@ -83,7 +83,7 @@ const ReferralSection = ({ userId }) => {
             window.open(whatsappUrl, '_blank')
             break
           case 'email':
-            const subject = encodeURIComponent('Join WearEarn - Earn Money While Shopping!')
+            const subject = encodeURIComponent('Join Wear And Earn - Earn Money While Shopping!')
             const body = encodeURIComponent(message)
             window.open(`mailto:?subject=${subject}&body=${body}`, '_blank')
             break

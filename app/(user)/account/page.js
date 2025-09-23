@@ -508,7 +508,7 @@ const ReferralSection = ({ userData }) => {
           const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(data.data.message)}`
           window.open(whatsappUrl, '_blank')
         } else if (platform === 'email') {
-          const subject = encodeURIComponent('Join WearEarn - Earn Money While Shopping!')
+          const subject = encodeURIComponent('Join Wear And Earn - Earn Money While Shopping!')
           const body = encodeURIComponent(data.data.message)
           window.open(`mailto:?subject=${subject}&body=${body}`, '_blank')
         } else if (platform === 'sms') {

@@ -110,7 +110,7 @@ const Register = ({ setIsLogin }) => {
     <div className="flex flex-col items-center justify-center min-h-[80vh] px-3 sm:px-4">
       <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl md:rounded-2xl shadow-xl sm:shadow-2xl p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col items-center">
         <Image src={"/images/brand-logo.png"} width={80} height={80} className="sm:w-[100px] sm:h-[100px] mb-4 sm:mb-6 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" alt="WearEarn Logo" />
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-600 dark:text-amber-400 mb-2 sm:mb-3 tracking-tight text-center">Join WearEarn</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-600 dark:text-amber-400 mb-2 sm:mb-3 tracking-tight text-center">Join Wear And Earn</h1>
         <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 text-center">Create your account</p>
 
         {/* Mobile-Enhanced Form */}

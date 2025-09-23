@@ -31,8 +31,15 @@ export async function POST(request) {
       );
     }
 
-    // Send OTP
-    const otpSent = await sendPasswordResetOTP(user.email, user.mobileNo);
+  // Determine domain from request for WebOTP SMS formatting
+  const forwardedHost = request.headers.get('x-forwarded-host');
+  const host = forwardedHost || request.headers.get('host');
+  const proto = request.headers.get('x-forwarded-proto') || 'https';
+  const domainForWebOtp = host ? `${proto}://${host}` : undefined;
+  console.log("🌐 send-forgot-password-otp using domain:", domainForWebOtp);
+
+  // Send OTP with domain hint
+  const otpSent = await sendPasswordResetOTP(user.email, user.mobileNo, domainForWebOtp);
 
     if (otpSent) {
       return NextResponse.json({
