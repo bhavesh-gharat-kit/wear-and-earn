@@ -13,7 +13,6 @@ const OTPInput = ({
   const [otp, setOtp] = useState(new Array(length).fill(""));
   const inputRefs = useRef([]);
   const [webOTPSupported, setWebOTPSupported] = useState(false);
-  const abortControllerRef = useRef(null);
 
   // Check for WebOTP API support
   useEffect(() => {
@@ -36,28 +35,24 @@ const OTPInput = ({
     }
   }, [autoFocus]);
 
-  // Simplified WebOTP listener
-  const startWebOTPListener = useCallback(() => {
+  // Simple WebOTP - start immediately when component loads
+  useEffect(() => {
     if (!webOTPSupported || disabled) return;
 
-    // Abort any existing listener
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    abortControllerRef.current = new AbortController();
+    let isActive = true;
     
     navigator.credentials.get({
-      otp: { transport: ['sms'] },
-      signal: abortControllerRef.current.signal
+      otp: { transport: ['sms'] }
     }).then(credential => {
+      if (!isActive) return;
+      
       if (credential?.code) {
-        console.log('📱 WebOTP SMS received:', credential.code);
+        console.log('📱 WebOTP received:', credential.code);
         const digits = credential.code.replace(/\D/g, '');
         const otpCode = digits.slice(0, length);
         
         if (otpCode.length > 0) {
-          console.log('✅ WebOTP extracted:', otpCode);
+          console.log('✅ Filling OTP:', otpCode);
           const otpArray = otpCode.split('');
           const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
           setOtp(filledArray);
@@ -69,30 +64,13 @@ const OTPInput = ({
         }
       }
     }).catch(error => {
-      // Normal when cancelled or no SMS
-      console.log('WebOTP listener ended:', error.name);
+      console.log('WebOTP error:', error.name);
     });
-  }, [webOTPSupported, disabled, length, onChange, onComplete]);
-
-  // Start WebOTP on component mount
-  useEffect(() => {
-    if (webOTPSupported && !disabled) {
-      startWebOTPListener();
-    }
 
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      isActive = false;
     };
-  }, [startWebOTPListener, webOTPSupported, disabled]);
-
-  // Restart WebOTP on user interaction
-  const handleInputFocus = useCallback(() => {
-    if (webOTPSupported && !disabled) {
-      startWebOTPListener();
-    }
-  }, [webOTPSupported, disabled, startWebOTPListener]);
+  }, [webOTPSupported, disabled, length, onChange, onComplete]);
 
   const handleChange = (element, index) => {
     if (disabled) return;
@@ -209,15 +187,6 @@ const OTPInput = ({
 
   return (
     <div className="flex flex-col items-center gap-3">
-      {/* Manual autofill button for better mobile UX */}
-      <button
-        type="button"
-        onClick={handleInputFocus}
-        className="text-sm text-blue-600 dark:text-blue-400 hover:underline focus:outline-none"
-      >
-        📱 Tap to autofill from SMS
-      </button>
-      
       <div className="flex gap-2 justify-center relative">
         {/* Multiple autofill strategies for better compatibility */}
         <input
@@ -312,10 +281,7 @@ const OTPInput = ({
             onChange={(e) => handleChange(e.target, index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
             onPaste={handlePaste}
-            onFocus={(e) => {
-              e.target.select();
-              handleInputFocus();
-            }}
+            onFocus={(e) => e.target.select()}
             disabled={disabled}
             autoComplete="off"
             className={`
