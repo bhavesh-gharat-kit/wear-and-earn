@@ -12,6 +12,14 @@ const OTPInput = ({
 }) => {
   const [otp, setOtp] = useState(new Array(length).fill(""));
   const inputRefs = useRef([]);
+  const [webOTPSupported, setWebOTPSupported] = useState(false);
+
+  // Check for WebOTP API support
+  useEffect(() => {
+    if ('OTPCredential' in window) {
+      setWebOTPSupported(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (value) {
@@ -27,13 +35,85 @@ const OTPInput = ({
     }
   }, [autoFocus]);
 
+  // WebOTP API for automatic SMS detection
+  useEffect(() => {
+    if (webOTPSupported && !disabled) {
+      const abortController = new AbortController();
+      
+      const startWebOTP = async () => {
+        try {
+          const credential = await navigator.credentials.get({
+            otp: { transport: ['sms'] },
+            signal: abortController.signal
+          });
+          
+          if (credential && credential.code) {
+            const otpCode = credential.code.replace(/\D/g, '').slice(0, length);
+            if (otpCode.length === length) {
+              const otpArray = otpCode.split('');
+              setOtp(otpArray);
+              
+              if (onChange) {
+                onChange(otpCode);
+              }
+              
+              if (onComplete) {
+                onComplete(otpCode);
+              }
+            }
+          }
+        } catch (error) {
+          // WebOTP was aborted or failed - this is normal behavior
+          if (error.name !== 'AbortError') {
+            console.log('WebOTP not available or failed:', error);
+          }
+        }
+      };
+
+      // Start listening for SMS
+      startWebOTP();
+
+      return () => {
+        abortController.abort();
+      };
+    }
+  }, [webOTPSupported, disabled, length, onChange, onComplete]);
+
   const handleChange = (element, index) => {
     if (disabled) return;
     
-    if (isNaN(element.value)) return false;
+    const inputValue = element.value;
+    
+    // Handle multi-digit input (from autofill or paste)
+    if (inputValue.length > 1) {
+      const otpCode = inputValue.replace(/\D/g, '').slice(0, length);
+      if (otpCode.length > 0) {
+        const otpArray = otpCode.split('');
+        const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
+        setOtp(filledArray);
+        
+        if (onChange) {
+          onChange(otpCode);
+        }
+        
+        // Focus the next empty input or the last input
+        const nextEmptyIndex = Math.min(otpCode.length, length - 1);
+        if (inputRefs.current[nextEmptyIndex]) {
+          inputRefs.current[nextEmptyIndex].focus();
+        }
+        
+        // Call onComplete if all fields are filled
+        if (otpCode.length === length && onComplete) {
+          onComplete(otpCode);
+        }
+      }
+      return;
+    }
+    
+    if (isNaN(inputValue)) return false;
 
     const newOtp = [...otp];
-    newOtp[index] = element.value;
+    newOtp[index] = inputValue;
     setOtp(newOtp);
 
     // Call onChange callback
@@ -42,7 +122,7 @@ const OTPInput = ({
     }
 
     // Focus next input
-    if (element.nextSibling && element.value !== "") {
+    if (element.nextSibling && inputValue !== "") {
       element.nextSibling.focus();
     }
 
@@ -129,6 +209,7 @@ const OTPInput = ({
             onPaste={handlePaste}
             onFocus={(e) => e.target.select()}
             disabled={disabled}
+            autoComplete={index === 0 ? "one-time-code" : "off"}
             className={`
               w-12 h-12 text-center text-lg font-semibold border-2 rounded-lg
               transition-all duration-200 outline-none
