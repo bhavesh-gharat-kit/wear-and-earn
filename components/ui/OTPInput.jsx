@@ -193,7 +193,40 @@ const OTPInput = ({
   };
 
   return (
-    <div className="flex gap-2 justify-center">
+    <div className="flex gap-2 justify-center relative">
+      {/* Hidden input for SMS autofill - iOS Safari and other browsers prefer single input */}
+      <input
+        type="text"
+        inputMode="numeric"
+        autoComplete="one-time-code"
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          width: '1px',
+          height: '1px',
+          opacity: 0,
+          pointerEvents: 'none'
+        }}
+        tabIndex={-1}
+        aria-hidden="true"
+        onChange={(e) => {
+          const value = e.target.value.replace(/\D/g, '').slice(0, length);
+          if (value.length > 0) {
+            const otpArray = value.split('');
+            const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
+            setOtp(filledArray);
+            
+            if (onChange) {
+              onChange(value);
+            }
+            
+            if (value.length === length && onComplete) {
+              onComplete(value);
+            }
+          }
+        }}
+      />
+      
       {otp.map((data, index) => {
         return (
           <input
@@ -209,7 +242,7 @@ const OTPInput = ({
             onPaste={handlePaste}
             onFocus={(e) => e.target.select()}
             disabled={disabled}
-            autoComplete={index === 0 ? "one-time-code" : "off"}
+            autoComplete="off"
             className={`
               w-12 h-12 text-center text-lg font-semibold border-2 rounded-lg
               transition-all duration-200 outline-none
