@@ -14,7 +14,6 @@ const OTPInput = ({
   const inputRefs = useRef([]);
   const [webOTPSupported, setWebOTPSupported] = useState(false);
   const abortControllerRef = useRef(null);
-  const [webOTPActive, setWebOTPActive] = useState(false);
 
   // Check for WebOTP API support
   useEffect(() => {
@@ -37,54 +36,41 @@ const OTPInput = ({
     }
   }, [autoFocus]);
 
-  // Function to start WebOTP listening
+  // Simplified WebOTP listener
   const startWebOTPListener = useCallback(() => {
-    if (!webOTPSupported || disabled || webOTPActive) return;
+    if (!webOTPSupported || disabled) return;
 
-    // Abort previous listener if exists
+    // Abort any existing listener
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
 
     abortControllerRef.current = new AbortController();
-    setWebOTPActive(true);
     
-    const startWebOTP = async () => {
-      try {
-        console.log('🔍 Starting WebOTP listener...');
-        const credential = await navigator.credentials.get({
-          otp: { transport: ['sms'] },
-          signal: abortControllerRef.current.signal
-        });
+    navigator.credentials.get({
+      otp: { transport: ['sms'] },
+      signal: abortControllerRef.current.signal
+    }).then(credential => {
+      if (credential?.code) {
+        console.log('📱 WebOTP SMS received:', credential.code);
+        const digits = credential.code.replace(/\D/g, '');
+        const otpCode = digits.slice(0, length);
         
-        if (credential && credential.code) {
-          console.log('📱 WebOTP received:', credential.code);
-          const otpCode = credential.code.replace(/\D/g, '').slice(0, length);
+        if (otpCode.length >= length) {
+          console.log('✅ WebOTP extracted:', otpCode);
+          const otpArray = otpCode.split('');
+          const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
+          setOtp(filledArray);
           
-          if (otpCode.length > 0) {
-            const otpArray = otpCode.split('');
-            const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
-            setOtp(filledArray);
-            
-            if (onChange) {
-              onChange(otpCode);
-            }
-            
-            // Call onComplete if we have the full code
-            if (otpCode.length === length && onComplete) {
-              onComplete(otpCode);
-            }
-          }
+          if (onChange) onChange(otpCode);
+          if (onComplete) onComplete(otpCode);
         }
-      } catch (error) {
-        console.log('WebOTP ended:', error.name);
-      } finally {
-        setWebOTPActive(false);
       }
-    };
-
-    startWebOTP();
-  }, [webOTPSupported, disabled, webOTPActive, length, onChange, onComplete]);
+    }).catch(error => {
+      // Normal when cancelled or no SMS
+      console.log('WebOTP listener ended:', error.name);
+    });
+  }, [webOTPSupported, disabled, length, onChange, onComplete]);
 
   // Start WebOTP on component mount
   useEffect(() => {
@@ -99,15 +85,12 @@ const OTPInput = ({
     };
   }, [startWebOTPListener, webOTPSupported, disabled]);
 
-  // Restart WebOTP when user focuses on any input (user gesture)
+  // Restart WebOTP on user interaction
   const handleInputFocus = useCallback(() => {
-    // Restart WebOTP listener if it's not active and we have support
-    if (webOTPSupported && !webOTPActive && !disabled) {
-      setTimeout(() => {
-        startWebOTPListener();
-      }, 100);
+    if (webOTPSupported && !disabled) {
+      startWebOTPListener();
     }
-  }, [webOTPSupported, webOTPActive, disabled, startWebOTPListener]);
+  }, [webOTPSupported, disabled, startWebOTPListener]);
 
   const handleChange = (element, index) => {
     if (disabled) return;
@@ -224,27 +207,74 @@ const OTPInput = ({
 
   return (
     <div className="flex flex-col items-center gap-3">
+      {/* Manual autofill button for better mobile UX */}
+      <button
+        type="button"
+        onClick={handleInputFocus}
+        className="text-sm text-blue-600 dark:text-blue-400 hover:underline focus:outline-none"
+      >
+        📱 Tap to autofill from SMS
+      </button>
+      
       <div className="flex gap-2 justify-center relative">
-        {/* Hidden input for SMS autofill - better positioned for mobile browsers */}
+        {/* Multiple autofill strategies for better compatibility */}
         <input
-          type="text"
+          type="tel"
+          autoComplete="one-time-code"
+          inputMode="numeric"
+          style={{
+            position: 'absolute',
+            left: '-9999px',
+            width: '1px', 
+            height: '1px',
+            opacity: 0
+          }}
+          tabIndex={-1}
+          onInput={(e) => {
+            const value = e.target.value.replace(/\D/g, '').slice(0, length);
+            if (value.length > 0) {
+              console.log('📋 Hidden input autofill:', value);
+              const otpArray = value.split('');
+              const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
+              setOtp(filledArray);
+              
+              if (onChange) {
+                onChange(value);
+              }
+              
+              if (value.length === length && onComplete) {
+                onComplete(value);
+              }
+            }
+          }}
+        />
+        
+        {/* Overlay input for mobile tap to trigger autofill */}
+        <input
+          type="tel"
           inputMode="numeric"
           autoComplete="one-time-code"
+          placeholder="Tap to autofill OTP"
           style={{
             position: 'absolute',
             left: '0',
             top: '0',
             width: '100%',
             height: '100%',
-            opacity: 0,
-            pointerEvents: 'auto',
-            zIndex: 10
+            opacity: 0.01,
+            fontSize: '16px',
+            background: 'transparent',
+            border: 'none',
+            zIndex: 5
           }}
-          onFocus={handleInputFocus}
-          onChange={(e) => {
+          onFocus={(e) => {
+            handleInputFocus();
+            e.target.select();
+          }}
+          onInput={(e) => {
             const value = e.target.value.replace(/\D/g, '').slice(0, length);
             if (value.length > 0) {
-              console.log('📋 Autocomplete filled:', value);
+              console.log('� Overlay input autofill:', value);
               const otpArray = value.split('');
               const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
               setOtp(filledArray);
@@ -257,10 +287,12 @@ const OTPInput = ({
                 onComplete(value);
               }
               
-              // Focus visible inputs for better UX
-              if (inputRefs.current[0]) {
-                inputRefs.current[0].focus();
-              }
+              // Focus first visible input after autofill
+              setTimeout(() => {
+                if (inputRefs.current[0]) {
+                  inputRefs.current[0].focus();
+                }
+              }, 100);
             }
           }}
         />
