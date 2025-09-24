@@ -606,6 +606,183 @@ const ReferralSection = ({ userData }) => {
   )
 }
 
+// My Team Section Component
+const MyTeamSection = ({ userData }) => {
+  const [teamData, setTeamData] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  const fetchTeamData = useCallback(async () => {
+    try {
+      console.log('🔍 Fetching team data...')
+      const response = await fetch('/api/account/team')
+      
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          console.log('✅ Team data received:', data.data)
+          setTeamData(data.data)
+        } else {
+          console.log('⚠️ Team data not available:', data.message)
+          setTeamData({ overview: [] })
+        }
+      } else {
+        console.error('❌ Failed to fetch team data')
+        setTeamData({ overview: [] })
+      }
+    } catch (error) {
+      console.error('❌ Error fetching team data:', error)
+      setTeamData({ overview: [] })
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchTeamData()
+  }, [fetchTeamData])
+
+  // Calculate level display
+  const getCurrentLevelDisplay = () => {
+    // Check numeric level first (this is the primary level system)
+    if (userData?.level && userData.level > 0) {
+      return `L${userData.level}`
+    }
+    
+    // Fallback to enum level
+    if (userData?.currentLevel && userData.currentLevel !== 'NONE') {
+      return userData.currentLevel
+    }
+    
+    // Check if user is active
+    if (userData?.isActive) {
+      return 'L0 (Active)'
+    }
+    
+    return 'New Member'
+  }
+
+  // Calculate next level requirement
+  const getNextLevelRequirement = () => {
+    const levelRequirements = {
+      0: { next: 'L1', teams: 1 },
+      1: { next: 'L2', teams: 9 },
+      2: { next: 'L3', teams: 27 },
+      3: { next: 'L4', teams: 81 },
+      4: { next: 'L5', teams: 243 },
+      5: { next: 'MAX', teams: 0 }
+    }
+    
+    const currentLevel = userData?.level || 0
+    return levelRequirements[currentLevel] || levelRequirements[0]
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    )
+  }
+
+  const currentTeams = userData?.totalTeams || 0
+  const nextLevel = getNextLevelRequirement()
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">My Team</h2>
+      
+      {/* Current Level Card */}
+      <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-800 p-3 sm:p-6 rounded-lg">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex-1">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-1">Current Level</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{getCurrentLevelDisplay()}</p>
+          </div>
+          <Users className="w-8 h-8 sm:w-10 sm:h-10 text-purple-500 dark:text-purple-400 flex-shrink-0" />
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4 text-center">
+          <div className="bg-white dark:bg-gray-700 p-3 rounded-lg">
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">{currentTeams}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300">Total Teams</p>
+          </div>
+          <div className="bg-white dark:bg-gray-700 p-3 rounded-lg">
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">
+              {nextLevel.next === 'MAX' ? 'MAX LEVEL' : nextLevel.teams}
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-300">
+              {nextLevel.next === 'MAX' ? 'Achieved' : `For ${nextLevel.next}`}
+            </p>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        {nextLevel.next !== 'MAX' && (
+          <div className="mt-4">
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
+              <span>Progress to {nextLevel.next}</span>
+              <span>{Math.min(currentTeams, nextLevel.teams)}/{nextLevel.teams}</span>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${Math.min((currentTeams / nextLevel.teams) * 100, 100)}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Team Overview */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Team Breakdown</h3>
+        
+        {teamData?.overview && teamData.overview.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {teamData.overview.slice(0, 4).map((levelData) => (
+                <div key={levelData.level} className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Level {levelData.level}</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">{levelData.totalMembers}</p>
+                  <p className="text-xs text-green-600 dark:text-green-400">{levelData.activeMembers} Active</p>
+                </div>
+              ))}
+            </div>
+
+            {teamData.totalTeamSize !== undefined && (
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Total Team Size</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{teamData.totalTeamSize}</p>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-8">
+            <Users className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+            <p className="text-gray-500 dark:text-gray-400 mb-2">No team data yet</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">
+              Start building your team by sharing your referral link!
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Team Benefits */}
+      <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 p-4 rounded-lg">
+        <h4 className="font-medium text-green-900 dark:text-green-300 mb-2">Team Benefits:</h4>
+        <ul className="text-sm text-green-800 dark:text-green-300 space-y-1">
+          <li>• Earn commission from your team&apos;s purchases</li>
+          <li>• Higher levels unlock better pool distribution shares</li>
+          <li>• Build deeper teams for increased earning potential</li>
+          <li>• Permanent level achievements - no downgrade!</li>
+        </ul>
+      </div>
+    </div>
+  )
+}
+
 const AccountDashboard = () => {
   const { data: session, status } = useSession()
   const [activeTab, setActiveTab] = useState('wallet')
@@ -2225,6 +2402,7 @@ const AccountDashboard = () => {
   const tabs = [
     { id: 'wallet', label: 'Wallet', icon: Wallet, color: 'from-green-400 to-emerald-500' },
     { id: 'referral', label: 'Referral', icon: Share2, color: 'from-purple-400 to-pink-500' },
+    { id: 'team', label: 'My Team', icon: Users, color: 'from-blue-400 to-indigo-500' },
     { id: 'kyc', label: 'KYC Verification', icon: FileText, color: 'from-orange-400 to-red-500' }
   ]
 
@@ -2338,6 +2516,13 @@ const AccountDashboard = () => {
             <div id="referral">
               {/* Referral Code Card */}
               <ReferralSection userData={userData} />
+            </div>
+          )}
+          
+          {activeTab === 'team' && (
+            <div id="team">
+              {/* Team Section Card */}
+              <MyTeamSection userData={userData} />
             </div>
           )}
           

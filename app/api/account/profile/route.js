@@ -47,6 +47,10 @@ export async function GET() {
       role: user.role,
       isVerified: user.isVerified,
       kycStatus: user.kycStatus,
+      level: user.level,
+      currentLevel: user.currentLevel,
+      totalTeams: user.totalTeams,
+      isActive: user.isActive,
       createdAt: user.createdAt,
       address: user.address ? {
         houseNumber: user.address.houseNumber,
