@@ -39,36 +39,36 @@ const OTPInput = ({
   useEffect(() => {
     if (!webOTPSupported || disabled) return;
 
-    let isActive = true;
+    const ac = new AbortController();
     
     navigator.credentials.get({
-      otp: { transport: ['sms'] }
+      otp: { transport: ['sms'] },
+      signal: ac.signal
     }).then(credential => {
-      if (!isActive) return;
-      
       if (credential?.code) {
         console.log('📱 WebOTP received:', credential.code);
-        const digits = credential.code.replace(/\D/g, '');
-        const otpCode = digits.slice(0, length);
+        const otpCode = credential.code.replace(/\D/g, '');
         
         if (otpCode.length > 0) {
-          console.log('✅ Filling OTP:', otpCode);
-          const otpArray = otpCode.split('');
+          console.log('✅ Filling OTP from WebOTP:', otpCode);
+          const otpArray = otpCode.split('').slice(0, length);
           const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
           setOtp(filledArray);
           
           if (onChange) onChange(otpCode);
-          if (otpCode.length === length && onComplete) {
-            onComplete(otpCode);
+          if (otpCode.length >= length && onComplete) {
+            onComplete(otpCode.slice(0, length));
           }
         }
       }
     }).catch(error => {
-      console.log('WebOTP error:', error.name);
+      if (error.name !== 'AbortError') {
+        console.log('WebOTP error:', error.name);
+      }
     });
 
     return () => {
-      isActive = false;
+      ac.abort();
     };
   }, [webOTPSupported, disabled, length, onChange, onComplete]);
 
@@ -202,19 +202,19 @@ const OTPInput = ({
           }}
           tabIndex={-1}
           onInput={(e) => {
-            const value = e.target.value.replace(/\D/g, '').slice(0, length);
+            const value = e.target.value.replace(/\D/g, '');
             if (value.length > 0) {
               console.log('📋 Hidden input autofill:', value);
-              const otpArray = value.split('');
+              const otpArray = value.split('').slice(0, length);
               const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
               setOtp(filledArray);
               
               if (onChange) {
-                onChange(value);
+                onChange(value.slice(0, length));
               }
               
-              if (value.length === length && onComplete) {
-                onComplete(value);
+              if (value.length >= length && onComplete) {
+                onComplete(value.slice(0, length));
               }
             }
           }}
