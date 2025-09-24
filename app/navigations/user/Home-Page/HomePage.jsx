@@ -1,8 +1,25 @@
+'use client'
 import ProductSlider from '@/components/product/ProductSlider'
 import HeroSlider from '@/components/layout/HeroSlider'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 function HomePage() {
+  // Track visitor when home page loads
+  useEffect(() => {
+    const trackVisitor = async () => {
+      try {
+        await fetch('/api/visitor/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}) // Can add country/city data if needed
+        })
+      } catch (error) {
+        console.log('Visitor tracking failed:', error) // Silent fail - don't disrupt user experience
+      }
+    }
+
+    trackVisitor()
+  }, [])
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Compact Mobile Hero for Rectangle Images */}

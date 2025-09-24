@@ -36,7 +36,7 @@ function AdminDashBoard() {
     return <LoaderEffect />;
   }
 
-  const { totalInStockQuantity, totalOrders, totalProducts, totalUsers, companyEarnings } =
+  const { totalInStockQuantity, totalOrders, totalProducts, totalUsers, companyEarnings, visitorStats } =
     allDatabaseDetails;
 
   return (
@@ -67,7 +67,7 @@ function AdminDashBoard() {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
             {/* Orders */}
             <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-md transition group border border-gray-100 dark:border-gray-800">
               <div className="flex items-center justify-between">
@@ -167,6 +167,46 @@ function AdminDashBoard() {
                     strokeLinejoin="round"
                     strokeWidth="2"
                     d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Total Visitors */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow p-4 sm:p-6 hover:shadow-md transition group border border-gray-100 dark:border-gray-800">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <h2 className="font-semibold text-purple-600 dark:text-purple-400 text-sm sm:text-base">Total Visitors</h2>
+                  <p className="text-lg sm:text-xl md:text-2xl font-bold mt-1 sm:mt-2 text-purple-900 dark:text-purple-200">
+                    {visitorStats?.totalVisitors || 0}
+                  </p>
+                  <div className="mt-1 sm:mt-2">
+                    <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                      Today: {visitorStats?.todayVisitors || 0}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                      Unique: {visitorStats?.uniqueVisitors || 0}
+                    </span>
+                  </div>
+                </div>
+                <svg
+                  className="w-8 h-8 sm:w-10 sm:h-10 text-purple-500 group-hover:scale-110 transition flex-shrink-0"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                   />
                 </svg>
               </div>

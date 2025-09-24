@@ -69,6 +69,45 @@ export const GET = async () => {
             console.error('Company earnings calculation error:', companyEarningsError);
             totalCompanyEarnings = 0;
         }
+
+        // Visitor statistics
+        let visitorStats = {
+            totalVisitors: 0,
+            todayVisitors: 0,
+            uniqueVisitors: 0
+        };
+        try {
+            // Total visitors
+            const totalVisitors = await prisma.visitor.count();
+            
+            // Today's visitors
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            const todayVisitors = await prisma.visitor.count({
+                where: {
+                    timestamp: {
+                        gte: today,
+                        lt: tomorrow
+                    }
+                }
+            });
+
+            // Unique visitors (unique IP addresses)
+            const uniqueVisitors = await prisma.visitor.groupBy({
+                by: ['ipAddress']
+            });
+
+            visitorStats = {
+                totalVisitors,
+                todayVisitors,
+                uniqueVisitors: uniqueVisitors.length
+            };
+        } catch (visitorError) {
+            console.error('Visitor stats calculation error:', visitorError);
+        }
         
         return Response.json({
             totalOrders,
@@ -83,7 +122,8 @@ export const GET = async () => {
             companyEarnings: {
                 totalEarnings: totalCompanyEarnings, // In paisa
                 totalEarningsRupees: totalCompanyEarnings / 100 // In rupees for display
-            }
+            },
+            visitorStats
         });
     } catch (error) {
         console.error('Error fetching dashboard stats:', error);
