@@ -316,9 +316,33 @@ const WalletActions = ({ walletBalance }) => {
   const [withdrawing, setWithdrawing] = useState(false)
   const [message, setMessage] = useState('')
 
+  // Calculate withdrawal breakdown
+  const calculateWithdrawalBreakdown = (amount) => {
+    const requestAmount = parseFloat(amount) || 0
+    const adminCharges = requestAmount * 0.05 // 5%
+    const tdsDeduction = requestAmount * 0.05 // 5%
+    const totalDeductions = adminCharges + tdsDeduction
+    const finalAmount = requestAmount - totalDeductions
+    
+    return {
+      requestAmount,
+      adminCharges,
+      tdsDeduction,
+      totalDeductions,
+      finalAmount
+    }
+  }
+
+  const breakdown = calculateWithdrawalBreakdown(withdrawAmount)
+
   const handleWithdraw = async () => {
     if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) {
       setMessage('Please enter a valid amount')
+      return
+    }
+
+    if (parseFloat(withdrawAmount) < 300) {
+      setMessage('Minimum withdrawal amount is ₹300')
       return
     }
 
@@ -334,7 +358,10 @@ const WalletActions = ({ walletBalance }) => {
       const response = await fetch('/api/account/withdraw', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: parseFloat(withdrawAmount) })
+        body: JSON.stringify({ 
+          amount: parseFloat(withdrawAmount),
+          breakdown: breakdown
+        })
       })
 
       const data = await response.json()
@@ -376,24 +403,97 @@ const WalletActions = ({ walletBalance }) => {
             
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Amount (₹)
+                Withdrawal Amount (₹)
               </label>
               <input
                 type="number"
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
-                placeholder="Enter amount"
-                min="500"
+                placeholder="Enter amount (minimum ₹300)"
+                min="300"
                 max={walletBalance}
-                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-medium"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Available balance: ₹{walletBalance?.toFixed(2) || '0.00'}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Minimum withdrawal: ₹300
-              </p>
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Available balance: ₹{walletBalance?.toFixed(2) || '0.00'}
+                </p>
+                <p className="text-xs text-red-500 dark:text-red-400 font-medium">
+                  Minimum withdrawal: ₹300
+                </p>
+              </div>
             </div>
+
+            {/* Real-time Withdrawal Breakdown */}
+            {withdrawAmount && parseFloat(withdrawAmount) > 0 && (
+              <div className={`mb-4 p-4 rounded-lg border-2 ${
+                parseFloat(withdrawAmount) >= 300 
+                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                  : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+              }`}>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">💰 Withdrawal Breakdown</h4>
+                  {parseFloat(withdrawAmount) < 300 && (
+                    <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-1 rounded-full font-medium">
+                      Below Minimum
+                    </span>
+                  )}
+                </div>
+                
+                <div className="space-y-3">
+                  {/* Amount Input Display */}
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">💸 Requested Amount:</span>
+                      <span className="text-lg font-bold text-blue-600 dark:text-blue-400">₹{breakdown.requestAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  {/* Deductions */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">🏢 Admin Charges (5%):</span>
+                      <span className="font-medium text-red-600 dark:text-red-400">-₹{breakdown.adminCharges.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">📋 TDS Deduction (5%):</span>
+                      <span className="font-medium text-red-600 dark:text-red-400">-₹{breakdown.tdsDeduction.toFixed(2)}</span>
+                    </div>
+                    <div className="border-t border-gray-300 dark:border-gray-600 pt-2">
+                      <div className="flex justify-between items-center py-1">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">📉 Total Deductions (10%):</span>
+                        <span className="font-semibold text-red-600 dark:text-red-400 text-lg">-₹{breakdown.totalDeductions.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Final Amount */}
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 p-3 rounded-lg border border-green-200 dark:border-green-700">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-green-800 dark:text-green-300">💰 You&apos;ll Receive:</span>
+                      <span className="text-xl font-bold text-green-600 dark:text-green-400">₹{breakdown.finalAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  {/* Percentage Display */}
+                  <div className="text-center">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Total deduction: <span className="font-medium text-red-600">10%</span> • 
+                      You receive: <span className="font-medium text-green-600">90%</span> of requested amount
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* No amount entered message */}
+            {(!withdrawAmount || parseFloat(withdrawAmount) === 0) && (
+              <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg text-center">
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  💡 Enter an amount above to see the withdrawal breakdown
+                </p>
+              </div>
+            )}
 
             {message && (
               <div className={`mb-4 p-3 rounded-lg text-sm ${
@@ -412,16 +512,36 @@ const WalletActions = ({ walletBalance }) => {
                   setWithdrawAmount('')
                   setMessage('')
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
+                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-white font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={handleWithdraw}
-                disabled={withdrawing}
-                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                disabled={withdrawing || !withdrawAmount || parseFloat(withdrawAmount) < 300}
+                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                  withdrawing || !withdrawAmount || parseFloat(withdrawAmount) < 300
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg'
+                }`}
               >
-                {withdrawing ? 'Processing...' : 'Submit Request'}
+                {withdrawing ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  withdrawAmount && parseFloat(withdrawAmount) >= 300 ? (
+                    <span className="text-sm">
+                      💰 Request ₹{breakdown.finalAmount.toFixed(2)}
+                    </span>
+                  ) : (
+                    'Submit Request'
+                  )
+                )}
               </button>
             </div>
           </div>
@@ -645,7 +765,14 @@ const MyTeamSection = ({ userData }) => {
   const getCurrentLevelDisplay = () => {
     // Check numeric level first (this is the primary level system)
     if (userData?.level && userData.level > 0) {
-      return `L${userData.level}`
+      const levelNames = {
+        1: 'Level 1 (Bronze)',
+        2: 'Level 2 (Silver)',
+        3: 'Level 3 (Gold)',
+        4: 'Level 4 (Platinum)',
+        5: 'Level 5 (Diamond)'
+      }
+      return levelNames[userData.level] || `Level ${userData.level}`
     }
     
     // Fallback to enum level
@@ -655,7 +782,7 @@ const MyTeamSection = ({ userData }) => {
     
     // Check if user is active
     if (userData?.isActive) {
-      return 'L0 (Active)'
+      return 'Level 0 (Active)'
     }
     
     return 'New Member'
@@ -664,12 +791,12 @@ const MyTeamSection = ({ userData }) => {
   // Calculate next level requirement
   const getNextLevelRequirement = () => {
     const levelRequirements = {
-      0: { next: 'L1', teams: 1 },
-      1: { next: 'L2', teams: 9 },
-      2: { next: 'L3', teams: 27 },
-      3: { next: 'L4', teams: 81 },
-      4: { next: 'L5', teams: 243 },
-      5: { next: 'MAX', teams: 0 }
+      0: { next: 'Level 1 (Bronze)', nextShort: 'Bronze', teams: 1 },
+      1: { next: 'Level 2 (Silver)', nextShort: 'Silver', teams: 9 },
+      2: { next: 'Level 3 (Gold)', nextShort: 'Gold', teams: 27 },
+      3: { next: 'Level 4 (Platinum)', nextShort: 'Platinum', teams: 81 },
+      4: { next: 'Level 5 (Diamond)', nextShort: 'Diamond', teams: 243 },
+      5: { next: 'MAX LEVEL', nextShort: 'MAX', teams: 0 }
     }
     
     const currentLevel = userData?.level || 0
@@ -708,19 +835,19 @@ const MyTeamSection = ({ userData }) => {
           </div>
           <div className="bg-white dark:bg-gray-700 p-3 rounded-lg">
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
-              {nextLevel.next === 'MAX' ? 'MAX LEVEL' : nextLevel.teams}
+              {nextLevel.next === 'MAX LEVEL' ? 'MAX' : nextLevel.teams}
             </p>
             <p className="text-xs text-gray-600 dark:text-gray-300">
-              {nextLevel.next === 'MAX' ? 'Achieved' : `For ${nextLevel.next}`}
+              {nextLevel.next === 'MAX LEVEL' ? 'Achieved' : `For ${nextLevel.nextShort || nextLevel.next}`}
             </p>
           </div>
         </div>
 
         {/* Progress Bar */}
-        {nextLevel.next !== 'MAX' && (
+        {nextLevel.next !== 'MAX LEVEL' && (
           <div className="mt-4">
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
-              <span>Progress to {nextLevel.next}</span>
+              <span>Progress to {nextLevel.nextShort || nextLevel.next}</span>
               <span>{Math.min(currentTeams, nextLevel.teams)}/{nextLevel.teams}</span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
