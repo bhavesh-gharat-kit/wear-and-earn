@@ -51,7 +51,7 @@ const Login = () => {
 
   return (
     <div className="flex flex-col items-center sm:justify-center min-h-[60vh] pt-4 sm:pt-0 px-3 sm:px-4">
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl md:rounded-2xl shadow-xl sm:shadow-2xl p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col items-center">
+      <div className="w-full max-w-lg sm:max-w-2xl md:max-w-3xl lg:max-w-5xl mx-auto bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl md:rounded-2xl shadow-xl sm:shadow-2xl p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col items-center">
         <Image src={"/images/brand-logo.png"} width={100} height={100} className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] mb-3 sm:mb-6 rounded-full border-2 border-amber-500 bg-white dark:bg-gray-800" alt="WearEarn Logo" />
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-3 tracking-tight text-center">
           <span className="block text-gray-700 dark:text-gray-200">Welcome to</span>
@@ -68,7 +68,7 @@ const Login = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl">
+  <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl">
           {/* Mobile-Enhanced Mobile Number */}
           <div className="mb-4 sm:mb-6">
             <label
