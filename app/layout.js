@@ -18,8 +18,8 @@ import FloatingCallButton from "@/components/ui/FloatingCallButton";
 // });
 
 export const metadata = {
-  title: "Wear and Earn - Premium Clothing & MLM Rewards",
-  description: "Shop premium clothing and earn rewards through our MLM program",
+  title: "Wear and Earn - Premium Clothing",
+  description: "Shop premium clothing and earn rewards ",
   manifest: "/manifest.json",
   themeColor: "#ffc107",
   viewport: {
