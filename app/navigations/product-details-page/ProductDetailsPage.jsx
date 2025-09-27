@@ -143,10 +143,68 @@ Price: ₹${finalAmount?.toLocaleString("en-IN")}
 
 ${shareUrl}`;
       
-      // Open WhatsApp with the message
-      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      // Try to include product image when possible.
+      // Determine image URL (handle relative paths stored in `images`)
+      const firstImage = images && images.length ? images[0] : null;
+      const resolveImageUrl = (img) => {
+        if (!img) return null;
+        if (typeof img === 'string') {
+          return img.startsWith('http') ? img : `${origin}${img}`;
+        }
+        // If image stored as object (e.g., { url: '' })
+        if (typeof img === 'object' && img.url) {
+          return img.url.startsWith('http') ? img.url : `${origin}${img.url}`;
+        }
+        return null;
+      };
+
+      const imageUrl = resolveImageUrl(firstImage);
+
+      // First try Web Share API with files (best experience on mobile)
+      if (navigator.share) {
+        try {
+          if (imageUrl && window.fetch) {
+            const resp = await fetch(imageUrl);
+            const blob = await resp.blob();
+            const fileName = `${(title || 'product').replace(/\s+/g, '_').toLowerCase()}.jpg`;
+            const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+
+            // Some browsers support sharing files
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                title,
+                text: message,
+                files: [file],
+                url: shareUrl
+              });
+              toast.success('Shared via device share (image included)');
+              return;
+            }
+
+            // If cannot share files, fallback to sharing text+url
+            await navigator.share({
+              title,
+              text: `${message}\n${imageUrl}`,
+              url: shareUrl
+            });
+            toast.success('Shared via device share');
+            return;
+          }
+
+          // If no image, share text+url using Web Share API
+          await navigator.share({ title, text: `${message}\n${shareUrl}`, url: shareUrl });
+          toast.success('Shared via device share');
+          return;
+        } catch (shareErr) {
+          // If Web Share fails, continue to fallback
+          console.warn('Web Share failed, falling back to WhatsApp:', shareErr);
+        }
+      }
+
+      // Fallback: open WhatsApp with message and include imageUrl if available (WhatsApp will show preview if URL supports it)
+      const fallbackMessage = imageUrl ? `${message}\n${imageUrl}` : message;
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(fallbackMessage)}`;
       window.open(whatsappUrl, '_blank');
-      
       toast.success('WhatsApp opened for sharing');
     } catch (err) {
       console.error('Share failed', err);
