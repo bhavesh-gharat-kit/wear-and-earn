@@ -134,11 +134,11 @@ function AdminProductsPage() {
 
       <form
         onSubmit={handleSubmitSearchProductQuery}
-        className="w-5/12 p-0.5 rounded h-10 flex items-center"
+        className="w-5/12 p-0.5 rounded h-10 flex items-center border border-gray-300 dark:border-gray-600"
         action=""
       >
         <input
-          className="w-full px-3 py-1 bg-slate-200 dark:bg-gray-800 h-full rounded outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+          className="w-full px-3 py-1 bg-slate-200 dark:bg-gray-800 h-full rounded-l border-0 outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
           type="search"
           placeholder="search category..."
           onChange={(e) => setSearchProduct(e.target.value)}
@@ -146,7 +146,7 @@ function AdminProductsPage() {
         />
         <button
           type="submit"
-          className="bg-primary h-full text-white px-2 cursor-pointer rounded"
+          className="bg-primary h-full text-white px-2 cursor-pointer rounded-r border-0"
         >
           <IoMdSearch fontSize={20} />
         </button>

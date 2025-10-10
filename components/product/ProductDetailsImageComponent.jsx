@@ -25,6 +25,11 @@ export default function ProductDetailsImageComponent({ productDetails }) {
   const [lastTapTime, setLastTapTime] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
   
+  // Hover zoom states for desktop
+  const [isHovering, setIsHovering] = useState(false);
+  const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
+  const [isDesktop, setIsDesktop] = useState(false);
+  
   const imageRefs = useRef([]);
   const touchStartDistance = useRef(0);
   const touchStartZoom = useRef(1);
@@ -34,6 +39,19 @@ export default function ProductDetailsImageComponent({ productDetails }) {
   const MIN_ZOOM = 1;
   const MAX_ZOOM = 4;
   const ZOOM_STEP = 0.25;
+  const HOVER_ZOOM_LEVEL = 2.5; // Zoom level for hover magnification
+
+  // Detect if user is on desktop
+  useEffect(() => {
+    const checkIsDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024 && !('ontouchstart' in window));
+    };
+    
+    checkIsDesktop();
+    window.addEventListener('resize', checkIsDesktop);
+    
+    return () => window.removeEventListener('resize', checkIsDesktop);
+  }, []);
 
   if(!productDetails?.images || productDetails?.images.length <= 0){
     return (
@@ -214,6 +232,28 @@ export default function ProductDetailsImageComponent({ productDetails }) {
     }
   }, [zoom, zoomToPoint, resetZoomAndPan, MIN_ZOOM]);
 
+  // Handle mouse enter for hover zoom (desktop only)
+  const handleMouseEnter = useCallback(() => {
+    if (isDesktop && zoom === MIN_ZOOM) {
+      setIsHovering(true);
+    }
+  }, [isDesktop, zoom, MIN_ZOOM]);
+
+  // Handle mouse leave for hover zoom
+  const handleMouseLeave = useCallback(() => {
+    setIsHovering(false);
+  }, []);
+
+  // Handle mouse move for hover zoom position
+  const handleMouseMove = useCallback((e) => {
+    if (isDesktop && isHovering && zoom === MIN_ZOOM) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setHoverPosition({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+    }
+  }, [isDesktop, isHovering, zoom, MIN_ZOOM]);
+
   // Button controls for desktop/fallback
   const increaseZoom = () => {
     const rect = imageRefs.current[currentSlide]?.getBoundingClientRect();
@@ -253,13 +293,16 @@ export default function ProductDetailsImageComponent({ productDetails }) {
             <div
               ref={(el) => imageRefs.current[index] = el}
               className={`w-full h-full relative overflow-hidden ${
-                zoom > MIN_ZOOM ? 'cursor-grab active:cursor-grabbing' : 'cursor-zoom-in'
+                zoom > MIN_ZOOM ? 'cursor-grab active:cursor-grabbing' : isDesktop ? 'cursor-zoom-in' : 'cursor-zoom-in'
               }`}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
               onWheel={handleWheel}
               onDoubleClick={handleDoubleClick}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              onMouseMove={handleMouseMove}
               style={{
                 touchAction: zoom > MIN_ZOOM ? 'none' : 'auto'
               }}
@@ -279,16 +322,27 @@ export default function ProductDetailsImageComponent({ productDetails }) {
                 draggable={false}
               />
               
-              {/* Zoom instructions overlay */}
-              {zoom === MIN_ZOOM && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="bg-black bg-opacity-60 text-white px-4 py-3 rounded-lg text-sm opacity-0 hover:opacity-100 transition-opacity duration-300 lg:opacity-70">
-                    <div className="text-center space-y-1">
-                      <p className="lg:hidden font-medium">📱 Touch Controls</p>
-                      <p className="lg:hidden text-xs">Double tap to zoom • Pinch to zoom • Drag to pan</p>
-                      <p className="hidden lg:block font-medium">🖱️ Mouse Controls</p>
-                      <p className="hidden lg:block text-xs">Double click to zoom • Ctrl+Scroll to zoom • Drag to pan</p>
-                    </div>
+              {/* Desktop Hover Zoom Overlay */}
+              {isDesktop && isHovering && zoom === MIN_ZOOM && (
+                <div className="absolute top-4 right-4 w-48 h-48 lg:w-64 lg:h-64 xl:w-80 xl:h-80 border-2 border-white shadow-2xl rounded-lg overflow-hidden bg-white z-10 pointer-events-none">
+                  <Image
+                    width={600}
+                    height={600}
+                    src={product.imageUrl}
+                    className="w-full h-full object-cover select-none"
+                    style={{
+                      transform: `scale(${HOVER_ZOOM_LEVEL})`,
+                      transformOrigin: `${hoverPosition.x}% ${hoverPosition.y}%`,
+                      transition: 'transform 0.1s ease-out'
+                    }}
+                    alt={`${productDetails?.title} - Zoomed view`}
+                    draggable={false}
+                  />
+                  {/* Magnifying glass icon */}
+                  <div className="absolute top-2 left-2 bg-black bg-opacity-60 text-white p-1 rounded-full">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                   </div>
                 </div>
               )}
