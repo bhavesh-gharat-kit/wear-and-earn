@@ -31,13 +31,22 @@ export async function POST(request) {
       }, { status: 400 })
     }
 
-    const { amount } = await request.json()
+    const { amount, breakdown } = await request.json()
 
     if (!amount || amount <= 0) {
       return NextResponse.json({ error: 'Invalid withdrawal amount' }, { status: 400 })
     }
 
+    // Validate breakdown if provided
+    if (breakdown) {
+      const expectedFinalAmount = amount - (amount * 0.1) // 10% total deduction
+      if (Math.abs(breakdown.finalAmount - expectedFinalAmount) > 0.01) {
+        return NextResponse.json({ error: 'Invalid withdrawal breakdown' }, { status: 400 })
+      }
+    }
+
     const amountInPaisa = Math.round(amount * 100)
+    const finalAmountInPaisa = breakdown ? Math.round(breakdown.finalAmount * 100) : Math.round(amount * 0.9 * 100) // 90% if no breakdown
 
     // Check if user has sufficient balance
     if (user.walletBalance < amountInPaisa) {
@@ -92,9 +101,17 @@ export async function POST(request) {
       const withdrawal = await tx.newWithdrawal.create({
         data: {
           userId,
-          amount: amountInPaisa,
+          amount: finalAmountInPaisa, // Store the final amount user will receive
+          requestedAmount: amountInPaisa, // Store original requested amount
           status: 'requested',
-          bankDetails: JSON.stringify(bankDetails)
+          bankDetails: JSON.stringify(bankDetails),
+          deductionBreakdown: breakdown ? JSON.stringify(breakdown) : JSON.stringify({
+            requestAmount: amount,
+            adminCharges: amount * 0.05,
+            tdsDeduction: amount * 0.05,
+            totalDeductions: amount * 0.1,
+            finalAmount: amount * 0.9
+          })
         }
       })
 
@@ -103,8 +120,8 @@ export async function POST(request) {
         data: {
           userId,
           type: 'withdrawal_debit',
-          amount: -amountInPaisa, // Negative for debit
-          note: `Withdrawal request #${withdrawal.id} - Amount deducted from wallet`,
+          amount: -amountInPaisa, // Negative for debit (original requested amount deducted from wallet)
+          note: `Withdrawal request #${withdrawal.id} - Requested: ₹${(amountInPaisa/100).toFixed(2)}, Final: ₹${(finalAmountInPaisa/100).toFixed(2)} (after 10% deduction)`,
           ref: `withdrawal_${withdrawal.id}`
         }
       })
@@ -118,7 +135,8 @@ export async function POST(request) {
       success: true,
       message: 'Withdrawal request submitted successfully. Amount has been deducted from your wallet and will be processed within 24-48 hours.',
       requestId: withdrawalRequest.id,
-      amount: amount,
+      requestedAmount: amount,
+      finalAmount: finalAmountInPaisa / 100,
       status: 'requested'
     })
 

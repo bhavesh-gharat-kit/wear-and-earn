@@ -153,7 +153,7 @@ function ProductCard({ product, variant = "default", setShowModal }) {
               </button>
               <button
                 onClick={handleBuyNow}
-                className="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-md text-sm flex items-center justify-center transition-colors duration-150"
+                className="hidden sm:flex flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-md text-sm items-center justify-center transition-colors duration-150"
               >
                 <FaShoppingBag className="mr-2" />
                 Buy Now
@@ -223,7 +223,7 @@ function ProductCard({ product, variant = "default", setShowModal }) {
           </button>
           <button
             onClick={handleBuyNow}
-            className="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-md text-sm flex items-center justify-center transition-colors duration-150"
+            className="hidden sm:flex flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-md text-sm items-center justify-center transition-colors duration-150"
           >
             <FaShoppingBag className="mr-2" />
             Buy Now

@@ -35,7 +35,7 @@ export async function GET(request) {
           createdAt: true,
           walletBalance: true,
           monthlyPurchase: true,
-          isKycApproved: true,
+          kycStatus: true,
           // Get their direct referrals count
           referrals: {
             select: { id: true }
@@ -70,7 +70,8 @@ export async function GET(request) {
           paisa: user.monthlyPurchase,
           rupees: paisaToRupees(user.monthlyPurchase)
         },
-        isKycApproved: user.isKycApproved,
+        kycStatus: user.kycStatus,
+        isKycApproved: user.kycStatus === 'APPROVED',
         directReferralsCount: user.referrals.length
       }))
 
@@ -106,7 +107,7 @@ export async function GET(request) {
               createdAt: true,
               walletBalance: true,
               monthlyPurchase: true,
-              isKycApproved: true,
+              kycStatus: true,
               sponsorId: true,
               sponsor: {
                 select: {
@@ -144,7 +145,8 @@ export async function GET(request) {
           paisa: member.descendant.monthlyPurchase,
           rupees: paisaToRupees(member.descendant.monthlyPurchase)
         },
-        isKycApproved: member.descendant.isKycApproved,
+        kycStatus: member.descendant.kycStatus,
+        isKycApproved: member.descendant.kycStatus === 'APPROVED',
         sponsor: member.descendant.sponsor,
         depth: member.depth
       }))

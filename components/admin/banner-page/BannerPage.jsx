@@ -16,6 +16,7 @@ import PaginationComponent from "@/components/ui/PaginationComponent";
 function BannerPage() {
   const [allBannersDetails, setAllBannersDetails] = useState([]);
   const [searchSliderTitle, setSearchSliderTitle] = useState("");
+  const [showAddBannerModal, setShowAddBannerModal] = useState(false);
 
   // pagination logic here
   const [currentPage, setCurrentPage] = useState(1);
@@ -94,8 +95,8 @@ function BannerPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-xl text-blue-700 dark:text-blue-400 font-bold">Manage Banners</h1>
         <button
-          onClick={() => document.getElementById("my_modal_3").showModal()}
-          className="flex items-center gap-2 btn btn-primary font-semibold"
+          onClick={() => setShowAddBannerModal(true)}
+          className="flex items-center gap-2 btn btn-primary font-semibold border border-blue-600"
         >
           <i className="text-xl">
             <IoMdAdd fontSize={22} />
@@ -108,11 +109,11 @@ function BannerPage() {
 
       <form
         onSubmit={handleSubmitSearchProductQuery}
-        className="w-5/12 p-0.5 rounded h-10 flex items-center"
+        className="w-5/12 p-0.5 rounded h-10 flex items-center border border-gray-300 dark:border-gray-600"
         action=""
       >
         <input
-          className="w-full px-3 py-1 bg-slate-200 dark:bg-gray-700 dark:text-white h-full rounded outline-none"
+          className="w-full px-3 py-1 bg-slate-200 dark:bg-gray-700 dark:text-white h-full rounded-l border-0 outline-none"
           type="search"
           placeholder="search by slider title..."
           onChange={(e) => setSearchSliderTitle(e.target.value)}
@@ -120,7 +121,7 @@ function BannerPage() {
         />
         <button
           type="submit"
-          className="bg-primary h-full text-white px-2 cursor-pointer rounded"
+          className="bg-primary h-full text-white px-2 cursor-pointer rounded-r border-0"
         >
           <IoMdSearch fontSize={20} />
         </button>
@@ -199,7 +200,13 @@ function BannerPage() {
           totalPages={totalPages}
         />
       </div>
-      <AddBannerModel fetchAllBannersDetails={fetchAllBannersDetails} />
+      
+      {showAddBannerModal && (
+        <AddBannerModel 
+          fetchAllBannersDetails={fetchAllBannersDetails} 
+          onClose={() => setShowAddBannerModal(false)}
+        />
+      )}
       
     </div>
   );

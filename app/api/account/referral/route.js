@@ -112,7 +112,7 @@ export async function POST(request) {
 
     // Generate platform-specific messages
     const messages = {
-      whatsapp: `🎉 Join WearEarn and start earning money while shopping for trendy clothes!
+      whatsapp: `🎉 Join Wear And Earn and start earning money while shopping for trendy clothes!
 
 👕 Shop premium garments
 💰 Earn commissions on every purchase
@@ -124,7 +124,7 @@ Register here: ${referralUrl}
 
 Start your earning journey today! 🚀`,
 
-      email: `Subject: Earn Money While Shopping - Join WearEarn Today!
+      email: `Subject: Earn Money While Shopping - Join Wear And Earn Today!
 
 Hi there!
 
@@ -145,9 +145,9 @@ Looking forward to having you on board!
 Best regards,
 ${user.fullName}`,
 
-      sms: `🎉 Join WearEarn & earn money shopping! Use my code: ${user.referralCode}. Register: ${referralUrl}`,
+      sms: `🎉 Join Wear And Earn & earn money shopping! Use my code: ${user.referralCode}. Register: ${referralUrl}`,
 
-      generic: `Join WearEarn using my referral code: ${user.referralCode}
+      generic: `Join Wear And Earn using my referral code: ${user.referralCode}
 Register at: ${referralUrl}
 Start earning money while shopping for trendy clothes!`
     }

@@ -1,7 +1,7 @@
 "use client";
 
 import ProductDetailsImageComponent from "@/components/product/ProductDetailsImageComponent";
-import { FaCheckCircle, FaShoppingCart, FaHeart, FaShare } from "react-icons/fa";
+import { FaCheckCircle, FaShoppingCart, FaShare } from "react-icons/fa";
 import { IoBag, IoShieldCheckmark } from "react-icons/io5";
 import { MdLocalShipping, MdSecurity } from "react-icons/md";
 
@@ -128,6 +128,88 @@ function ProductDetailsPage({ id }) {
     handleAddToCart().then(() => {
       router.push("/checkout");
     });
+  };
+
+  const handleShare = async () => {
+    try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const shareUrl = `${origin}/product-details/${id}`;
+      const title = productDetails?.title || 'Product';
+      
+      // Create WhatsApp message - simpler format for better link detection
+      const message = `${title}
+
+Price: ₹${finalAmount?.toLocaleString("en-IN")}
+
+${shareUrl}`;
+      
+      // Try to include product image when possible.
+      // Determine image URL (handle relative paths stored in `images`)
+      const firstImage = images && images.length ? images[0] : null;
+      const resolveImageUrl = (img) => {
+        if (!img) return null;
+        if (typeof img === 'string') {
+          return img.startsWith('http') ? img : `${origin}${img}`;
+        }
+        // If image stored as object (e.g., { url: '' })
+        if (typeof img === 'object' && img.url) {
+          return img.url.startsWith('http') ? img.url : `${origin}${img.url}`;
+        }
+        return null;
+      };
+
+      const imageUrl = resolveImageUrl(firstImage);
+
+      // First try Web Share API with files (best experience on mobile)
+      if (navigator.share) {
+        try {
+          if (imageUrl && window.fetch) {
+            const resp = await fetch(imageUrl);
+            const blob = await resp.blob();
+            const fileName = `${(title || 'product').replace(/\s+/g, '_').toLowerCase()}.jpg`;
+            const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+
+            // Some browsers support sharing files
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                title,
+                text: message,
+                files: [file],
+                url: shareUrl
+              });
+              toast.success('Shared via device share (image included)');
+              return;
+            }
+
+            // If cannot share files, fallback to sharing text+url
+            await navigator.share({
+              title,
+              text: `${message}\n${imageUrl}`,
+              url: shareUrl
+            });
+            toast.success('Shared via device share');
+            return;
+          }
+
+          // If no image, share text+url using Web Share API
+          await navigator.share({ title, text: `${message}\n${shareUrl}`, url: shareUrl });
+          toast.success('Shared via device share');
+          return;
+        } catch (shareErr) {
+          // If Web Share fails, continue to fallback
+          console.warn('Web Share failed, falling back to WhatsApp:', shareErr);
+        }
+      }
+
+      // Fallback: open WhatsApp with message and include imageUrl if available (WhatsApp will show preview if URL supports it)
+      const fallbackMessage = imageUrl ? `${message}\n${imageUrl}` : message;
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(fallbackMessage)}`;
+      window.open(whatsappUrl, '_blank');
+      toast.success('WhatsApp opened for sharing');
+    } catch (err) {
+      console.error('Share failed', err);
+      toast.error('Unable to open WhatsApp');
+    }
   };
 
   return (
@@ -257,13 +339,10 @@ function ProductDetailsPage({ id }) {
 
             {/* Secondary Actions */}
             <div className="flex space-x-4">
-              <button className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors">
-                <FaHeart />
-                <span>Add to Wishlist</span>
-              </button>
-              <button className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
+              {/* Wishlist removed per requirements */}
+              <button onClick={handleShare} className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400 transition-colors">
                 <FaShare />
-                <span>Share Product</span>
+                <span>Share on WhatsApp</span>
               </button>
             </div>
 
@@ -318,7 +397,7 @@ function ProductDetailsPage({ id }) {
                     : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
-                Shipping & Returns
+                Shipping
               </button>
             </nav>
           </div>
@@ -381,7 +460,7 @@ function ProductDetailsPage({ id }) {
                         Free shipping on orders over ₹999. Standard delivery takes 3-5 business days.
                       </p>
                     </div>
-                    <div className="space-y-3">
+                    {/* <div className="space-y-3">
                       <div className="flex items-center space-x-3">
                         <IoShieldCheckmark className="h-5 w-5 text-blue-500" />
                         <span className="font-medium text-gray-900 dark:text-gray-100">30-Day Returns</span>
@@ -389,7 +468,7 @@ function ProductDetailsPage({ id }) {
                       <p className="text-gray-600 dark:text-gray-300 text-sm ml-8">
                         Easy returns within 30 days of purchase. Item must be in original condition.
                       </p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

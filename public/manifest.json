@@ -1,7 +1,7 @@
 {
-  "name": "Wear and Earn - Premium Clothing & MLM Rewards",
+  "name": "Wear and Earn - Premium Clothing",
   "short_name": "WearEarn",
-  "description": "Shop premium clothing and earn rewards through our innovative MLM program. Install for the best mobile experience.",
+  "description": "Shop premium clothing and earn rewards. Install for the best mobile experience.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

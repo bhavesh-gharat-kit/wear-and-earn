@@ -439,20 +439,35 @@ model SelfIncomeInstallment {
 }
 
 model NewWithdrawal {
-  id          Int       @id @default(autoincrement()) @db.UnsignedInt
-  userId      Int       @db.UnsignedInt
-  amount      Int
-  status      String    @default("requested")
-  bankDetails String?   @db.Text
-  adminNotes  String?   @db.Text
-  createdAt   DateTime  @default(now())
-  processedAt DateTime?
-  user        User      @relation(fields: [userId], references: [id])
+  id                 Int       @id @default(autoincrement()) @db.UnsignedInt
+  userId             Int       @db.UnsignedInt
+  amount             Int       // Final amount user will receive (after deductions)
+  requestedAmount    Int?      // Original requested amount
+  status             String    @default("requested")
+  bankDetails        String?   @db.Text
+  adminNotes         String?   @db.Text
+  deductionBreakdown String?   @db.Text // JSON string containing breakdown details
+  createdAt          DateTime  @default(now())
+  processedAt        DateTime?
+  user               User      @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([status])
   @@index([createdAt])
   @@map("new_withdrawals")
+}
+
+model Visitor {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  ipAddress String   @db.VarChar(45) // Support both IPv4 and IPv6
+  userAgent String?  @db.Text
+  timestamp DateTime @default(now())
+  country   String?
+  city      String?
+
+  @@index([ipAddress])
+  @@index([timestamp])
+  @@map("visitors")
 }
 
 model Team {

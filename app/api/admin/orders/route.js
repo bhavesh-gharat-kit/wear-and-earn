@@ -86,7 +86,8 @@ export const GET = async (request) => {
                     select: {
                         id: true,
                         email: true,
-                        fullName: true
+                        fullName: true,
+                        mobileNo: true
                     }
                 },
                 orderProducts: {
@@ -95,7 +96,12 @@ export const GET = async (request) => {
                         title: true,
                         quantity: true,
                         sellingPrice: true,
-                        totalPrice: true
+                        discount: true,
+                        gst: true,
+                        finalMRP: true,
+                        homeDelivery: true,
+                        totalPrice: true,
+                        productId: true
                     }
                 }
             },

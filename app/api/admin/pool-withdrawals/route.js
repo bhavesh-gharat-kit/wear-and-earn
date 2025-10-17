@@ -35,24 +35,38 @@ export async function GET(request) {
 
     return NextResponse.json({
       success: true,
-      withdrawals: withdrawals.map(w => ({
-        id: w.id.toString(),
-        amount: w.amount,
-        amountRs: w.amount / 100,
-        status: w.status,
-        createdAt: w.createdAt,
-        processedAt: w.processedAt,
-        adminNotes: w.adminNotes,
-        bankDetails: w.bankDetails ? JSON.parse(w.bankDetails) : null,
-        user: {
-          id: w.user.id,
-          fullName: w.user.fullName,
-          email: w.user.email,
-          mobileNo: w.user.mobileNo,
-          walletBalance: w.user.walletBalance,
-          walletBalanceRs: w.user.walletBalance / 100
+      withdrawals: withdrawals.map(w => {
+        let breakdown = null;
+        if (w.deductionBreakdown) {
+          try {
+            breakdown = JSON.parse(w.deductionBreakdown);
+          } catch (e) {
+            console.error('Error parsing breakdown:', e);
+          }
         }
-      }))
+        
+        return {
+          id: w.id.toString(),
+          amount: w.amount, // Final amount user will receive
+          amountRs: w.amount / 100, // Final amount in rupees
+          requestedAmount: w.requestedAmount, // Original requested amount
+          requestedAmountRs: w.requestedAmount ? w.requestedAmount / 100 : null,
+          status: w.status,
+          createdAt: w.createdAt,
+          processedAt: w.processedAt,
+          adminNotes: w.adminNotes,
+          bankDetails: w.bankDetails ? JSON.parse(w.bankDetails) : null,
+          deductionBreakdown: breakdown,
+          user: {
+            id: w.user.id,
+            fullName: w.user.fullName,
+            email: w.user.email,
+            mobileNo: w.user.mobileNo,
+            walletBalance: w.user.walletBalance,
+            walletBalanceRs: w.user.walletBalance / 100
+          }
+        };
+      })
     });
 
   } catch (error) {
@@ -114,8 +128,8 @@ export async function POST(request) {
           data: {
             userId: withdrawal.userId,
             type: 'withdrawal_approved',
-            amount: -withdrawal.amount, // Negative for completed withdrawal
-            note: `Withdrawal #${withdrawal.id} approved by admin. ${adminNotes || ''}`,
+            amount: -withdrawal.amount, // Negative for completed withdrawal (final amount)
+            note: `Withdrawal #${withdrawal.id} approved by admin. Final amount: ₹${(withdrawal.amount/100).toFixed(2)}. ${adminNotes || ''}`,
             ref: `withdrawal_approved_${withdrawal.id}`
           }
         });
@@ -133,11 +147,12 @@ export async function POST(request) {
           }
         });
 
-        // Return money to user wallet
+        // Return original requested amount to user wallet (not the final amount)
+        const refundAmount = withdrawal.requestedAmount || withdrawal.amount;
         await tx.user.update({
           where: { id: withdrawal.userId },
           data: {
-            walletBalance: { increment: withdrawal.amount }
+            walletBalance: { increment: refundAmount }
           }
         });
 
@@ -146,8 +161,8 @@ export async function POST(request) {
           data: {
             userId: withdrawal.userId,
             type: 'withdrawal_refund',
-            amount: withdrawal.amount, // Positive for refund
-            note: `Withdrawal #${withdrawal.id} rejected - Amount refunded. ${adminNotes || ''}`,
+            amount: refundAmount, // Positive for refund (original requested amount)
+            note: `Withdrawal #${withdrawal.id} rejected - Original amount ₹${(refundAmount/100).toFixed(2)} refunded. ${adminNotes || ''}`,
             ref: `withdrawal_refund_${withdrawal.id}`
           }
         });

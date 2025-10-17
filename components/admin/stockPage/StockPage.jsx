@@ -79,7 +79,7 @@ function StockPage() {
         <div className="flex gap-2">
           <button
             onClick={() => setShowAddStockModal(true)}
-            className="flex items-center gap-2 btn btn-primary font-semibold"
+            className="flex items-center gap-2 btn btn-primary font-semibold border border-blue-600"
           >
             <i className="text-xl">
               <IoMdAdd fontSize={22} />

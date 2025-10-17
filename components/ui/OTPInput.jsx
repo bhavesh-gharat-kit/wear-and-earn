@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 const OTPInput = ({ 
   length = 6, 
@@ -12,6 +12,14 @@ const OTPInput = ({
 }) => {
   const [otp, setOtp] = useState(new Array(length).fill(""));
   const inputRefs = useRef([]);
+  const [webOTPSupported, setWebOTPSupported] = useState(false);
+
+  // Check for WebOTP API support
+  useEffect(() => {
+    if ('OTPCredential' in window) {
+      setWebOTPSupported(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (value) {
@@ -27,13 +35,78 @@ const OTPInput = ({
     }
   }, [autoFocus]);
 
+  // Simple WebOTP - start immediately when component loads
+  useEffect(() => {
+    if (!webOTPSupported || disabled) return;
+
+    const ac = new AbortController();
+    
+    navigator.credentials.get({
+      otp: { transport: ['sms'] },
+      signal: ac.signal
+    }).then(credential => {
+      if (credential?.code) {
+        console.log('📱 WebOTP received:', credential.code);
+        const otpCode = credential.code.replace(/\D/g, '');
+        
+        if (otpCode.length > 0) {
+          console.log('✅ Filling OTP from WebOTP:', otpCode);
+          const otpArray = otpCode.split('').slice(0, length);
+          const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
+          setOtp(filledArray);
+          
+          if (onChange) onChange(otpCode);
+          if (otpCode.length >= length && onComplete) {
+            onComplete(otpCode.slice(0, length));
+          }
+        }
+      }
+    }).catch(error => {
+      if (error.name !== 'AbortError') {
+        console.log('WebOTP error:', error.name);
+      }
+    });
+
+    return () => {
+      ac.abort();
+    };
+  }, [webOTPSupported, disabled, length, onChange, onComplete]);
+
   const handleChange = (element, index) => {
     if (disabled) return;
     
-    if (isNaN(element.value)) return false;
+    const inputValue = element.value;
+    
+    // Handle multi-digit input (from autofill or paste)
+    if (inputValue.length > 1) {
+      const otpCode = inputValue.replace(/\D/g, '').slice(0, length);
+      if (otpCode.length > 0) {
+        const otpArray = otpCode.split('');
+        const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
+        setOtp(filledArray);
+        
+        if (onChange) {
+          onChange(otpCode);
+        }
+        
+        // Focus the next empty input or the last input
+        const nextEmptyIndex = Math.min(otpCode.length, length - 1);
+        if (inputRefs.current[nextEmptyIndex]) {
+          inputRefs.current[nextEmptyIndex].focus();
+        }
+        
+        // Call onComplete if all fields are filled
+        if (otpCode.length === length && onComplete) {
+          onComplete(otpCode);
+        }
+      }
+      return;
+    }
+    
+    if (isNaN(inputValue)) return false;
 
     const newOtp = [...otp];
-    newOtp[index] = element.value;
+    newOtp[index] = inputValue;
     setOtp(newOtp);
 
     // Call onChange callback
@@ -42,7 +115,7 @@ const OTPInput = ({
     }
 
     // Focus next input
-    if (element.nextSibling && element.value !== "") {
+    if (element.nextSibling && inputValue !== "") {
       element.nextSibling.focus();
     }
 
@@ -113,8 +186,88 @@ const OTPInput = ({
   };
 
   return (
-    <div className="flex gap-2 justify-center">
-      {otp.map((data, index) => {
+    <div className="flex flex-col items-center gap-3">
+      <div className="flex gap-2 justify-center relative">
+        {/* Multiple autofill strategies for better compatibility */}
+        <input
+          type="tel"
+          autoComplete="one-time-code"
+          inputMode="numeric"
+          style={{
+            position: 'absolute',
+            left: '-9999px',
+            width: '1px', 
+            height: '1px',
+            opacity: 0
+          }}
+          tabIndex={-1}
+          onInput={(e) => {
+            const value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+              console.log('📋 Hidden input autofill:', value);
+              const otpArray = value.split('').slice(0, length);
+              const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
+              setOtp(filledArray);
+              
+              if (onChange) {
+                onChange(value.slice(0, length));
+              }
+              
+              if (value.length >= length && onComplete) {
+                onComplete(value.slice(0, length));
+              }
+            }
+          }}
+        />
+        
+        {/* Overlay input for mobile tap to trigger autofill */}
+        <input
+          type="tel"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          placeholder="Tap to autofill OTP"
+          style={{
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            width: '100%',
+            height: '100%',
+            opacity: 0.01,
+            fontSize: '16px',
+            background: 'transparent',
+            border: 'none',
+            zIndex: 5
+          }}
+          onFocus={(e) => {
+            e.target.select();
+          }}
+          onInput={(e) => {
+            const value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+              console.log('📱 Overlay input autofill:', value);
+              const otpArray = value.split('').slice(0, length);
+              const filledArray = [...otpArray, ...new Array(length - otpArray.length).fill("")];
+              setOtp(filledArray);
+              
+              if (onChange) {
+                onChange(value.slice(0, length));
+              }
+              
+              if (value.length >= length && onComplete) {
+                onComplete(value.slice(0, length));
+              }
+              
+              // Focus first visible input after autofill
+              setTimeout(() => {
+                if (inputRefs.current[0]) {
+                  inputRefs.current[0].focus();
+                }
+              }, 100);
+            }
+          }}
+        />
+        
+        {otp.map((data, index) => {
         return (
           <input
             key={index}
@@ -129,6 +282,7 @@ const OTPInput = ({
             onPaste={handlePaste}
             onFocus={(e) => e.target.select()}
             disabled={disabled}
+            autoComplete="off"
             className={`
               w-12 h-12 text-center text-lg font-semibold border-2 rounded-lg
               transition-all duration-200 outline-none
@@ -142,6 +296,7 @@ const OTPInput = ({
           />
         );
       })}
+      </div>
     </div>
   );
 };

@@ -143,20 +143,20 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {/* Personal Information */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Personal Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">Personal Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">Full Name</label>
               <input 
                 type="text" 
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleInputChange}
                 required
-                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                 placeholder="Enter your full name" 
               />
             </div>
@@ -202,8 +202,8 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
 
         {/* Identity Documents */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Identity Documents</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">Identity Documents</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aadhar Number</label>
               <input 
@@ -238,8 +238,8 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
 
         {/* Bank Details */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Bank Account Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">Bank Account Details</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bank Account Number</label>
               <input 
@@ -295,11 +295,11 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
         </div>
 
         {/* Submit Button */}
-        <div className="pt-4">
+        <div className="pt-3 sm:pt-4">
           <button 
             type="submit"
             disabled={submitting}
-            className="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
+            className="w-full bg-blue-500 text-white py-2 sm:py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
           >
             {submitting ? 'Submitting...' : kycData?.status === 'rejected' ? 'Resubmit KYC Application' : 'Submit KYC Application'}
           </button>
@@ -316,9 +316,33 @@ const WalletActions = ({ walletBalance }) => {
   const [withdrawing, setWithdrawing] = useState(false)
   const [message, setMessage] = useState('')
 
+  // Calculate withdrawal breakdown
+  const calculateWithdrawalBreakdown = (amount) => {
+    const requestAmount = parseFloat(amount) || 0
+    const adminCharges = requestAmount * 0.05 // 5%
+    const tdsDeduction = requestAmount * 0.05 // 5%
+    const totalDeductions = adminCharges + tdsDeduction
+    const finalAmount = requestAmount - totalDeductions
+    
+    return {
+      requestAmount,
+      adminCharges,
+      tdsDeduction,
+      totalDeductions,
+      finalAmount
+    }
+  }
+
+  const breakdown = calculateWithdrawalBreakdown(withdrawAmount)
+
   const handleWithdraw = async () => {
     if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) {
       setMessage('Please enter a valid amount')
+      return
+    }
+
+    if (parseFloat(withdrawAmount) < 300) {
+      setMessage('Minimum withdrawal amount is ₹300')
       return
     }
 
@@ -334,7 +358,10 @@ const WalletActions = ({ walletBalance }) => {
       const response = await fetch('/api/account/withdraw', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: parseFloat(withdrawAmount) })
+        body: JSON.stringify({ 
+          amount: parseFloat(withdrawAmount),
+          breakdown: breakdown
+        })
       })
 
       const data = await response.json()
@@ -376,24 +403,97 @@ const WalletActions = ({ walletBalance }) => {
             
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Amount (₹)
+                Withdrawal Amount (₹)
               </label>
               <input
                 type="number"
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
-                placeholder="Enter amount"
-                min="500"
+                placeholder="Enter amount (minimum ₹300)"
+                min="300"
                 max={walletBalance}
-                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-medium"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Available balance: ₹{walletBalance?.toFixed(2) || '0.00'}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Minimum withdrawal: ₹300
-              </p>
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Available balance: ₹{walletBalance?.toFixed(2) || '0.00'}
+                </p>
+                <p className="text-xs text-red-500 dark:text-red-400 font-medium">
+                  Minimum withdrawal: ₹300
+                </p>
+              </div>
             </div>
+
+            {/* Real-time Withdrawal Breakdown */}
+            {withdrawAmount && parseFloat(withdrawAmount) > 0 && (
+              <div className={`mb-4 p-4 rounded-lg border-2 ${
+                parseFloat(withdrawAmount) >= 300 
+                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                  : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+              }`}>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">💰 Withdrawal Breakdown</h4>
+                  {parseFloat(withdrawAmount) < 300 && (
+                    <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-1 rounded-full font-medium">
+                      Below Minimum
+                    </span>
+                  )}
+                </div>
+                
+                <div className="space-y-3">
+                  {/* Amount Input Display */}
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">💸 Requested Amount:</span>
+                      <span className="text-lg font-bold text-blue-600 dark:text-blue-400">₹{breakdown.requestAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  {/* Deductions */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">🏢 Admin Charges (5%):</span>
+                      <span className="font-medium text-red-600 dark:text-red-400">-₹{breakdown.adminCharges.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">📋 TDS Deduction (5%):</span>
+                      <span className="font-medium text-red-600 dark:text-red-400">-₹{breakdown.tdsDeduction.toFixed(2)}</span>
+                    </div>
+                    <div className="border-t border-gray-300 dark:border-gray-600 pt-2">
+                      <div className="flex justify-between items-center py-1">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">📉 Total Deductions (10%):</span>
+                        <span className="font-semibold text-red-600 dark:text-red-400 text-lg">-₹{breakdown.totalDeductions.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Final Amount */}
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 p-3 rounded-lg border border-green-200 dark:border-green-700">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-green-800 dark:text-green-300">💰 You&apos;ll Receive:</span>
+                      <span className="text-xl font-bold text-green-600 dark:text-green-400">₹{breakdown.finalAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  {/* Percentage Display */}
+                  <div className="text-center">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Total deduction: <span className="font-medium text-red-600">10%</span> • 
+                      You receive: <span className="font-medium text-green-600">90%</span> of requested amount
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* No amount entered message */}
+            {(!withdrawAmount || parseFloat(withdrawAmount) === 0) && (
+              <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg text-center">
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  💡 Enter an amount above to see the withdrawal breakdown
+                </p>
+              </div>
+            )}
 
             {message && (
               <div className={`mb-4 p-3 rounded-lg text-sm ${
@@ -412,16 +512,36 @@ const WalletActions = ({ walletBalance }) => {
                   setWithdrawAmount('')
                   setMessage('')
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
+                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-white font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={handleWithdraw}
-                disabled={withdrawing}
-                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                disabled={withdrawing || !withdrawAmount || parseFloat(withdrawAmount) < 300}
+                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                  withdrawing || !withdrawAmount || parseFloat(withdrawAmount) < 300
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg'
+                }`}
               >
-                {withdrawing ? 'Processing...' : 'Submit Request'}
+                {withdrawing ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  withdrawAmount && parseFloat(withdrawAmount) >= 300 ? (
+                    <span className="text-sm">
+                      💰 Request ₹{breakdown.finalAmount.toFixed(2)}
+                    </span>
+                  ) : (
+                    'Submit Request'
+                  )
+                )}
               </button>
             </div>
           </div>
@@ -508,7 +628,7 @@ const ReferralSection = ({ userData }) => {
           const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(data.data.message)}`
           window.open(whatsappUrl, '_blank')
         } else if (platform === 'email') {
-          const subject = encodeURIComponent('Join WearEarn - Earn Money While Shopping!')
+          const subject = encodeURIComponent('Join Wear And Earn - Earn Money While Shopping!')
           const body = encodeURIComponent(data.data.message)
           window.open(`mailto:?subject=${subject}&body=${body}`, '_blank')
         } else if (platform === 'sms') {
@@ -552,10 +672,10 @@ const ReferralSection = ({ userData }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Referral Code Card */}
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border-2 border-purple-200 dark:border-purple-700 p-6 rounded-lg mb-6">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border-2 border-purple-200 dark:border-purple-700 p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+        <div className="flex items-center gap-3 mb-3 sm:mb-4">
           <div className="bg-purple-500 p-2 rounded-full">
             <Share2 className="w-5 h-5 text-white" />
           </div>
@@ -600,6 +720,190 @@ const ReferralSection = ({ userData }) => {
           <li>• When they register and make their first purchase, you earn commission</li>
           <li>• Build your team and earn from multiple levels</li>
           <li>• The more active your team, the more you earn!</li>
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+// My Team Section Component
+const MyTeamSection = ({ userData }) => {
+  const [teamData, setTeamData] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  const fetchTeamData = useCallback(async () => {
+    try {
+      console.log('🔍 Fetching team data...')
+      const response = await fetch('/api/account/team')
+      
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          console.log('✅ Team data received:', data.data)
+          setTeamData(data.data)
+        } else {
+          console.log('⚠️ Team data not available:', data.message)
+          setTeamData({ overview: [] })
+        }
+      } else {
+        console.error('❌ Failed to fetch team data')
+        setTeamData({ overview: [] })
+      }
+    } catch (error) {
+      console.error('❌ Error fetching team data:', error)
+      setTeamData({ overview: [] })
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchTeamData()
+  }, [fetchTeamData])
+
+  // Calculate level display
+  const getCurrentLevelDisplay = () => {
+    // Check numeric level first (this is the primary level system)
+    if (userData?.level && userData.level > 0) {
+      const levelNames = {
+        1: 'Level 1 (Bronze)',
+        2: 'Level 2 (Silver)',
+        3: 'Level 3 (Gold)',
+        4: 'Level 4 (Platinum)',
+        5: 'Level 5 (Diamond)'
+      }
+      return levelNames[userData.level] || `Level ${userData.level}`
+    }
+    
+    // Fallback to enum level
+    if (userData?.currentLevel && userData.currentLevel !== 'NONE') {
+      return userData.currentLevel
+    }
+    
+    // Check if user is active
+    if (userData?.isActive) {
+      return 'Level 0 (Active)'
+    }
+    
+    return 'New Member'
+  }
+
+  // Calculate next level requirement
+  const getNextLevelRequirement = () => {
+    const levelRequirements = {
+      0: { next: 'Level 1 (Bronze)', nextShort: 'Bronze', teams: 1 },
+      1: { next: 'Level 2 (Silver)', nextShort: 'Silver', teams: 9 },
+      2: { next: 'Level 3 (Gold)', nextShort: 'Gold', teams: 27 },
+      3: { next: 'Level 4 (Platinum)', nextShort: 'Platinum', teams: 81 },
+      4: { next: 'Level 5 (Diamond)', nextShort: 'Diamond', teams: 243 },
+      5: { next: 'MAX LEVEL', nextShort: 'MAX', teams: 0 }
+    }
+    
+    const currentLevel = userData?.level || 0
+    return levelRequirements[currentLevel] || levelRequirements[0]
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    )
+  }
+
+  const currentTeams = userData?.totalTeams || 0
+  const nextLevel = getNextLevelRequirement()
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">My Team</h2>
+      
+      {/* Current Level Card */}
+      <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-800 p-3 sm:p-6 rounded-lg">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex-1">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-1">Current Level</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{getCurrentLevelDisplay()}</p>
+          </div>
+          <Users className="w-8 h-8 sm:w-10 sm:h-10 text-purple-500 dark:text-purple-400 flex-shrink-0" />
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4 text-center">
+          <div className="bg-white dark:bg-gray-700 p-3 rounded-lg">
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">{currentTeams}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300">Total Teams</p>
+          </div>
+          <div className="bg-white dark:bg-gray-700 p-3 rounded-lg">
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">
+              {nextLevel.next === 'MAX LEVEL' ? 'MAX' : nextLevel.teams}
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-300">
+              {nextLevel.next === 'MAX LEVEL' ? 'Achieved' : `For ${nextLevel.nextShort || nextLevel.next}`}
+            </p>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        {nextLevel.next !== 'MAX LEVEL' && (
+          <div className="mt-4">
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
+              <span>Progress to {nextLevel.nextShort || nextLevel.next}</span>
+              <span>{Math.min(currentTeams, nextLevel.teams)}/{nextLevel.teams}</span>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${Math.min((currentTeams / nextLevel.teams) * 100, 100)}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Team Overview */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Team Breakdown</h3>
+        
+        {teamData?.overview && teamData.overview.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {teamData.overview.slice(0, 4).map((levelData) => (
+                <div key={levelData.level} className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Level {levelData.level}</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">{levelData.totalMembers}</p>
+                  <p className="text-xs text-green-600 dark:text-green-400">{levelData.activeMembers} Active</p>
+                </div>
+              ))}
+            </div>
+
+            {teamData.totalTeamSize !== undefined && (
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Total Team Size</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{teamData.totalTeamSize}</p>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-8">
+            <Users className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+            <p className="text-gray-500 dark:text-gray-400 mb-2">No team data yet</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">
+              Start building your team by sharing your referral link!
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Team Benefits */}
+      <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 p-4 rounded-lg">
+        <h4 className="font-medium text-green-900 dark:text-green-300 mb-2">Team Benefits:</h4>
+        <ul className="text-sm text-green-800 dark:text-green-300 space-y-1">
+          <li>• Earn commission from your team&apos;s purchases</li>
+          <li>• Higher levels unlock better pool distribution shares</li>
+          <li>• Build deeper teams for increased earning potential</li>
+          <li>• Permanent level achievements - no downgrade!</li>
         </ul>
       </div>
     </div>
@@ -2225,6 +2529,7 @@ const AccountDashboard = () => {
   const tabs = [
     { id: 'wallet', label: 'Wallet', icon: Wallet, color: 'from-green-400 to-emerald-500' },
     { id: 'referral', label: 'Referral', icon: Share2, color: 'from-purple-400 to-pink-500' },
+    { id: 'team', label: 'My Team', icon: Users, color: 'from-blue-400 to-indigo-500' },
     { id: 'kyc', label: 'KYC Verification', icon: FileText, color: 'from-orange-400 to-red-500' }
   ]
 
@@ -2263,7 +2568,7 @@ const AccountDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-3 sm:py-6">
+    <div className="bg-gray-50 dark:bg-gray-900 py-3 sm:py-6">
       <div className="max-w-7xl mx-auto px-3 sm:px-4">
         {/* Mobile-Enhanced Page Header */}
         <div className="mb-4 sm:mb-6">
@@ -2312,14 +2617,14 @@ const AccountDashboard = () => {
           </div>
         </div>
 
-        {/* Mobile-Enhanced Content Area */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl shadow-sm p-4 sm:p-6 md:p-8 min-h-96">
+  {/* Mobile-Enhanced Content Area */}
+  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-6 md:p-8 min-h-0">
           {activeTab === 'wallet' && (
             <div>
-              <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-gray-900 dark:text-white">My Wallet</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">My Wallet</h2>
               
               {/* Mobile-Enhanced Balance Card */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-800 p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-800 p-3 sm:p-6 rounded-lg mb-3 sm:mb-6">
                 <div className="flex justify-between items-center">
                   <div className="flex-1">
                     <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-1">Available Balance</p>
@@ -2331,8 +2636,6 @@ const AccountDashboard = () => {
 
               {/* Wallet Options */}
               <WalletActions walletBalance={walletData?.balance?.rupees || 0} />
-
-
             </div>
           )}
           
@@ -2343,9 +2646,16 @@ const AccountDashboard = () => {
             </div>
           )}
           
+          {activeTab === 'team' && (
+            <div id="team">
+              {/* Team Section Card */}
+              <MyTeamSection userData={userData} />
+            </div>
+          )}
+          
           {activeTab === 'kyc' && (
             <div>
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">KYC Verification</h2>
+              <h2 className="text-2xl font-semibold mb-4 sm:mb-6 text-gray-900 dark:text-white">KYC Verification</h2>
               
               {/* KYC Status */}
               {/* Only show status row if not fully verified */}
