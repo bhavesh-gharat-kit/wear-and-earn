@@ -11,8 +11,6 @@ import AdminBreadcrumb from "@/components/admin/breadcrumb/AdminBreadcrumb";
 
 export default function AdminLayout({ children }) {
   const [showMenus, setShowMenus] = useState(false); // false = menu closed, true = menu open
-  
-  console.log('Admin Layout - showMenus state:', showMenus);
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();

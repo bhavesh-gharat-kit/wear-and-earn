@@ -34,49 +34,57 @@ function AdminNavbar({ setShowMenus }) {
     <>
       <header id="header" className="w-full">
         <div className="w-full">
-          {/* NAVBAR HEADER TOP */}
-          <div className="navbar shadow-sm gap-2 sm:gap-4 px-3 sm:px-4 md:px-6 lg:px-8 min-h-16 sm:min-h-20 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-            <div className="text-xl sm:text-2xl lg:hidden">
+          {/* NAVBAR HEADER TOP - Improved Mobile Responsive Layout */}
+          <div className="flex items-center justify-between shadow-sm px-3 sm:px-4 md:px-6 lg:px-8 min-h-14 sm:min-h-16 md:min-h-20 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+            
+            {/* Mobile Menu Button - Only visible on mobile */}
+            <div className="lg:hidden">
               <button 
                 onClick={handleShowMenus}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 aria-label="Toggle menu"
               >
-                <FaBars />
+                <FaBars className="text-lg sm:text-xl" />
               </button>
             </div>
-            <div className="flex-1">
+
+            {/* Logo Section - Centered on mobile, left on desktop */}
+            <div className="flex-1 flex justify-center lg:justify-start">
               <Link href={"/admin"} className="block">
                 <Image
                   alt="brand-logo"
                   src={"/images/brand-logo.png"}
-                  className="rounded-xl h-12 sm:h-14 md:h-16 w-auto"
+                  className="rounded-xl h-10 sm:h-12 md:h-14 lg:h-16 w-auto"
                   width={200}
                   height={200}
                   priority
                 />
               </Link>
             </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-700 dark:text-blue-400 hidden sm:block">
+
+            {/* Admin Dashboard Title - Hidden on mobile, visible on larger screens */}
+            <div className="hidden md:flex flex-1 justify-center">
+              <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-blue-700 dark:text-blue-400">
                 Admin Dashboard
               </h1>
-              
-              {/* Admin Profile Dropdown - Only show if user is authenticated as admin */}
+            </div>
+            
+            {/* Profile Section - Always visible */}
+            <div className="flex items-center">
               {session?.user?.role === "admin" && (
                 <div className="relative">
                   <button
                     onClick={() => setShowDropdown(!showDropdown)}
-                    className="flex items-center gap-1 sm:gap-2 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 px-2 sm:px-3 md:px-4 py-2 rounded-lg transition-colors"
+                    className="flex items-center gap-1 sm:gap-2 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 px-2 sm:px-3 py-2 rounded-lg transition-colors"
                   >
                     <FaUser className="text-blue-600 dark:text-blue-400 text-sm sm:text-base" />
-                    <span className="text-blue-800 dark:text-blue-200 font-medium text-sm sm:text-base hidden sm:inline">
+                    <span className="text-blue-800 dark:text-blue-200 font-medium text-xs sm:text-sm hidden sm:inline">
                       {session?.user?.name || "Admin"}
                     </span>
                   </button>
                   
                   {showDropdown && (
-                    <div className="absolute right-0 mt-2 w-48 sm:w-52 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+                    <div className="absolute right-0 mt-2 w-44 sm:w-48 md:w-52 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
                       <div className="p-2 sm:p-3 border-b border-gray-200 dark:border-gray-700">
                         <p className="text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
                           {session?.user?.name || "Administrator"}
@@ -86,7 +94,7 @@ function AdminNavbar({ setShowMenus }) {
                       <button
                         onClick={handleLogout}
                         disabled={isLoggingOut}
-                        className="w-full flex items-center gap-2 px-3 sm:px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full flex items-center gap-2 px-3 sm:px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isLoggingOut ? (
                           <div className="animate-spin border-2 border-current border-t-transparent rounded-full w-3 h-3"></div>

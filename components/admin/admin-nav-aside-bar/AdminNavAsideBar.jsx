@@ -89,10 +89,7 @@ function AdminNavAsideBar({ showMenus, setShowMenus }) {
         <div className="flex justify-between items-center mb-4 sm:mb-6 lg:hidden">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Admin Menu</h2>
           <button
-            onClick={() => {
-              console.log('Close button clicked!');
-              setShowMenus(false);
-            }}
+            onClick={() => setShowMenus(false)}
             className="p-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
             aria-label="Close menu"
           >
