@@ -316,7 +316,7 @@ export default function ProductDetailsImageComponent({ productDetails }) {
                   transition: isDragging ? 'none' : 'transform 0.2s ease-out',
                   transformOrigin: 'center center'
                 }}
-                className="w-full h-full object-cover select-none"
+                className="w-full h-full object-contain select-none"
                 alt={`${productDetails?.title} - Image ${index + 1}`}
                 priority={index === 0}
                 draggable={false}
@@ -329,7 +329,7 @@ export default function ProductDetailsImageComponent({ productDetails }) {
                     width={600}
                     height={600}
                     src={product.imageUrl}
-                    className="w-full h-full object-cover select-none"
+                    className="w-full h-full object-contain select-none"
                     style={{
                       transform: `scale(${HOVER_ZOOM_LEVEL})`,
                       transformOrigin: `${hoverPosition.x}% ${hoverPosition.y}%`,
@@ -392,7 +392,7 @@ export default function ProductDetailsImageComponent({ productDetails }) {
           freeMode={true}
           watchSlidesProgress={true}
           modules={[FreeMode, Navigation, Thumbs]}
-          className="thumb-swiper h-20"
+          className="thumb-swiper"
           breakpoints={{
             320: {
               slidesPerView: Math.min(3, productDetails.images.length),
@@ -410,12 +410,12 @@ export default function ProductDetailsImageComponent({ productDetails }) {
         >
           {productDetails.images?.map((product, index) => (
             <SwiperSlide key={index} className="cursor-pointer">
-              <div className="w-full h-full rounded-md overflow-hidden border-2 border-transparent hover:border-blue-500 transition-colors duration-200">
+              <div className="w-16 h-16 rounded-md overflow-hidden border-2 border-transparent hover:border-blue-500 transition-colors duration-200">
                 <Image
-                  width={80}
-                  height={80}
+                  width={64}
+                  height={64}
                   src={product.imageUrl}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   alt={`${productDetails?.title} - Thumbnail ${index + 1}`}
                 />
               </div>

@@ -2,8 +2,7 @@
 
 import ProductDetailsImageComponent from "@/components/product/ProductDetailsImageComponent";
 import { FaCheckCircle, FaShoppingCart, FaShare } from "react-icons/fa";
-import { IoBag, IoShieldCheckmark } from "react-icons/io5";
-import { MdLocalShipping, MdSecurity } from "react-icons/md";
+import { IoBag } from "react-icons/io5";
 
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
@@ -16,7 +15,6 @@ import CreateContext from "@/components/context/createContext";
 function ProductDetailsPage({ id }) {
   const [productDetails, setProductDetails] = useState(null);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState('description');
   
   const { data: session } = useSession();
   const router = useRouter();
@@ -213,7 +211,7 @@ ${shareUrl}`;
   };
 
   return (
-  <div className="min-h-screen">
+  <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
   <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
         {/* Main Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
@@ -237,7 +235,7 @@ ${shareUrl}`;
             </div>
 
             {/* Price Breakdown */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 transition-colors">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
               <div className="flex items-center space-x-3 mb-4">
                 <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                   ₹{finalAmount?.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -345,134 +343,18 @@ ${shareUrl}`;
                 <span>Share on WhatsApp</span>
               </button>
             </div>
-
-            {/* Trust Badges */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-2">
-                <MdLocalShipping className="h-5 w-5 text-green-500" />
-                <span className="text-sm text-gray-600 dark:text-gray-400">Free Shipping</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <IoShieldCheckmark className="h-5 w-5 text-blue-500" />
-                <span className="text-sm text-gray-600 dark:text-gray-400">Secure Payment</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <MdSecurity className="h-5 w-5 text-purple-500" />
-                <span className="text-sm text-gray-600 dark:text-gray-400">2 Year Warranty</span>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Product Details Tabs */}
+        {/* Product Description */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm transition-colors">
-          {/* Tab Navigation */}
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="flex space-x-8 px-6">
-              <button
-                onClick={() => setActiveTab('description')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'description'
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
-                }`}
-              >
-                Description
-              </button>
-              <button
-                onClick={() => setActiveTab('features')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'features'
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
-                }`}
-              >
-                Key Features
-              </button>
-              <button
-                onClick={() => setActiveTab('shipping')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'shipping'
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
-                }`}
-              >
-                Shipping
-              </button>
-            </nav>
-          </div>
-
-          {/* Tab Content */}
-          <div className="p-6 bg-gray-50 dark:bg-gray-900 transition-colors rounded-b-lg">
-            {activeTab === 'description' && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Product Overview</h3>
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{description}</p>
-                </div>
+          <div className="p-6">
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Product Overview</h3>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{description}</p>
               </div>
-            )}
-
-            {activeTab === 'features' && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Key Features</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {keyFeature ? (
-                      <div className="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <FaCheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                        <span className="text-gray-700 dark:text-gray-300">{keyFeature}</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <FaCheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                        <span className="text-gray-700 dark:text-gray-300">Premium Quality Materials</span>
-                      </div>
-                    )}
-                    <div className="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <FaCheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                      <span className="text-gray-700 dark:text-gray-300">Fast and Reliable Performance</span>
-                    </div>
-                    <div className="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <FaCheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                      <span className="text-gray-700 dark:text-gray-300">2 Year Manufacturer Warranty</span>
-                    </div>
-                    <div className="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <FaCheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                      <span className="text-gray-700 dark:text-gray-300">Easy Installation & Setup</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'shipping' && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Shipping Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-3">
-                        <MdLocalShipping className="h-5 w-5 text-green-500" />
-                        <span className="font-medium text-gray-900 dark:text-gray-100">Free Standard Shipping</span>
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm ml-8">
-                        Free shipping on orders over ₹999. Standard delivery takes 3-5 business days.
-                      </p>
-                    </div>
-                    {/* <div className="space-y-3">
-                      <div className="flex items-center space-x-3">
-                        <IoShieldCheckmark className="h-5 w-5 text-blue-500" />
-                        <span className="font-medium text-gray-900 dark:text-gray-100">30-Day Returns</span>
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm ml-8">
-                        Easy returns within 30 days of purchase. Item must be in original condition.
-                      </p>
-                    </div> */}
-                  </div>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </div>

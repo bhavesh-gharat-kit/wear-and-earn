@@ -125,6 +125,7 @@ export async function GET(request) {
     // Format data for frontend compatibility
     const teams = formattedData.map(team => ({
       id: team.id,
+      userId: team.userId, // Include userId for navigation
       leaderName: team.leaderName,
       leaderEmail: team.leaderEmail,
       level: team.level,

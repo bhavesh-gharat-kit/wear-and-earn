@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { 
   Users, 
   DollarSign, 
@@ -23,6 +24,7 @@ import {
 
 export default function PoolManagementPanel() {
   const { data: session, status } = useSession()
+  const router = useRouter()
   const [poolStats, setPoolStats] = useState(null)
   const [poolDistribution, setPoolDistribution] = useState(null)
   const [teams, setTeams] = useState([])
@@ -168,14 +170,26 @@ export default function PoolManagementPanel() {
     }
   }
 
+  const handleViewUserDetails = (userId) => {
+    router.push(`/admin/user-details/${userId}`)
+  }
+
   const exportDistributionHistory = () => {
     // Create CSV data
-    const csvData = poolDistribution?.recentDistributions?.map(dist => ({
-      Date: new Date(dist.createdAt).toLocaleDateString(),
-      Amount: dist.amount / 100, // Convert paisa to rupees
-      Users: dist.userCount,
-      Status: 'Completed'
-    })) || []
+    const csvData = poolDistribution?.recentDistributions?.map(dist => {
+      const distributionAmount = dist.amount / 100; // Convert paisa to rupees
+      const totalMLMAmount = Math.round(distributionAmount / 0.7);
+      const companyShare = Math.round(distributionAmount * 0.3 / 0.7);
+      
+      return {
+        Date: new Date(dist.createdAt).toLocaleDateString(),
+        'Total MLM Amount (100%)': totalMLMAmount,
+        'Distribution Amount (70%)': distributionAmount,
+        'Company Share (30%)': companyShare,
+        Users: dist.userCount,
+        Status: 'Completed'
+      };
+    }) || []
 
     if (csvData.length === 0) {
       alert('No data to export')
@@ -474,79 +488,70 @@ export default function PoolManagementPanel() {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Distribution History</h3>
-              
-              {/* Enhanced Filters */}
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search distributions..."
-                    value={filters.search}
-                    onChange={(e) => setFilters({...filters, search: e.target.value})}
-                    className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="date"
-                    value={filters.dateFrom}
-                    onChange={(e) => setFilters({...filters, dateFrom: e.target.value})}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                  />
-                  <input
-                    type="date"
-                    value={filters.dateTo}
-                    onChange={(e) => setFilters({...filters, dateTo: e.target.value})}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                  />
-                </div>
-              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">MLM Breakdown</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Users</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Level Breakdown</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-                  {poolDistribution?.recentDistributions?.map((dist, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                        {new Date(dist.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 dark:text-green-400">
-                        {formatCurrency(dist.amount)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                        {dist.userCount}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                        {/* Show level breakdown if available */}
-                        {dist.levelBreakdown ? (
+                  {poolDistribution?.recentDistributions?.map((dist, index) => {
+                    const distributionAmount = dist.amount;
+                    const totalMLMAmount = Math.round(distributionAmount / 0.7);
+                    const companyShare = Math.round(distributionAmount * 0.3 / 0.7);
+                    
+                    return (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                          {new Date(dist.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <div className="space-y-1">
-                            {Object.entries(dist.levelBreakdown).map(([level, info]) => (
-                              <div key={level} className="flex justify-between text-xs">
-                                <span className="font-semibold">L{level}:</span>
-                                <span>{info.users} users</span>
-                                <span>₹{info.amount}</span>
-                              </div>
-                            ))}
+                            <div className="flex justify-between">
+                              <span className="text-gray-600 dark:text-gray-300 text-xs">A. Total MLM (100%):</span>
+                              <span className="font-medium text-blue-600 dark:text-blue-400">{formatCurrency(totalMLMAmount)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600 dark:text-gray-300 text-xs">B. Distribution (70%):</span>
+                              <span className="font-medium text-green-600 dark:text-green-400">{formatCurrency(distributionAmount)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600 dark:text-gray-300 text-xs">C. Company Share (30%):</span>
+                              <span className="font-medium text-orange-600 dark:text-orange-400">{formatCurrency(companyShare)}</span>
+                            </div>
                           </div>
-                        ) : '—'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 dark:text-green-400">
-                        Completed
-                      </td>
-                    </tr>
-                  )) || (
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                          {dist.userCount}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                          {/* Show level breakdown if available */}
+                          {dist.levelBreakdown ? (
+                            <div className="space-y-1">
+                              {Object.entries(dist.levelBreakdown).map(([level, info]) => (
+                                <div key={level} className="flex justify-between text-xs">
+                                  <span className="font-semibold">L{level}:</span>
+                                  <span>{info.users} users</span>
+                                  <span>₹{info.amount}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : '—'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 dark:text-green-400">
+                          Completed
+                        </td>
+                      </tr>
+                    );
+                  }) || (
                     <tr>
-                      <td colSpan="4" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
+                      <td colSpan="5" className="px-6 py-4 text-center text-gray-500 dark:text-gray-300">
                         No recent distributions
                       </td>
                     </tr>
@@ -637,7 +642,11 @@ export default function PoolManagementPanel() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        <button className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">
+                        <button 
+                          onClick={() => handleViewUserDetails(team.userId)}
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3"
+                          title="View User Details"
+                        >
                           <Eye className="w-4 h-4" />
                         </button>
                       </td>
@@ -715,9 +724,32 @@ export default function PoolManagementPanel() {
                   <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" />
                   <span className="font-medium text-blue-800 dark:text-blue-200">Distribution Preview</span>
                 </div>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  Total Amount: <span className="font-bold">{distributionPreview ? formatCurrency(distributionPreview.totalAmount || 0) : '₹0'}</span>
-                </p>
+                
+                {/* MLM Amount Breakdown */}
+                <div className="bg-white dark:bg-gray-800 p-3 rounded-lg mb-3 border border-blue-200 dark:border-blue-700">
+                  <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">MLM Amount Breakdown:</h4>
+                  <div className="space-y-1 text-sm">
+                    <p className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-300">A. Total MLM Amount (100%):</span>
+                      <span className="font-bold text-blue-600 dark:text-blue-400">
+                        {distributionPreview ? formatCurrency(Math.round((distributionPreview.totalAmount || 0) / 0.7)) : '₹0'}
+                      </span>
+                    </p>
+                    <p className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-300">B. Distribution Amount (70%):</span>
+                      <span className="font-bold text-green-600 dark:text-green-400">
+                        {distributionPreview ? formatCurrency(distributionPreview.totalAmount || 0) : '₹0'}
+                      </span>
+                    </p>
+                    <p className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-300">C. Company Share (30%):</span>
+                      <span className="font-bold text-orange-600 dark:text-orange-400">
+                        {distributionPreview ? formatCurrency(Math.round((distributionPreview.totalAmount || 0) * 0.3 / 0.7)) : '₹0'}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                
                 <p className="text-sm text-blue-700 dark:text-blue-300">
                   Eligible Users: <span className="font-bold">{distributionPreview ? distributionPreview.eligibleUsers || 0 : 0}</span>
                 </p>
