@@ -7,9 +7,12 @@ import { useEffect, useState } from "react";
 import LoaderEffect from "@/components/ui/LoaderEffect";
 import AdminNavbar from "@/components/admin/admin-navbar/AdminNavbar";
 import AdminNavAsideBar from "@/components/admin/admin-nav-aside-bar/AdminNavAsideBar";
+import AdminBreadcrumb from "@/components/admin/breadcrumb/AdminBreadcrumb";
 
 export default function AdminLayout({ children }) {
-  const [showMenus, setShowMenus] = useState(true);
+  const [showMenus, setShowMenus] = useState(false); // false = menu closed, true = menu open
+  
+  console.log('Admin Layout - showMenus state:', showMenus);
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -44,25 +47,24 @@ export default function AdminLayout({ children }) {
   return (
     <div className="w-full">
       <AdminNavbar setShowMenus={setShowMenus} />
-      <div className="min-h-screen bg-base-200 dark:bg-gray-900 w-full px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-3 sm:py-4 md:py-6 relative">
-        <div className="w-full">
-          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6">
-            <AdminNavAsideBar setShowMenus={setShowMenus} showMenus={showMenus} />
-            {/* Dynamic Main Content */}
-            <main className="lg:w-3/4 w-full">
-              <div className="bg-base-100 dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-sm sm:shadow p-4 sm:p-5 md:p-6 text-gray-900 dark:text-gray-100 overflow-hidden">
-                {children}
-              </div>
-            </main>
-          </div>
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 w-full relative">
+        <div className="flex">
+          <AdminNavAsideBar setShowMenus={setShowMenus} showMenus={showMenus} />
+          {/* Dynamic Main Content */}
+          <main className="flex-1 lg:ml-0 px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-5 md:p-6 text-gray-900 dark:text-gray-100 overflow-x-auto min-h-screen">
+              <AdminBreadcrumb />
+              {children}
+            </div>
+          </main>
         </div>
       </div>
       
       {/* Mobile overlay */}
-      {!showMenus && (
+      {showMenus && (
         <div 
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-          onClick={() => setShowMenus(true)}
+          onClick={() => setShowMenus(false)}
         />
       )}
     </div>

@@ -36,10 +36,11 @@ function AdminNavbar({ setShowMenus }) {
         <div className="w-full">
           {/* NAVBAR HEADER TOP */}
           <div className="navbar shadow-sm gap-2 sm:gap-4 px-3 sm:px-4 md:px-6 lg:px-8 min-h-16 sm:min-h-20 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-            <div className="text-2xl sm:text-3xl sm:hidden">
+            <div className="text-xl sm:text-2xl lg:hidden">
               <button 
                 onClick={handleShowMenus}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                aria-label="Toggle menu"
               >
                 <FaBars />
               </button>
@@ -75,7 +76,7 @@ function AdminNavbar({ setShowMenus }) {
                   </button>
                   
                   {showDropdown && (
-                    <div className="absolute right-0 mt-2 w-44 sm:w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+                    <div className="absolute right-0 mt-2 w-48 sm:w-52 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
                       <div className="p-2 sm:p-3 border-b border-gray-200 dark:border-gray-700">
                         <p className="text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
                           {session?.user?.name || "Administrator"}

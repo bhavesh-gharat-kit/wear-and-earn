@@ -75,21 +75,26 @@ function AdminNavAsideBar({ showMenus, setShowMenus }) {
 
   return (
     <aside
-      className={`w-full lg:w-1/4 grow 
-      sm:absolute sm:top-0 sm:left-0 lg:relative transition-all duration-300 z-40
-      sm:border sm:border-slate-300/30 sm:bg-white/95 sm:backdrop-blur-sm dark:sm:bg-gray-900/95
-      sm:w-80 md:w-96 lg:bg-transparent lg:border-0 lg:backdrop-blur-none
+      className={`
+      fixed lg:relative top-0 left-0 transition-all duration-300 z-40
+      w-80 md:w-96 lg:w-1/4 h-full
+      border border-slate-300/30 bg-white/95 backdrop-blur-sm dark:bg-gray-900/95
+      lg:bg-transparent lg:border-0 lg:backdrop-blur-none
       ${
-        showMenus ? "sm:-translate-x-full lg:translate-x-0" : "sm:translate-x-0"
+        showMenus ? "translate-x-0 lg:translate-x-0" : "-translate-x-full lg:translate-x-0"
       } `}
     >
-      <div className="bg-base-100 dark:bg-gray-800 rounded-none sm:rounded-r-xl lg:rounded-box shadow-none sm:shadow-xl lg:shadow p-3 sm:p-4 h-full min-h-screen lg:min-h-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-none lg:rounded-lg shadow-lg lg:shadow p-3 sm:p-4 h-full min-h-screen overflow-y-auto">
         {/* Enhanced close button */}
         <div className="flex justify-between items-center mb-4 sm:mb-6 lg:hidden">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Admin Menu</h2>
           <button
-            onClick={() => setShowMenus(true)}
+            onClick={() => {
+              console.log('Close button clicked!');
+              setShowMenus(false);
+            }}
             className="p-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
+            aria-label="Close menu"
           >
             <RiCloseLargeLine className="text-lg" />
           </button>
@@ -99,7 +104,7 @@ function AdminNavAsideBar({ showMenus, setShowMenus }) {
           {asideMenus.map((menu, i) => (
             <li className="border-b border-slate-200 dark:border-gray-600 last:border-b-0" key={i}>
               <Link
-                onClick={() => setShowMenus(true)}
+                onClick={() => setShowMenus(false)}
                 href={menu.path}
                 className={`${
                   menu.path === pathname 

@@ -124,21 +124,21 @@ function UserPage() {
 
       <form
         onSubmit={handleSubmitSearchProductQuery}
-        className="w-5/12 p-0.5 rounded h-10 flex items-center"
+        className="w-full sm:w-8/12 md:w-6/12 lg:w-5/12 p-0.5 rounded h-10 flex items-center border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
         action=""
       >
         <input
-          className="w-full px-3 py-1 bg-slate-200 dark:bg-gray-700 dark:text-white h-full rounded outline-none"
+          className="w-full px-3 py-2 bg-transparent dark:text-white h-full rounded outline-none text-sm"
           type="search"
-          placeholder="search by user email..."
+          placeholder="Search by user email..."
           onChange={(e) => setSearchUserEmail(e.target.value)}
           value={searchUserEmail}
         />
         <button
           type="submit"
-          className="bg-primary h-full text-white px-2 cursor-pointer rounded"
+          className="bg-blue-600 hover:bg-blue-700 h-full text-white px-3 cursor-pointer rounded transition-colors flex items-center justify-center"
         >
-          <IoMdSearch fontSize={20} />
+          <IoMdSearch fontSize={18} />
         </button>
       </form>
 
@@ -148,12 +148,12 @@ function UserPage() {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600 text-sm">
           <thead className="bg-indigo-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
             <tr>
-              <th className="p-3 text-left">#</th>
-              <th className="p-3 text-left">Username</th>
-              <th className="p-3 text-left">Email</th>
-              <th className="p-3 text-left">Contact</th>
-              <th className="p-3 text-left">Created On</th>
-              <th className="p-3 text-left">Actions</th>
+              <th className="p-2 sm:p-3 text-left text-xs sm:text-sm font-medium">#</th>
+              <th className="p-2 sm:p-3 text-left text-xs sm:text-sm font-medium">Username</th>
+              <th className="p-2 sm:p-3 text-left text-xs sm:text-sm font-medium">Email</th>
+              <th className="p-2 sm:p-3 text-left text-xs sm:text-sm font-medium hidden sm:table-cell">Contact</th>
+              <th className="p-2 sm:p-3 text-left text-xs sm:text-sm font-medium hidden md:table-cell">Created On</th>
+              <th className="p-2 sm:p-3 text-left text-xs sm:text-sm font-medium">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600 text-gray-900 dark:text-gray-100">
@@ -166,28 +166,33 @@ function UserPage() {
                   key={user.id} 
                   className="hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  <td className="p-3">{index + 1}</td>
-                  <td className="p-3">{user?.fullName || "Not Defined"}</td>
-                  <td className="p-3">{user.email}</td>
-                  <td className="p-3">{user.mobileNo}</td>
-                  <td className="p-3">
+                  <td className="p-2 sm:p-3 text-xs sm:text-sm">{index + 1}</td>
+                  <td className="p-2 sm:p-3 text-xs sm:text-sm">
+                    <div className="font-medium">{user?.fullName || "Not Defined"}</div>
+                    <div className="text-gray-500 dark:text-gray-400 sm:hidden text-xs">{user.email}</div>
+                  </td>
+                  <td className="p-2 sm:p-3 text-xs sm:text-sm hidden sm:table-cell">{user.email}</td>
+                  <td className="p-2 sm:p-3 text-xs sm:text-sm hidden sm:table-cell">{user.mobileNo}</td>
+                  <td className="p-2 sm:p-3 text-xs sm:text-sm hidden md:table-cell">
                     {moment(user.createdAt).format("MM-DD-YYYY")}
                   </td>
-                  <td className="p-3 space-x-2 flex items-center">
-                    <button
-                      onClick={() => handleViewUserDetails(user.id)}
-                      className="text-white bg-blue-600 px-3 py-2 rounded hover:bg-blue-700 text-xs flex items-center cursor-pointer"
-                      title="View Details"
-                    >
-                      👁️
-                    </button>
-                    <button
-                      onClick={() => handleConfirmAction(user.id)}
-                      className="text-white bg-red-600 px-3 py-2 rounded hover:bg-red-700 text-xs flex items-center cursor-pointer"
-                      title="Delete User"
-                    >
-                      <BiTrash fontSize={16} />
-                    </button>
+                  <td className="p-2 sm:p-3">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <button
+                        onClick={() => handleViewUserDetails(user.id)}
+                        className="text-white bg-blue-600 px-2 sm:px-3 py-1 sm:py-2 rounded hover:bg-blue-700 text-xs flex items-center cursor-pointer"
+                        title="View Details"
+                      >
+                        👁️
+                      </button>
+                      <button
+                        onClick={() => handleConfirmAction(user.id)}
+                        className="text-white bg-red-600 px-2 sm:px-3 py-1 sm:py-2 rounded hover:bg-red-700 text-xs flex items-center cursor-pointer"
+                        title="Delete User"
+                      >
+                        <BiTrash fontSize={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
