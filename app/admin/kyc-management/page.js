@@ -167,18 +167,18 @@ export default function KYCManagementPanel() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">KYC Management</h1>
-        <p className="text-gray-600 dark:text-gray-300">Manage user KYC submissions and approval workflow</p>
+    <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">KYC Management</h1>
+        <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">Manage user KYC submissions and approval workflow</p>
       </div>
 
       {/* Refresh Button */}
-      <div className="flex justify-end mb-6">
+      <div className="flex justify-end mb-4 sm:mb-6">
         <button
           onClick={() => fetchKycQueue()}
           disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center disabled:opacity-50"
+          className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center disabled:opacity-50 text-sm sm:text-base"
         >
           <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -186,62 +186,62 @@ export default function KYCManagementPanel() {
       </div>
 
       {/* KYC Queue */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Statistics Cards */}
         {kycQueue.statistics && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Submissions</p>
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Total Submissions</p>
+                  <p className="text-lg sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
                     {kycQueue.statistics.total}
                   </p>
                 </div>
-                <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                  <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <div className="bg-blue-100 dark:bg-blue-900 p-2 sm:p-3 rounded-full">
+                  <FileText className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Pending Review</p>
-                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Pending Review</p>
+                  <p className="text-lg sm:text-2xl font-bold text-orange-600 dark:text-orange-400">
                     {kycQueue.statistics.pending}
                   </p>
                 </div>
-                <div className="bg-orange-100 dark:bg-orange-900 p-3 rounded-full">
-                  <Clock className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                <div className="bg-orange-100 dark:bg-orange-900 p-2 sm:p-3 rounded-full">
+                  <Clock className="w-4 h-4 sm:w-6 sm:h-6 text-orange-600 dark:text-orange-400" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Approved</p>
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Approved</p>
+                  <p className="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400">
                     {kycQueue.statistics.approved}
                   </p>
                 </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full">
-                  <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+                <div className="bg-green-100 dark:bg-green-900 p-2 sm:p-3 rounded-full">
+                  <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Avg. Processing</p>
-                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Avg. Processing</p>
+                  <p className="text-lg sm:text-2xl font-bold text-purple-600 dark:text-purple-400">
                     {kycQueue.statistics.averageProcessingDays || 0}d
                   </p>
                 </div>
-                <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-full">
-                  <Timer className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                <div className="bg-purple-100 dark:bg-purple-900 p-2 sm:p-3 rounded-full">
+                  <Timer className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
             </div>
@@ -249,16 +249,16 @@ export default function KYCManagementPanel() {
         )}
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+        <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 items-start lg:items-center justify-between">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 flex-1 w-full lg:w-auto">
               {/* Status Filter */}
               <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-500" />
+                <Filter className="w-4 h-4 text-gray-500 flex-shrink-0" />
                 <select
                   value={filters.status}
                   onChange={(e) => setFilters({...filters, status: e.target.value, page: 1})}
-                  className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  className="border border-gray-300 dark:border-gray-600 rounded-md px-2 sm:px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm w-full sm:w-auto"
                 >
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
@@ -268,14 +268,14 @@ export default function KYCManagementPanel() {
               </div>
 
               {/* Search */}
-              <div className="flex items-center gap-2 flex-1 max-w-md">
-                <Search className="w-4 h-4 text-gray-500" />
+              <div className="flex items-center gap-2 flex-1 w-full">
+                <Search className="w-4 h-4 text-gray-500 flex-shrink-0" />
                 <input
                   type="text"
                   placeholder="Search by name, email, or mobile..."
                   value={filters.search}
                   onChange={(e) => setFilters({...filters, search: e.target.value, page: 1})}
-                  className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  className="border border-gray-300 dark:border-gray-600 rounded-md px-2 sm:px-3 py-2 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
                 />
               </div>
             </div>
@@ -283,7 +283,7 @@ export default function KYCManagementPanel() {
             {/* Export Button */}
             <button
               onClick={exportKycData}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
+              className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 flex items-center text-sm w-full sm:w-auto justify-center"
             >
               <Download className="w-4 h-4 mr-2" />
               Export CSV
@@ -291,9 +291,96 @@ export default function KYCManagementPanel() {
           </div>
         </div>
 
-        {/* KYC Queue Table */}
+        {/* KYC Queue Table/Cards */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div className="overflow-x-auto">
+          
+          {/* Mobile Card View */}
+          <div className="block lg:hidden">
+            {kycQueue.users && kycQueue.users.length > 0 ? (
+              kycQueue.users.map((user) => (
+                <div key={user.id} className="border-b border-gray-200 dark:border-gray-700 p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 h-10 w-10">
+                      <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                        <Users className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">{user.fullName}</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{user.mobileNo}</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">Aadhaar:</span>
+                          <p className="text-gray-900 dark:text-gray-100">{user.kycData?.aadharNumber || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">PAN:</span>
+                          <p className="text-gray-900 dark:text-gray-100">{user.kycData?.panNumber || 'N/A'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className={`px-2 py-1 text-xs leading-5 font-semibold rounded-full ${
+                            user.kycData?.status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200' :
+                            user.kycData?.status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200' :
+                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200'
+                          }`}>
+                            {user.kycData?.status || 'pending'}
+                          </span>
+                          {user.waitingDays > 0 && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              {user.waitingDays} days ago
+                            </p>
+                          )}
+                        </div>
+                        
+                        <div className="flex gap-1">
+                          {user.kycData?.status === 'pending' && (
+                            <>
+                              <button
+                                onClick={() => handleKycAction(user.id, 'approve', 'Admin approved KYC')}
+                                className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700"
+                                title="Approve"
+                              >
+                                <CheckCircle className="w-3 h-3" />
+                              </button>
+                              <button
+                                onClick={() => handleKycAction(user.id, 'reject', 'Admin rejected KYC', ['Incomplete documents'])}
+                                className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700"
+                                title="Reject"
+                              >
+                                <XCircle className="w-3 h-3" />
+                              </button>
+                            </>
+                          )}
+                          <button
+                            onClick={() => setSelectedUser(user)}
+                            className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700"
+                            title="View Details"
+                          >
+                            <Eye className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                <p>No KYC submissions found</p>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
@@ -389,27 +476,27 @@ export default function KYCManagementPanel() {
 
           {/* Pagination */}
           {kycQueue.pagination && (
-            <div className="px-6 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex items-center justify-between">
-              <div className="text-sm text-gray-700 dark:text-gray-300">
+            <div className="px-3 sm:px-6 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                 Showing {((filters.page - 1) * filters.limit) + 1} to {Math.min(filters.page * filters.limit, kycQueue.pagination.total)} of {kycQueue.pagination.total} results
               </div>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setFilters({...filters, page: filters.page - 1})}
                   disabled={!kycQueue.pagination.hasPrev}
-                  className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm disabled:opacity-50"
+                  className="px-2 sm:px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-xs sm:text-sm disabled:opacity-50 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
                 </button>
-                <span className="px-3 py-1 text-sm">
+                <span className="px-2 sm:px-3 py-1 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                   Page {filters.page} of {kycQueue.pagination.totalPages}
                 </span>
                 <button
                   onClick={() => setFilters({...filters, page: filters.page + 1})}
                   disabled={!kycQueue.pagination.hasNext}
-                  className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm disabled:opacity-50"
+                  className="px-2 sm:px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-xs sm:text-sm disabled:opacity-50 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
                 </button>
               </div>
             </div>
