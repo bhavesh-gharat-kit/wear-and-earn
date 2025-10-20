@@ -266,15 +266,15 @@ export default function PoolManagementPanel() {
   }
 
   return (
-  <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Pool Management Panel</h1>
-        <p className="text-gray-600 dark:text-gray-300">Manage the new pool-based MLM system, teams, and distributions</p>
+    <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">Pool Management Panel</h1>
+        <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">Manage the new pool-based MLM system, teams, and distributions</p>
       </div>
 
-      {/* Tab Navigation */}
-  <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
-        <nav className="-mb-px flex space-x-8">
+      {/* Tab Navigation - Mobile Responsive */}
+      <div className="mb-4 sm:mb-6 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+        <nav className="-mb-px flex space-x-4 sm:space-x-8 min-w-max">
           {[
             { id: 'overview', name: 'Overview', icon: TrendingUp },
             { id: 'distribution', name: 'Pool Distribution', icon: DollarSign },
@@ -284,104 +284,106 @@ export default function PoolManagementPanel() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`flex items-center py-2 px-3 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'
               }`}
             >
-              <tab.icon className="w-4 h-4 mr-2" />
-              {tab.name}
+              <tab.icon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">{tab.name}</span>
+              <span className="sm:hidden">{tab.name.split(' ')[0]}</span>
             </button>
           ))}
         </nav>
         
         {/* Real-time Refresh Button */}
-        <div className="flex justify-end mt-4">
+        <div className="flex justify-end mt-3 sm:mt-4">
           <button
             onClick={refreshData}
             disabled={loading}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center disabled:opacity-50"
+            className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center disabled:opacity-50 text-sm"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Refresh Data
+            <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh Data</span>
+            <span className="sm:hidden">Refresh</span>
           </button>
         </div>
       </div>
 
       {/* Overview Tab */}
       {activeTab === 'overview' && (
-        <div className="space-y-6">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+        <div className="space-y-4 sm:space-y-6">
+          {/* Stats Cards - Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Pool Amount</p>
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Total Pool Amount</p>
+                  <p className="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400">
                     {poolStats ? formatCurrency(poolStats.totalPoolAmount || 0) : '₹0'}
                   </p>
                 </div>
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full">
-                  <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
+                <div className="bg-green-100 dark:bg-green-900 p-2 sm:p-3 rounded-full">
+                  <DollarSign className="w-4 h-4 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Active Teams</p>
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Active Teams</p>
+                  <p className="text-lg sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
                     {poolStats ? poolStats.activeTeams || 0 : 0}
                   </p>
                 </div>
-                <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                  <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <div className="bg-blue-100 dark:bg-blue-900 p-2 sm:p-3 rounded-full">
+                  <Users className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">L5 Users</p>
-                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">L5 Users</p>
+                  <p className="text-lg sm:text-2xl font-bold text-purple-600 dark:text-purple-400">
                     {poolStats ? poolStats.l5Users || 0 : 0}
                   </p>
                 </div>
-                <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-full">
-                  <Crown className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                <div className="bg-purple-100 dark:bg-purple-900 p-2 sm:p-3 rounded-full">
+                  <Crown className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Pending Distributions</p>
-                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Pending Distributions</p>
+                  <p className="text-lg sm:text-2xl font-bold text-orange-600 dark:text-orange-400">
                     {poolStats ? poolStats.pendingDistributions || 0 : 0}
                   </p>
                 </div>
-                <div className="bg-orange-100 dark:bg-orange-900 p-3 rounded-full">
-                  <Wallet className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                <div className="bg-orange-100 dark:bg-orange-900 p-2 sm:p-3 rounded-full">
+                  <Wallet className="w-4 h-4 sm:w-6 sm:h-6 text-orange-600 dark:text-orange-400" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Level Distribution Chart */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">User Level Distribution</h3>
-            <div className="space-y-4">
+          <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">User Level Distribution</h3>
+            <div className="space-y-3 sm:space-y-4">
               {poolStats?.levelDistribution && Object.entries(poolStats.levelDistribution).map(([level, count]) => (
                 <div key={level} className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <Crown className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-2" />
-                    <span className="font-medium dark:text-gray-200">Level {level}</span>
+                    <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500 mr-2" />
+                    <span className="font-medium dark:text-gray-200 text-sm sm:text-base">Level {level}</span>
                   </div>
-                  <span className="text-lg font-bold text-blue-600 dark:text-blue-400">{count} users</span>
+                  <span className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400">{count} users</span>
                 </div>
               ))}
             </div>
@@ -391,24 +393,24 @@ export default function PoolManagementPanel() {
 
       {/* Pool Distribution Tab */}
       {activeTab === 'distribution' && (
-        <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Pool Distribution Control</h3>
-              <div className="flex gap-2">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">Pool Distribution Control</h3>
+              <div className="flex flex-col sm:flex-row gap-2">
                 <button
                   onClick={handleDistributePool}
                   disabled={isDistributing}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center disabled:opacity-50"
+                  className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 flex items-center justify-center disabled:opacity-50 text-sm sm:text-base"
                 >
-                  <DollarSign className="w-4 h-4 mr-2" />
+                  <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   {isDistributing ? 'Distributing...' : 'Distribute Pool Now'}
                 </button>
                 <button
                   onClick={exportDistributionHistory}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 flex items-center"
+                  className="bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 flex items-center justify-center text-sm sm:text-base"
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Export History
                 </button>
               </div>
@@ -416,10 +418,10 @@ export default function PoolManagementPanel() {
             
             {/* Distribution Progress */}
             {isDistributing && (
-              <div className="mb-4 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="mb-4 bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 rounded-lg border border-blue-200 dark:border-blue-800">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-blue-800 dark:text-blue-200 font-medium">Distribution in Progress...</span>
-                  <span className="text-blue-600 dark:text-blue-400">{Math.round(distributionProgress)}%</span>
+                  <span className="text-blue-800 dark:text-blue-200 font-medium text-sm sm:text-base">Distribution in Progress...</span>
+                  <span className="text-blue-600 dark:text-blue-400 text-sm sm:text-base">{Math.round(distributionProgress)}%</span>
                 </div>
                 <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2">
                   <div 
@@ -430,10 +432,10 @@ export default function PoolManagementPanel() {
               </div>
             )}
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <div>
-                <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-2">Current Pool Status</h4>
-                <div className="space-y-2">
+                <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-2 text-sm sm:text-base">Current Pool Status</h4>
+                <div className="space-y-2 text-sm sm:text-base">
                   <p>Total Amount: <span className="font-bold text-green-600 dark:text-green-400">{poolDistribution ? formatCurrency(poolDistribution.totalAmount || 0) : '₹0'}</span></p>
                   <p>Eligible Users: <span className="font-bold text-blue-600 dark:text-blue-400">{poolDistribution ? poolDistribution.eligibleUsers || 0 : 0}</span></p>
                   <p>Last Distribution: <span className="font-medium dark:text-gray-200">{poolDistribution?.lastDistribution?.date ? new Date(poolDistribution.lastDistribution.date).toLocaleDateString() : 'Never'}</span></p>
@@ -441,8 +443,8 @@ export default function PoolManagementPanel() {
               </div>
               
               <div>
-                <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-2">Distribution by Level</h4>
-                <div className="space-y-2">
+                <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-2 text-sm sm:text-base">Distribution by Level</h4>
+                <div className="space-y-2 text-sm sm:text-base">
                   {poolDistribution?.levelBreakdown && Object.entries(poolDistribution.levelBreakdown).map(([level, data]) => {
                     const hasUsers = data.users > 0;
                     const displayAmount = hasUsers ? data.amount : 0;
@@ -484,12 +486,58 @@ export default function PoolManagementPanel() {
             </div>
           </div>
 
-          {/* Recent Distributions */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+          {/* Recent Distributions - Mobile Responsive */}
+          <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Distribution History</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">Distribution History</h3>
             </div>
-            <div className="overflow-x-auto">
+            
+            {/* Mobile Card View */}
+            <div className="block lg:hidden space-y-4">
+              {poolDistribution?.recentDistributions?.map((dist, index) => {
+                const distributionAmount = dist.amount;
+                const totalMLMAmount = Math.round(distributionAmount / 0.7);
+                const companyShare = Math.round(distributionAmount * 0.3 / 0.7);
+                
+                return (
+                  <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                          {new Date(dist.createdAt).toLocaleDateString()}
+                        </h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{dist.userCount} users</p>
+                      </div>
+                      <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full">
+                        Completed
+                      </span>
+                    </div>
+                    
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Total MLM (100%):</span>
+                        <span className="font-medium text-blue-600 dark:text-blue-400">{formatCurrency(totalMLMAmount)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Distribution (70%):</span>
+                        <span className="font-medium text-green-600 dark:text-green-400">{formatCurrency(distributionAmount)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Company Share (30%):</span>
+                        <span className="font-medium text-orange-600 dark:text-orange-400">{formatCurrency(companyShare)}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }) || (
+                <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+                  No recent distributions
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden lg:block overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
