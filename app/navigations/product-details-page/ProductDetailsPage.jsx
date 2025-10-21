@@ -219,7 +219,7 @@ ${shareUrl}`;
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
           {/* Product Images */}
           <div className="space-y-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 transition-colors">
+            <div className="rounded-lg shadow-sm transition-colors">
               <ProductDetailsImageComponent productDetails={productDetails} />
             </div>
           </div>
