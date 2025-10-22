@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { formatDate } from '@/lib/serialization-utils'
 import ShareButtons from '@/components/ui/ShareButtons'
 import { 
   User, 
@@ -114,7 +115,7 @@ const KYCForm = ({ userData, kycData, onSubmit }) => {
         <p className="text-sm text-gray-500 dark:text-gray-400">This process usually takes 24-48 hours.</p>
         <div className="mt-6 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
           <p className="text-sm text-blue-800 dark:text-blue-300">
-            <strong>Submitted on:</strong> {new Date(kycData.submittedAt).toLocaleDateString()}
+            <strong>Submitted on:</strong> {formatDate(kycData.submittedAt)}
           </p>
         </div>
       </div>
@@ -1194,7 +1195,7 @@ const AccountDashboard = () => {
           <div className="text-right">
             <div className="text-sm text-indigo-200 dark:text-indigo-300 mb-1">Member Since</div>
             <div className="text-lg font-semibold mb-3">
-              {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A'}
+              {formatDate(userData?.createdAt)}
             </div>
             <button
               onClick={refreshAllData}
@@ -1389,7 +1390,7 @@ const AccountDashboard = () => {
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">Order #{order.id}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {new Date(order.createdAt).toLocaleDateString()}
+                      {formatDate(order.createdAt)}
                     </p>
                   </div>
                 </div>

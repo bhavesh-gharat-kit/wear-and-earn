@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { formatDate } from '@/lib/serialization-utils';
 import { 
   CheckCircle, 
   Package, 
@@ -182,7 +183,7 @@ export default function OrderDetailsPage({ orderId }) {
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-300">Order Date:</span>
                   <span className="font-medium">
-                    {new Date(order.createdAt).toLocaleDateString()}
+                    {formatDate(order.createdAt)}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -193,7 +194,7 @@ export default function OrderDetailsPage({ orderId }) {
                   <div className="flex justify-between">
                     <span className="text-gray-600 dark:text-gray-300">Delivered:</span>
                     <span className="font-medium text-green-600 dark:text-green-300">
-                      {new Date(order.deliveredAt).toLocaleDateString()}
+                      {formatDate(order.deliveredAt)}
                     </span>
                   </div>
                 )}

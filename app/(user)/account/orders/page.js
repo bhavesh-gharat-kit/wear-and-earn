@@ -2,6 +2,7 @@
 import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { formatDate } from '@/lib/serialization-utils'
 import { 
   Package, 
   Truck, 
@@ -185,20 +186,12 @@ export default function OrdersPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                     <Calendar className="h-4 w-4 mr-2" />
-                    <span>Ordered: {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    }) : 'N/A'}</span>
+                    <span>Ordered: {formatDate(order.createdAt)}</span>
                   </div>
                   {order.deliveredAt && (
                     <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                       <CheckCircle className="h-4 w-4 mr-2" />
-                      <span>Delivered: {new Date(order.deliveredAt).toLocaleDateString('en-IN', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}</span>
+                      <span>Delivered: {formatDate(order.deliveredAt)}</span>
                     </div>
                   )}
                   {order.paymentId && (
