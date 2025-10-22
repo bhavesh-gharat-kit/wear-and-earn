@@ -204,13 +204,9 @@ export async function POST(request) {
       return { order, orderProducts }
     })
 
-    // Clear user's cart after successful order creation
-    await prisma.cart.deleteMany({
-      where: {
-        userId
-      }
-    })
-
+    // Don't clear cart here - it will be cleared after successful payment verification
+    // Cart clearing moved to /api/orders/verify-payment to ensure rollback capability
+    
     return NextResponse.json({
       success: true,
       message: 'Order placed successfully',

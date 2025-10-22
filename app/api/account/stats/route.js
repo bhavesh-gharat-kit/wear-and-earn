@@ -18,18 +18,10 @@ export async function GET() {
     const userId = parseInt(session.user.id)
 
     // Get user statistics
-    const [totalOrders, pendingOrders, cartItems, orderStats] = await Promise.all([
+    const [totalOrders, cartItems, orderStats] = await Promise.all([
       // Total orders count
       prisma.order.count({
         where: { userId }
-      }),
-      
-      // Pending orders count
-      prisma.order.count({
-        where: { 
-          userId,
-          status: { in: ['pending', 'inProcess'] }
-        }
       }),
       
       // Cart items count
@@ -48,7 +40,6 @@ export async function GET() {
 
     return NextResponse.json({
       totalOrders,
-      pendingOrders,
       cartItems,
       totalSpent
     })

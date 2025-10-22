@@ -134,6 +134,13 @@ export async function POST(req) {
           }
         });
 
+        // Clear user's cart only after successful payment verification
+        console.log('🧹 Clearing user cart after successful payment...');
+        await tx.cart.deleteMany({
+          where: { userId: updatedOrder.userId }
+        });
+        console.log('✅ Cart cleared successfully');
+
         return { ...updatedOrder, userReferralCode: updatedUserData.referralCode };
       });
 

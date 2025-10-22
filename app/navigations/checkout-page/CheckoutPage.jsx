@@ -189,8 +189,7 @@ export default function CheckoutPage() {
                     toast.success('Payment successful! Your order is being processed.', { duration: 4000 });
                   }
                   
-                  // Clear cart after successful payment
-                  await axios.delete('/api/cart/clear');
+                  // Cart is automatically cleared by payment verification API
                   fetchUserProductCartDetails();
                   
                   // Redirect to account page with a small delay to ensure MLM processing is complete
@@ -200,6 +199,14 @@ export default function CheckoutPage() {
                 } else {
                   console.error('❌ Payment verification failed:', verifyResponse.data);
                   toast.error(`Payment verification failed: ${verifyResponse.data.message || 'Unknown error'}`);
+                  
+                  // Cleanup the pending order since verification failed
+                  try {
+                    await axios.delete(`/api/orders/cleanup?orderId=${response.data.orderId}`);
+                    console.log('✅ Failed verification order cleaned up successfully');
+                  } catch (cleanupError) {
+                    console.error('⚠️ Failed to cleanup verification failed order:', cleanupError);
+                  }
                   // Don't redirect, let user try again
                 }
               } catch (error) {
@@ -211,6 +218,16 @@ export default function CheckoutPage() {
                   toast.error('Payment successful but processing failed. Please check your order status.');
                 } else {
                   toast.error(`Payment verification failed: ${error.response?.data?.message || error.message}`);
+                  
+                  // For non-timeout errors, cleanup the pending order
+                  if (error.code !== 'ECONNABORTED' && error.response?.status !== 500) {
+                    try {
+                      await axios.delete(`/api/orders/cleanup?orderId=${response.data.orderId}`);
+                      console.log('✅ Error order cleaned up successfully');
+                    } catch (cleanupError) {
+                      console.error('⚠️ Failed to cleanup error order:', cleanupError);
+                    }
+                  }
                 }
               } finally {
                 setIsPlacingOrder(false);
@@ -228,15 +245,31 @@ export default function CheckoutPage() {
               color: '#16a34a',
             },
             modal: {
-              ondismiss: () => {
+              ondismiss: async () => {
                 toast.error('Payment cancelled');
+                // Cleanup the pending order since payment was cancelled
+                try {
+                  await axios.delete(`/api/orders/cleanup?orderId=${response.data.orderId}`);
+                  console.log('✅ Cancelled order cleaned up successfully');
+                } catch (cleanupError) {
+                  console.error('⚠️ Failed to cleanup cancelled order:', cleanupError);
+                }
                 setIsPlacingOrder(false);
               },
             },
             // Add payment failure handler
-            'payment.failed': (response) => {
-              console.error('💥 Razorpay payment failed:', response.error);
-              toast.error(`Payment failed: ${response.error.description || 'Unknown error'}`);
+            'payment.failed': async (paymentResponse) => {
+              console.error('💥 Razorpay payment failed:', paymentResponse.error);
+              toast.error(`Payment failed: ${paymentResponse.error.description || 'Unknown error'}`);
+              
+              // Cleanup the pending order since payment failed
+              try {
+                await axios.delete(`/api/orders/cleanup?orderId=${response.data.orderId}`);
+                console.log('✅ Failed order cleaned up successfully');
+              } catch (cleanupError) {
+                console.error('⚠️ Failed to cleanup failed order:', cleanupError);
+              }
+              
               setIsPlacingOrder(false);
             },
           };
