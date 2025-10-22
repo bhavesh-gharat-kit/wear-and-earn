@@ -27,7 +27,7 @@ const AdminEditProduct = ({ params }) => {
     gst: "",
     shipping: "",
     productType: "REGULAR",
-    totalPrice: 0,        // Auto-calculated total price
+    totalPrice: "",        // Auto-calculated total price
     productImages: [],
   };
 
@@ -86,10 +86,15 @@ const AdminEditProduct = ({ params }) => {
       const { productPrice, mlmPrice, gst, shipping, discount } = updatedData;
 
       // Calculate total price = (Pr + Pm + Shipping) + GST - Discount
-      if (productPrice && mlmPrice) {
-        const basePrice = Number(productPrice) + Number(mlmPrice);
+      const pr = Number(productPrice);
+      const pm = Number(mlmPrice);
+
+      if (!Number.isFinite(pr) || !Number.isFinite(pm) || pr <= 0 || pm < 0) {
+        // insufficient data to calculate
+        updatedData.totalPrice = "";
+      } else {
         const shippingAmount = Number(shipping) || 0;
-        const subtotal = basePrice + shippingAmount;
+        const subtotal = pr + pm + shippingAmount;
         const gstAmount = (subtotal * (Number(gst) || 0)) / 100;
         const discountAmount = (subtotal * (Number(discount) || 0)) / 100;
         updatedData.totalPrice = Number((subtotal + gstAmount - discountAmount).toFixed(2));
@@ -203,14 +208,18 @@ const AdminEditProduct = ({ params }) => {
         gst: gst || "",
         shipping: homeDelivery || "",
         productType: type || "REGULAR",
-        category: category?.name,
+        category: category?.id || "",
       };
 
       // Calculate total price when loading existing product data
-      if (productPrice && mlmPrice) {
-        const basePrice = Number(productPrice) + Number(mlmPrice);
+      const pr = Number(productPrice);
+      const pm = Number(mlmPrice);
+
+      if (!Number.isFinite(pr) || !Number.isFinite(pm) || pr <= 0 || pm < 0) {
+        updatedData.totalPrice = "";
+      } else {
         const shippingAmount = Number(homeDelivery) || 0;
-        const subtotal = basePrice + shippingAmount;
+        const subtotal = pr + pm + shippingAmount;
         const gstAmount = (subtotal * (Number(gst) || 0)) / 100;
         const discountAmount = (subtotal * (Number(discount) || 0)) / 100;
         updatedData.totalPrice = Number((subtotal + gstAmount - discountAmount).toFixed(2));
@@ -233,11 +242,11 @@ const AdminEditProduct = ({ params }) => {
 
   if (error) {
     return (
-      <section className="p-4 sm:p-8 bg-gray-50 min-h-screen">
+      <section className="p-4 sm:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <h2 className="text-2xl font-semibold text-red-600 mb-4">Error Loading Product</h2>
-            <p className="text-gray-600 mb-6">{error}</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
             <div className="space-x-4">
               <button
                 onClick={() => {
@@ -266,7 +275,7 @@ const AdminEditProduct = ({ params }) => {
   }
 
   return (
-    <section className="p-4 sm:p-8 bg-gray-50 min-h-screen">
+    <section className="p-4 sm:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="flex justify-between items-start">
         <button
           onClick={() => window.history.back()}
@@ -274,7 +283,7 @@ const AdminEditProduct = ({ params }) => {
         >
           <FaArrowLeft /> Back
         </button>
-        <h2 className="text-2xl font-semibold text-green-800 mb-6">
+        <h2 className="text-2xl font-semibold text-green-800 dark:text-green-400 mb-6">
           Edit Product
         </h2>
       </div>
@@ -283,20 +292,20 @@ const AdminEditProduct = ({ params }) => {
         Use Webp Optimized images standard size
       </p>
 
-      <form onSubmit={handleSubmit}>
+  <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Product Name */}
           <div className="col-span-2">
             <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
               Product Name
             </label>
-            <input
+              <input
               type="text"
               name="title"
               value={formData.title}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             />
           </div>
 
@@ -332,7 +341,7 @@ const AdminEditProduct = ({ params }) => {
                   Select Category
                 </option>
                 {categories.map((cat) => (
-                  <option key={cat.id} value={cat.name}>
+                  <option key={cat.id} value={cat.id}>
                     {cat.name}
                   </option>
                 ))}
@@ -382,7 +391,7 @@ const AdminEditProduct = ({ params }) => {
               </label>
               <input
                 type="text"
-                value={formData.totalPrice ? `₹${Number(formData.totalPrice).toFixed(2)}` : 'Auto-calculated'}
+                value={formData.totalPrice !== "" && formData.totalPrice !== undefined ? `₹${Number(formData.totalPrice).toFixed(2)}` : 'Auto-calculated'}
                 readOnly
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300"
               />
@@ -391,7 +400,7 @@ const AdminEditProduct = ({ params }) => {
           </div>
 
           {/* Customer Pricing Preview */}
-          {formData.productPrice && formData.mlmPrice && (
+          {formData.productPrice !== "" && formData.mlmPrice !== "" && (
             <div className="col-span-2 bg-blue-50 dark:bg-blue-900 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
               <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">Customer Will See:</h4>
               <div className="space-y-1 text-sm text-blue-800 dark:text-blue-200">
@@ -411,7 +420,7 @@ const AdminEditProduct = ({ params }) => {
                 )}
                 <div className="flex justify-between font-semibold border-t border-blue-200 dark:border-blue-700 pt-1">
                   <span>Final Amount:</span>
-                  <span>₹{Number(formData.totalPrice).toFixed(2)}</span>
+                  <span>₹{formData.totalPrice !== "" ? Number(formData.totalPrice).toFixed(2) : '0.00'}</span>
                 </div>
               </div>
             </div>
@@ -532,7 +541,7 @@ const AdminEditProduct = ({ params }) => {
         <div className="flex justify-end gap-3 mt-8">
           <Link
             href={"/admin/products"}
-            className="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition"
+            className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition"
           >
             Cancel
           </Link>

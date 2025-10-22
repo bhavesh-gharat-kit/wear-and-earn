@@ -259,15 +259,25 @@ export async function PUT(request, { params }) {
             }
         }
 
+        // Parse the pricing fields
+        const productPrice = parseFloat(data.productPrice) || existingProduct.productPrice;
+        const mlmPrice = parseFloat(data.mlmPrice) || existingProduct.mlmPrice;
+        const shippingCost = parseFloat(data.shipping) || existingProduct.homeDelivery;
+        
+        // Calculate sellingPrice to match frontend expectations (productPrice + mlmPrice + shipping)
+        const calculatedSellingPrice = productPrice + mlmPrice + shippingCost;
+
         // Map form data to update object
         const updateData = {
             title: data.title || existingProduct.title,
             description: data.description || existingProduct.description,
             longDescription: data.overview || existingProduct.longDescription,
-            productPrice: parseFloat(data.productPrice) || existingProduct.productPrice,
-            mlmPrice: parseFloat(data.mlmPrice) || existingProduct.mlmPrice,
+            productPrice: productPrice,
+            mlmPrice: mlmPrice,
+            price: calculatedSellingPrice, // Update price for compatibility
+            sellingPrice: calculatedSellingPrice, // Update sellingPrice to reflect new pricing
             gst: parseFloat(data.gst) || existingProduct.gst,
-            homeDelivery: parseFloat(data.shipping) || existingProduct.homeDelivery,
+            homeDelivery: shippingCost,
             discount: parseFloat(data.discount) || existingProduct.discount,
             keyFeature: data.keyFeatures || existingProduct.keyFeature,
             type: data.productType || existingProduct.type,
@@ -276,8 +286,8 @@ export async function PUT(request, { params }) {
 
         // Handle category update
         if (data.category) {
-            const category = await prisma.category.findFirst({
-                where: { name: data.category }
+            const category = await prisma.category.findUnique({
+                where: { id: parseInt(data.category) }
             });
             if (category) {
                 updateData.categoryId = category.id;

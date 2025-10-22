@@ -11,6 +11,7 @@ import {
   RefreshCw,
   Download
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 export default function PoolWithdrawalsPage() {
   const { data: session, status } = useSession()
@@ -49,9 +50,32 @@ export default function PoolWithdrawalsPage() {
   }, [session, status, filters, fetchWithdrawals])
 
   const handleWithdrawalAction = async (withdrawalId, action, remarks = '') => {
-    if (!confirm(`Are you sure you want to ${action} this withdrawal request?`)) {
-      return
-    }
+    // Show confirmation toast
+    toast((t) => (
+      <div>
+        <p>Are you sure you want to {action} this withdrawal request?</p>
+        <div className="flex gap-2 mt-2">
+          <button
+            className="bg-green-500 text-white px-3 py-1 rounded text-sm"
+            onClick={() => {
+              toast.dismiss(t.id)
+              processWithdrawal(withdrawalId, action, remarks)
+            }}
+          >
+            Confirm
+          </button>
+          <button
+            className="bg-gray-500 text-white px-3 py-1 rounded text-sm"
+            onClick={() => toast.dismiss(t.id)}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: 10000 })
+  }
+
+  const processWithdrawal = async (withdrawalId, action, remarks = '') => {
 
     try {
       setProcessing(true)
@@ -68,15 +92,24 @@ export default function PoolWithdrawalsPage() {
       })
 
       if (response.ok) {
-        alert(`Withdrawal ${action}ed successfully!`)
+        toast.success(`Withdrawal ${action}ed successfully!`, {
+          duration: 4000,
+          icon: action === 'approve' ? '✅' : '❌'
+        })
         fetchWithdrawals() // Refresh the list
       } else {
         const error = await response.json()
-        alert(`Error: ${error.message}`)
+        toast.error(`Error: ${error.message}`, {
+          duration: 4000,
+          icon: '⚠️'
+        })
       }
     } catch (error) {
       console.error('Error processing withdrawal:', error)
-      alert('Failed to process withdrawal')
+      toast.error('Failed to process withdrawal', {
+        duration: 4000,
+        icon: '❌'
+      })
     } finally {
       setProcessing(false)
     }

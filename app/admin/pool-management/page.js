@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 import { 
   Users, 
   DollarSign, 
@@ -150,7 +151,10 @@ export default function PoolManagementPanel() {
         setTimeout(() => {
           const amount = result.data?.totalAmountDistributed || '0'
           const users = result.data?.usersRewarded || 0
-          alert(`🎉 Pool Distribution Completed Successfully!\n\n💰 Total Amount Distributed: ₹${amount}\n👥 Users Rewarded: ${users}\n\n✅ All amounts have been added to user wallets.`)
+          toast.success(`Pool Distribution Completed Successfully! Total Amount Distributed: ₹${amount}, Users Rewarded: ${users}`, {
+            duration: 5000,
+            icon: '🎉'
+          })
           // Refresh data
           refreshData()
           setIsDistributing(false)
@@ -158,13 +162,19 @@ export default function PoolManagementPanel() {
         }, 1000)
       } else {
         const error = await response.json()
-        alert('Error distributing pool: ' + error.message)
+        toast.error('Error distributing pool: ' + error.message, {
+          duration: 4000,
+          icon: '❌'
+        })
         setIsDistributing(false)
         setDistributionProgress(0)
       }
     } catch (error) {
       console.error('Error:', error)
-      alert('Failed to distribute pool')
+      toast.error('Failed to distribute pool', {
+        duration: 4000,
+        icon: '❌'
+      })
       setIsDistributing(false)
       setDistributionProgress(0)
     }
@@ -192,7 +202,10 @@ export default function PoolManagementPanel() {
     }) || []
 
     if (csvData.length === 0) {
-      alert('No data to export')
+      toast.error('No data to export', {
+        duration: 3000,
+        icon: '📁'
+      })
       return
     }
 

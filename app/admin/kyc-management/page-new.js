@@ -27,6 +27,7 @@ import {
   ZoomIn,
   MessageSquare
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 export default function KYCManagementPanel() {
   const { data: session, status } = useSession()
@@ -91,15 +92,24 @@ export default function KYCManagementPanel() {
       const result = await response.json()
 
       if (result.success) {
-        alert(`KYC ${action}d successfully!`)
+        toast.success(`KYC ${action}d successfully!`, {
+          duration: 4000,
+          icon: action === 'approve' ? '✅' : '❌'
+        })
         await fetchKycQueue()
         setSelectedUser(null)
       } else {
-        alert('Error: ' + result.error)
+        toast.error('Error: ' + result.error, {
+          duration: 4000,
+          icon: '⚠️'
+        })
       }
     } catch (error) {
       console.error('Error processing KYC:', error)
-      alert('Failed to process KYC')
+      toast.error('Failed to process KYC', {
+        duration: 4000,
+        icon: '❌'
+      })
     }
   }
 
@@ -114,7 +124,10 @@ export default function KYCManagementPanel() {
 
   const exportKycData = () => {
     if (!kycQueue.users || kycQueue.users.length === 0) {
-      alert('No data to export')
+      toast.error('No data to export', {
+        duration: 3000,
+        icon: '📁'
+      })
       return
     }
 
