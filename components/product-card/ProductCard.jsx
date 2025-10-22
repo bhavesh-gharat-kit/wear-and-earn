@@ -113,7 +113,7 @@ function ProductCard({ product, variant = "grid", compact = false }) {
                 className="object-cover"
                 sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, 128px"
               />
-              {discount && (
+              {discount !== null && discount !== undefined && discount !== '' && discount !== '0' && discount !== 0 && Number(discount) > 0 && (
                 <div className="absolute top-1 left-1 sm:top-2 sm:left-2">
                   <span className="bg-red-500 text-white text-xs py-0.5 px-1 sm:py-1 sm:px-2 rounded-full font-medium">
                     -{discount}%
@@ -209,7 +209,7 @@ function ProductCard({ product, variant = "grid", compact = false }) {
           sizes={compact ? "(max-width: 640px) 45vw, (max-width: 768px) 30vw, 20vw" : "(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"}
         />        {/* Compact Mode Responsive Badges */}
         <div className={`absolute ${compact ? 'top-1 left-1' : 'top-2 sm:top-3 left-2 sm:left-3'} flex flex-col gap-1 sm:gap-2`}>
-          {discount && (
+          {discount !== null && discount !== undefined && discount !== '' && discount !== '0' && discount !== 0 && Number(discount) > 0 && (
             // hide image badge on mobile, show from sm+
             <span className={`hidden sm:inline-flex bg-red-500 text-white ${compact ? 'text-xs py-0.5 px-1' : 'text-xs py-0.5 px-1.5 sm:py-1 sm:px-2'} rounded-full font-medium shadow-sm`}>
               -{discount}%
@@ -270,7 +270,7 @@ function ProductCard({ product, variant = "grid", compact = false }) {
                 </span>
               )}
               {/* inline discount pill for mobile only */}
-              {discount && (
+              {discount !== null && discount !== undefined && discount !== '' && discount !== '0' && discount !== 0 && Number(discount) > 0 && (
                 <span className={`inline-flex sm:hidden bg-red-500 text-white ${compact ? 'text-[10px] py-0.5 px-1' : 'text-xs py-0.5 px-1'} rounded-full font-medium`}>
                   -{discount}%
                 </span>

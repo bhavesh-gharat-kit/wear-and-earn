@@ -6,7 +6,7 @@ const FloatingCallButton = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   // Your business phone number (replace with actual number)
-  const phoneNumber = "+917709258441";
+  const phoneNumber = "+919326152855";
 
   useEffect(() => {
     // Show button after component mounts (prevents hydration issues)

@@ -278,7 +278,7 @@ export async function PUT(request, { params }) {
             sellingPrice: calculatedSellingPrice, // Update sellingPrice to reflect new pricing
             gst: parseFloat(data.gst) || existingProduct.gst,
             homeDelivery: shippingCost,
-            discount: parseFloat(data.discount) || existingProduct.discount,
+            discount: data.discount && parseFloat(data.discount) > 0 ? parseFloat(data.discount) : null,
             keyFeature: data.keyFeatures || existingProduct.keyFeature,
             type: data.productType || existingProduct.type,
             mainImage: thumbnailImageUrl,

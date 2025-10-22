@@ -234,15 +234,16 @@ export default function AccountSettings() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Contact Number
+                      <span className="text-xs text-gray-500 ml-2">(Cannot be changed)</span>
                     </label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                       <input
                         type="tel"
                         value={profileData.contactNumber}
-                        onChange={(e) => setProfileData({...profileData, contactNumber: e.target.value})}
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-                        required
+                        readOnly
+                        className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 cursor-not-allowed"
+                        title="Mobile number cannot be changed for security reasons"
                       />
                     </div>
                   </div>

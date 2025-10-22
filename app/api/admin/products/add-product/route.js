@@ -152,7 +152,7 @@ export async function POST(req) {
                 inStock: data.inStock ? Number(data.inStock) : 1,
                 isActive: true,
                 keyFeature: data.keyFeatures || "",
-                discount: data.discount ? Number(data.discount) : 0,
+                discount: data.discount && Number(data.discount) > 0 ? Number(data.discount) : null,
                 
                 // NEW SPEC: Clear pricing structure
                 productPrice: productPrice,      // Pr - Product Price (goes to company)

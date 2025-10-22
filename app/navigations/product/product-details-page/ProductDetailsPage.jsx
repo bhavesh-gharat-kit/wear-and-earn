@@ -83,9 +83,11 @@ function ProductDetailsPage({ id }) {
               <span className="text-slate-800 text-xl line-through">
                 ₹{price?.toLocaleString("en-IN")}
               </span>
-              <span className="bg-red-600 p-2 rounded text-sm font-medium text-white">
-                {discount}%
-              </span>
+              {discount && Number(discount) > 0 && (
+                <span className="bg-red-600 p-2 rounded text-sm font-medium text-white">
+                  {discount}%
+                </span>
+              )}
             </div>
           </div>
           <div id="product-body" className="my-4 text-xl text-slate-700">

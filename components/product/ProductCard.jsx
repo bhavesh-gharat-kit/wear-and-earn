@@ -89,8 +89,8 @@ function ProductCard({ product, variant = "default", setShowModal }) {
           {/* Product Thumbnail */}
           <div className="relative group">
             {/* Product Label */}
-            {discount && (
-              <span className="absolute top-2 left-2 bg-red-500 text-white text-xs py-1 px-2 rounded z-10">
+            {discount !== null && discount !== undefined && discount !== '' && discount !== '0' && discount !== 0 && Number(discount) > 0 && (
+              <span className="absolute top-2 left-2 bg-red-500 text-white text-xs py-1 px-2 rounded-full font-medium">
                 -{discount}%
               </span>
             )}
@@ -184,9 +184,9 @@ function ProductCard({ product, variant = "default", setShowModal }) {
             Best Seller
           </span>
         </div>
-        {discount && (
-          <div className="absolute top-2 right-2">
-            <span className="bg-red-500 text-white text-xs py-1 px-2 rounded">
+        {discount !== null && discount !== undefined && discount !== '' && discount !== '0' && discount !== 0 && Number(discount) > 0 && (
+          <div className="sm:hidden absolute top-2 left-2">
+            <span className="bg-red-500 text-white text-xs py-1 px-2 rounded-full font-medium">
               -{discount}%
             </span>
           </div>
