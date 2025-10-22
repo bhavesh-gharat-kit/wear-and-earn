@@ -220,11 +220,13 @@ function AdminManageCategoryPage() {
         </table>
 
         {/* PAGINATION COMPONENET START HERE */}
-        <PaginationComponent
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          totalPages={totalPages}
-        />
+        {totalPages > 1 && (
+          <PaginationComponent
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+          />
+        )}
         {/* PAGINATION COMPONENET START END */}
       </div>
       

@@ -198,11 +198,13 @@ function UserPage() {
               ))}
           </tbody>
         </table>
-        <PaginationComponent
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          totalPages={totalPages}
-        />
+        {totalPages > 1 && (
+          <PaginationComponent
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+          />
+        )}
       </div>
 
     </div>

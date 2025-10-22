@@ -316,16 +316,18 @@ function AdminProductsPage() {
         </div>
         
         {/* Pagination */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-          <PaginationComponent
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            totalPages={totalPages}
-            setRowsPage={setRowsPage}
-            rowsPage={rowsPage}
-            totalCount={totalProductsCount}
-          />
-        </div>
+        {totalPages > 1 && (
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <PaginationComponent
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              totalPages={totalPages}
+              setRowsPage={setRowsPage}
+              rowsPage={rowsPage}
+              totalCount={totalProductsCount}
+            />
+          </div>
+        )}
       </div>
 
       

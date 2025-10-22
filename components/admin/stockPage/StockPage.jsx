@@ -149,11 +149,13 @@ function StockPage() {
         </table>
 
         {/* PAGINATION COMPONENT START*/}
-        <PaginationComponent
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          totalPages={totalPages}
-        />
+        {totalPages > 1 && (
+          <PaginationComponent
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+          />
+        )}
         {/* PAGINATION COMPONENT END*/}
       </div>
       {showAddStockModal && (

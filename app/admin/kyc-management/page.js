@@ -475,7 +475,7 @@ export default function KYCManagementPanel() {
           </div>
 
           {/* Pagination */}
-          {kycQueue.pagination && (
+          {kycQueue.pagination && kycQueue.pagination.totalPages > 1 && (
             <div className="px-3 sm:px-6 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                 Showing {((filters.page - 1) * filters.limit) + 1} to {Math.min(filters.page * filters.limit, kycQueue.pagination.total)} of {kycQueue.pagination.total} results
