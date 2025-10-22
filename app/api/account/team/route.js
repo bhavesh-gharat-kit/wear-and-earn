@@ -165,47 +165,61 @@ export async function GET(request) {
       }))
     }
 
-    // Get team overview (all levels)
-    const teamOverview = await Promise.all([1,2,3,4,5,6,7].map(async (lvl) => {
-      const count = lvl === 1 
-        ? await prisma.user.count({ where: { sponsorId: userId }})
-        : await prisma.hierarchy.count({ 
-            where: { ancestorId: userId, depth: lvl }
-          })
-      
-      const active = lvl === 1
-        ? await prisma.user.count({ 
-            where: { sponsorId: userId, isActive: true }
-          })
-        : await prisma.hierarchy.count({
-            where: { 
-              ancestorId: userId, 
-              depth: lvl,
-              descendant: { isActive: true }
-            }
-          })
-
-      return {
-        level: lvl,
-        totalMembers: count,
-        activeMembers: active,
-        inactiveMembers: count - active
+    // Get team overview using admin panel logic (referrals with purchases)
+    console.log('🔍 Fetching team overview for userId:', userId)
+    
+    // Get direct referrals who made first purchases (Level 1)
+    const directReferralsWithPurchases = await prisma.user.findMany({
+      where: { 
+        sponsorId: userId,
+        purchases: {
+          some: {
+            type: 'first' // Only referrals who made first purchases
+          }
+        }
+      },
+      select: {
+        id: true,
+        isActive: true,
+        purchases: {
+          where: { type: 'first' },
+          select: { id: true }
+        }
       }
-    }))
-
-    const totalTeamSize = await prisma.hierarchy.count({
-      where: { ancestorId: userId }
     })
 
-    const directReferralsCount = await prisma.user.count({
-      where: { sponsorId: userId }
-    })
+    console.log(`📊 Direct referrals with purchases: ${directReferralsWithPurchases.length}`)
+
+    // Calculate level 1 stats
+    const level1Total = directReferralsWithPurchases.length
+    const level1Active = directReferralsWithPurchases.filter(user => user.isActive).length
+
+    // For now, only show Level 1 (direct referrals) as other levels need hierarchy data
+    // This matches the working admin panel approach
+    const teamOverview = [
+      {
+        level: 1,
+        totalMembers: level1Total,
+        activeMembers: level1Active,
+        inactiveMembers: level1Total - level1Active
+      },
+      // Levels 2-7 will show 0 until hierarchy is properly populated
+      ...Array.from({length: 6}, (_, i) => ({
+        level: i + 2,
+        totalMembers: 0,
+        activeMembers: 0,
+        inactiveMembers: 0
+      }))
+    ]
+
+    // Total team size is just direct referrals with purchases for now
+    const totalTeamSize = level1Total
 
     return NextResponse.json(serializeBigInt({
       success: true,
       data: {
         overview: teamOverview,
-        totalTeamSize: totalTeamSize + directReferralsCount,
+        totalTeamSize: totalTeamSize,
         levelBreakdown: teamOverview
       },
       level: 'overview',
