@@ -4,16 +4,11 @@ import { authOptions } from '../../auth/[...nextauth]/route'
 import prisma from "@/lib/prisma";
 import { serializeBigInt, paisaToRupees } from '@/lib/serialization-utils'
 
-
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions)
-    
     if (!session || !session.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const userId = parseInt(session.user.id)
@@ -22,80 +17,24 @@ export async function GET(request) {
     const page = parseInt(searchParams.get('page')) || 1
     const limit = parseInt(searchParams.get('limit')) || 20
 
-    // Get direct referrals (level 1)
-    if (level === 1 || level === 0) {
-      const directReferrals = await prisma.user.findMany({
-        where: { sponsorId: userId },
-        select: {
-          id: true,
-          fullName: true,
-          mobileNo: true,
-          isActive: true,
-          referralCode: true,
-          createdAt: true,
-          walletBalance: true,
-          monthlyPurchase: true,
-          kycStatus: true,
-          // Get their direct referrals count
-          referrals: {
-            select: { id: true }
-          }
-        },
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit
-      })
+    // 🧠 Step 1: Calculate levelwise team counts
+    const levelCounts = await prisma.hierarchy.groupBy({
+      by: ['depth'],
+      where: { ancestorId: userId },
+      _count: { descendantId: true },
+    })
 
-      // Add debugging
-      console.log('🔍 Querying direct referrals for userId:', userId)
-      
-      const totalDirects = await prisma.user.count({
-        where: { sponsorId: userId }
-      })
-      
-      console.log('✅ Total directs found:', totalDirects)
-
-      const formattedReferrals = directReferrals.map(user => ({
-        id: user.id,
-        fullName: user.fullName,
-        mobileNo: user.mobileNo,
-        isActive: user.isActive,
-        referralCode: user.referralCode,
-        createdAt: user.createdAt,
-        walletBalance: {
-          paisa: user.walletBalance,
-          rupees: paisaToRupees(user.walletBalance)
-        },
-        monthlyPurchase: {
-          paisa: user.monthlyPurchase,
-          rupees: paisaToRupees(user.monthlyPurchase)
-        },
-        kycStatus: user.kycStatus,
-        isKycApproved: user.kycStatus === 'APPROVED',
-        directReferralsCount: user.referrals.length
+    const levelBreakdown = levelCounts
+      .sort((a, b) => a.depth - b.depth)
+      .map(l => ({
+        level: l.depth,
+        totalMembers: l._count.descendantId
       }))
 
-      return NextResponse.json(serializeBigInt({
-        success: true,
-        data: formattedReferrals,
-        pagination: {
-          page,
-          limit,
-          total: totalDirects,
-          totalPages: Math.ceil(totalDirects / limit)
-        },
-        level: 1,
-        title: 'Direct Referrals'
-      }))
-    }
-
-    // Get team members by level (2-7)
-    if (level >= 2 && level <= 7) {
+    // 🧩 Step 2: If level is specified (1–7), fetch team members of that level
+    if (level >= 1 && level <= 7) {
       const teamMembers = await prisma.hierarchy.findMany({
-        where: { 
-          ancestorId: userId,
-          depth: level
-        },
+        where: { ancestorId: userId, depth: level },
         include: {
           descendant: {
             select: {
@@ -110,10 +49,7 @@ export async function GET(request) {
               kycStatus: true,
               sponsorId: true,
               sponsor: {
-                select: {
-                  id: true,
-                  fullName: true
-                }
+                select: { id: true, fullName: true }
               }
             }
           }
@@ -123,12 +59,7 @@ export async function GET(request) {
         take: limit
       })
 
-      const totalAtLevel = await prisma.hierarchy.count({
-        where: { 
-          ancestorId: userId,
-          depth: level
-        }
-      })
+      const totalAtLevel = levelCounts.find(l => l.depth === level)?._count.descendantId || 0
 
       const formattedMembers = teamMembers.map(member => ({
         id: member.descendant.id,
@@ -161,78 +92,264 @@ export async function GET(request) {
           totalPages: Math.ceil(totalAtLevel / limit)
         },
         level,
-        title: `Level ${level} Team`
+        title: `Level ${level} Team`,
+        levelBreakdown
       }))
     }
 
-    // Get team overview using admin panel logic (referrals with purchases)
-    console.log('🔍 Fetching team overview for userId:', userId)
-    
-    // Get direct referrals who made first purchases (Level 1)
-    const directReferralsWithPurchases = await prisma.user.findMany({
-      where: { 
-        sponsorId: userId,
-        purchases: {
-          some: {
-            type: 'first' // Only referrals who made first purchases
-          }
-        }
-      },
-      select: {
-        id: true,
-        isActive: true,
-        purchases: {
-          where: { type: 'first' },
-          select: { id: true }
-        }
-      }
-    })
-
-    console.log(`📊 Direct referrals with purchases: ${directReferralsWithPurchases.length}`)
-
-    // Calculate level 1 stats
-    const level1Total = directReferralsWithPurchases.length
-    const level1Active = directReferralsWithPurchases.filter(user => user.isActive).length
-
-    // For now, only show Level 1 (direct referrals) as other levels need hierarchy data
-    // This matches the working admin panel approach
-    const teamOverview = [
-      {
-        level: 1,
-        totalMembers: level1Total,
-        activeMembers: level1Active,
-        inactiveMembers: level1Total - level1Active
-      },
-      // Levels 2-7 will show 0 until hierarchy is properly populated
-      ...Array.from({length: 6}, (_, i) => ({
-        level: i + 2,
-        totalMembers: 0,
-        activeMembers: 0,
-        inactiveMembers: 0
-      }))
-    ]
-
-    // Total team size is just direct referrals with purchases for now
-    const totalTeamSize = level1Total
+    // 🧩 Step 3: Overview (all levels)
+    const totalTeamSize = levelBreakdown.reduce((sum, l) => sum + l.totalMembers, 0)
 
     return NextResponse.json(serializeBigInt({
       success: true,
       data: {
-        overview: teamOverview,
-        totalTeamSize: totalTeamSize,
-        levelBreakdown: teamOverview
+        totalTeamSize,
+        levelBreakdown
       },
-      level: 'overview',
       title: 'Team Overview'
     }))
-
   } catch (error) {
-    console.error('Error fetching team data:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch team data' },
-      { status: 500 }
-    )
-  } finally {
-    //await prisma.$disconnect()
+    console.error('❌ Error fetching team data:', error)
+    return NextResponse.json({ error: 'Failed to fetch team data' }, { status: 500 })
   }
 }
+
+
+// import { NextResponse } from 'next/server'
+// import { getServerSession } from 'next-auth'
+// import { authOptions } from '../../auth/[...nextauth]/route'
+// import prisma from "@/lib/prisma";
+// import { serializeBigInt, paisaToRupees } from '@/lib/serialization-utils'
+
+
+// export async function GET(request) {
+//   try {
+//     const session = await getServerSession(authOptions)
+    
+//     if (!session || !session.user?.id) {
+//       return NextResponse.json(
+//         { error: 'Unauthorized' },
+//         { status: 401 }
+//       )
+//     }
+
+//     const userId = parseInt(session.user.id)
+//     const { searchParams } = new URL(request.url)
+//     const level = parseInt(searchParams.get('level')) || 0
+//     const page = parseInt(searchParams.get('page')) || 1
+//     const limit = parseInt(searchParams.get('limit')) || 20
+
+//     // Get direct referrals (level 1)
+//     if (level === 1 || level === 0) {
+//       const directReferrals = await prisma.user.findMany({
+//         where: { sponsorId: userId },
+//         select: {
+//           id: true,
+//           fullName: true,
+//           mobileNo: true,
+//           isActive: true,
+//           referralCode: true,
+//           createdAt: true,
+//           walletBalance: true,
+//           monthlyPurchase: true,
+//           kycStatus: true,
+//           // Get their direct referrals count
+//           referrals: {
+//             select: { id: true }
+//           }
+//         },
+//         orderBy: { createdAt: 'desc' },
+//         skip: (page - 1) * limit,
+//         take: limit
+//       })
+
+//       // Add debugging
+//       console.log('🔍 Querying direct referrals for userId:', userId)
+      
+//       const totalDirects = await prisma.user.count({
+//         where: { sponsorId: userId }
+//       })
+      
+//       console.log('✅ Total directs found:', totalDirects)
+
+//       const formattedReferrals = directReferrals.map(user => ({
+//         id: user.id,
+//         fullName: user.fullName,
+//         mobileNo: user.mobileNo,
+//         isActive: user.isActive,
+//         referralCode: user.referralCode,
+//         createdAt: user.createdAt,
+//         walletBalance: {
+//           paisa: user.walletBalance,
+//           rupees: paisaToRupees(user.walletBalance)
+//         },
+//         monthlyPurchase: {
+//           paisa: user.monthlyPurchase,
+//           rupees: paisaToRupees(user.monthlyPurchase)
+//         },
+//         kycStatus: user.kycStatus,
+//         isKycApproved: user.kycStatus === 'APPROVED',
+//         directReferralsCount: user.referrals.length
+//       }))
+
+//       return NextResponse.json(serializeBigInt({
+//         success: true,
+//         data: formattedReferrals,
+//         pagination: {
+//           page,
+//           limit,
+//           total: totalDirects,
+//           totalPages: Math.ceil(totalDirects / limit)
+//         },
+//         level: 1,
+//         title: 'Direct Referrals'
+//       }))
+//     }
+
+//     // Get team members by level (2-7)
+//     if (level >= 2 && level <= 7) {
+//       const teamMembers = await prisma.hierarchy.findMany({
+//         where: { 
+//           ancestorId: userId,
+//           depth: level
+//         },
+//         include: {
+//           descendant: {
+//             select: {
+//               id: true,
+//               fullName: true,
+//               mobileNo: true,
+//               isActive: true,
+//               referralCode: true,
+//               createdAt: true,
+//               walletBalance: true,
+//               monthlyPurchase: true,
+//               kycStatus: true,
+//               sponsorId: true,
+//               sponsor: {
+//                 select: {
+//                   id: true,
+//                   fullName: true
+//                 }
+//               }
+//             }
+//           }
+//         },
+//         orderBy: { descendant: { createdAt: 'desc' } },
+//         skip: (page - 1) * limit,
+//         take: limit
+//       })
+
+//       const totalAtLevel = await prisma.hierarchy.count({
+//         where: { 
+//           ancestorId: userId,
+//           depth: level
+//         }
+//       })
+
+//       const formattedMembers = teamMembers.map(member => ({
+//         id: member.descendant.id,
+//         fullName: member.descendant.fullName,
+//         mobileNo: member.descendant.mobileNo,
+//         isActive: member.descendant.isActive,
+//         referralCode: member.descendant.referralCode,
+//         createdAt: member.descendant.createdAt,
+//         walletBalance: {
+//           paisa: member.descendant.walletBalance,
+//           rupees: paisaToRupees(member.descendant.walletBalance)
+//         },
+//         monthlyPurchase: {
+//           paisa: member.descendant.monthlyPurchase,
+//           rupees: paisaToRupees(member.descendant.monthlyPurchase)
+//         },
+//         kycStatus: member.descendant.kycStatus,
+//         isKycApproved: member.descendant.kycStatus === 'APPROVED',
+//         sponsor: member.descendant.sponsor,
+//         depth: member.depth
+//       }))
+
+//       return NextResponse.json(serializeBigInt({
+//         success: true,
+//         data: formattedMembers,
+//         pagination: {
+//           page,
+//           limit,
+//           total: totalAtLevel,
+//           totalPages: Math.ceil(totalAtLevel / limit)
+//         },
+//         level,
+//         title: `Level ${level} Team`
+//       }))
+//     }
+
+//     // Get team overview using admin panel logic (referrals with purchases)
+//     console.log('🔍 Fetching team overview for userId:', userId)
+    
+//     // Get direct referrals who made first purchases (Level 1)
+//     const directReferralsWithPurchases = await prisma.user.findMany({
+//       where: { 
+//         sponsorId: userId,
+//         purchases: {
+//           some: {
+//             type: 'first' // Only referrals who made first purchases
+//           }
+//         }
+//       },
+//       select: {
+//         id: true,
+//         isActive: true,
+//         purchases: {
+//           where: { type: 'first' },
+//           select: { id: true }
+//         }
+//       }
+//     })
+
+//     console.log(`📊 Direct referrals with purchases: ${directReferralsWithPurchases.length}`)
+
+//     // Calculate level 1 stats
+//     const level1Total = directReferralsWithPurchases.length
+//     const level1Active = directReferralsWithPurchases.filter(user => user.isActive).length
+
+//     // For now, only show Level 1 (direct referrals) as other levels need hierarchy data
+//     // This matches the working admin panel approach
+//     const teamOverview = [
+//       {
+//         level: 1,
+//         totalMembers: level1Total,
+//         activeMembers: level1Active,
+//         inactiveMembers: level1Total - level1Active
+//       },
+//       // Levels 2-7 will show 0 until hierarchy is properly populated
+//       ...Array.from({length: 6}, (_, i) => ({
+//         level: i + 2,
+//         totalMembers: 0,
+//         activeMembers: 0,
+//         inactiveMembers: 0
+//       }))
+//     ]
+
+//     // Total team size is just direct referrals with purchases for now
+//     const totalTeamSize = level1Total
+
+//     return NextResponse.json(serializeBigInt({
+//       success: true,
+//       data: {
+//         overview: teamOverview,
+//         totalTeamSize: totalTeamSize,
+//         levelBreakdown: teamOverview
+//       },
+//       level: 'overview',
+//       title: 'Team Overview'
+//     }))
+
+//   } catch (error) {
+//     console.error('Error fetching team data:', error)
+//     return NextResponse.json(
+//       { error: 'Failed to fetch team data' },
+//       { status: 500 }
+//     )
+//   } finally {
+//     //await prisma.$disconnect()
+//   }
+// }
