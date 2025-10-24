@@ -139,7 +139,7 @@ const contactMethods = [
     icon: <FaPhone className="text-blue-500" />,
     title: 'Phone Support',
     description: 'Call us for immediate assistance',
-    contact: '+91 123456789',
+    contact: '+91 93261 52855',
     availability: 'Mon-Sat, 9 AM - 7 PM'
   },
   {

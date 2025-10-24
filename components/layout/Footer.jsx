@@ -72,11 +72,11 @@ function Footer() {
                 </div>
                 <div className="contact-item flex items-start mb-3">
                   <i className="bi bi-telephone text-xl mr-2"></i>
-                  <span className="text-sm">+91 123456789</span>
+                  <span className="text-sm">+91 93261 52855</span>
                 </div>
                 <div className="contact-item flex items-start">
                   <i className="bi bi-envelope text-xl mr-2"></i>
-                  <span className="text-sm">admin@wearearn.com</span>
+                  <span className="text-sm">bhushanjadhav1409175@gmail.com</span>
                 </div>
               </div>
             </div>

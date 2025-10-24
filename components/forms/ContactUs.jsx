@@ -77,7 +77,7 @@ function ContactUs() {
               <h3 className="text-xl font-semibold mt-3 text-[#f0a019] dark:text-amber-400">
                 Call Us
               </h3>
-              <p className="mt-2 text-gray-700 dark:text-gray-300">+91 123456789</p>
+              <p className="mt-2 text-gray-700 dark:text-gray-300">+91 93261 52855</p>
             </div>
             {/* End Call Us Section */}
 
@@ -89,7 +89,7 @@ function ContactUs() {
               <h3 className="text-xl font-semibold mt-3 text-[#f0a019] dark:text-amber-400">
                 Email Us
               </h3>
-              <p className="mt-2 text-gray-700 dark:text-gray-300">admin@wearearn.com</p>
+              <p className="mt-2 text-gray-700 dark:text-gray-300">bhushanjadhav1409175@gmail.com</p>
             </div>
             {/* End Email Us Section */}
           </div>
