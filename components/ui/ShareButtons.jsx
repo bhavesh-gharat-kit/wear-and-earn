@@ -152,40 +152,6 @@ const ShareButtons = ({
           <span className="font-medium">WhatsApp</span>
         </button>
 
-        {/* Email Share */}
-        <button
-          onClick={handleEmailShare}
-          className={`
-            ${getSizeClasses()}
-            bg-blue-500 hover:bg-blue-600 text-white rounded-lg
-            flex items-center justify-center gap-2 transition-all duration-200
-            transform hover:scale-105 active:scale-95
-            focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50
-            shadow-md hover:shadow-lg
-          `}
-          title="Share via Email"
-        >
-          <Mail className={getIconSize()} />
-          <span className="font-medium">Email</span>
-        </button>
-
-        {/* SMS Share */}
-        <button
-          onClick={handleSMSShare}
-          className={`
-            ${getSizeClasses()}
-            bg-purple-500 hover:bg-purple-600 text-white rounded-lg
-            flex items-center justify-center gap-2 transition-all duration-200
-            transform hover:scale-105 active:scale-95
-            focus:outline-none focus:ring-2 focus:ring-purple-300 focus:ring-opacity-50
-            shadow-md hover:shadow-lg
-          `}
-          title="Share via SMS"
-        >
-          <MessageSquare className={getIconSize()} />
-          <span className="font-medium">SMS</span>
-        </button>
-
         {/* Native Share (if supported) */}
         {navigator?.share && (
           <button

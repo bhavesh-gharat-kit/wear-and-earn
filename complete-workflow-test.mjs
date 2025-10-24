@@ -57,7 +57,7 @@ async function testCompleteWorkflow() {
         status: 'requested',
         requestedAt: new Date(),
         bankDetails: JSON.stringify({
-          accountNumber: '1234567890',
+          accountNumber: '93261 528550',
           ifscCode: 'ABCD0001234',
           bankName: 'Test Bank',
           accountHolderName: testUser.fullName

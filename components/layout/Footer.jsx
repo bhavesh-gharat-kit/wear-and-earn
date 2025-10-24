@@ -51,9 +51,7 @@ function Footer() {
                 wearandearn
               </a>
               <p className="mt-4 text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
-                quasi ipsam ducimus eligendi! Id laudantium aspernatur a. Minus
-                possimus reiciendis, vel blanditiis aut est dignissimos!
+                Join Wear & Earn – shop stylish garments & jewellery, share with others, and earn rewards through our company!
               </p>
               <p className="text-sm">Experience the Beauty of Indian Style</p>
             </div>
@@ -65,18 +63,16 @@ function Footer() {
                 <div className="contact-item flex items-start mb-3">
                   <i className="bi bi-geo-alt text-xl mr-2"></i>
                   <span className="text-sm">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Nullam in nibh vehicula, facilisis magna ut, consectetur
-                    lorem.
+                    Shop No 3, Near Shivdarshan Society, Mohili Village, Saki Naka, Mumbai - 72
                   </span>
                 </div>
                 <div className="contact-item flex items-start mb-3">
                   <i className="bi bi-telephone text-xl mr-2"></i>
-                  <span className="text-sm">+91 123456789</span>
+                  <span className="text-sm">+91 93261 52855</span>
                 </div>
                 <div className="contact-item flex items-start">
                   <i className="bi bi-envelope text-xl mr-2"></i>
-                  <span className="text-sm">admin@wearearn.com</span>
+                  <span className="text-sm">bhushanjadhav1409175@gmail.com</span>
                 </div>
               </div>
             </div>

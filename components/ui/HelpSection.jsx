@@ -13,7 +13,7 @@ export default function HelpSection() {
             </div>
             <div className="md:w-1/3 text-center">
               <a
-                href="tel:+91123456789"
+                href="tel:+9193261 52855"
                 className="inline-block bg-yellow-600 dark:bg-yellow-500 hover:bg-yellow-500 dark:hover:bg-yellow-400 text-white font-semibold text-lg py-3 px-6 rounded-full transition-colors"
               >
                 Call Us Now

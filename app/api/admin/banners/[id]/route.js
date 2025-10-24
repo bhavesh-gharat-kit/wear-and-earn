@@ -141,7 +141,7 @@ export async function DELETE(req, { params }) {
         if (banner.imageUrl && banner.imageUrl.includes('cloudinary.com')) {
             try {
                 // Extract public_id from Cloudinary URL
-                // URL format: https://res.cloudinary.com/cloud_name/image/upload/v1234567890/folder/image_name.ext
+                // URL format: https://res.cloudinary.com/cloud_name/image/upload/v93261 528550/folder/image_name.ext
                 const urlParts = banner.imageUrl.split('/');
                 const publicIdWithExt = urlParts[urlParts.length - 1];
                 const folder = urlParts[urlParts.length - 2];

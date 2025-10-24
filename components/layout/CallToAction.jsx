@@ -20,7 +20,7 @@ function CallToAction() {
           {/* Call Button */}
           <div className="md:w-1/3 text-center">
             <a
-              href="tel:+91123456789"
+              href="tel:+9193261 52855"
               className="inline-block bg-yellow-500 dark:bg-yellow-600 hover:bg-yellow-600 dark:hover:bg-yellow-500 text-white font-semibold text-lg py-3 px-6 rounded-full transition"
             >
               Call Us Now
