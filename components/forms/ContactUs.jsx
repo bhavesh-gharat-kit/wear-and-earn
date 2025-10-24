@@ -63,8 +63,7 @@ function ContactUs() {
                 Address
               </h3>
               <p className="mt-2 text-gray-700 dark:text-gray-300">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-                in nibh vehicula, facilisis magna ut, consectetur lorem.
+                Shop No 3, Near Shivdarshan Society, Mohili Village, Saki Naka, Mumbai - 72
               </p>
             </div>
             {/* End Address Section */}
@@ -100,7 +99,7 @@ function ContactUs() {
             <div>
               <iframe
                 className="w-full h-96 rounded-lg hover:scale-105 transition-transform duration-300 border dark:border-gray-700"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1883.3974305750978!2d72.8534700983948!3d19.24777010000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b0e13820c495%3A0xc387b3379071e7f6!2sVini%20Gardens%20CHSL%2C%20Bldg%201%2C%20A%20Wing!5e0!3m2!1sen!2sin!4v1749626080278!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!3m2!1sen!2sin!4v1761301729825!5m2!1sen!2sin!6m8!1m7!1sfbA53HFNWnaO-iFHc0WfHw!2m2!1d19.09892772537482!2d72.89240922629958!3f65.93968892873832!4f0!5f0.7820865974627469"
                 frameBorder="0"
                 style={{ border: "0" }}
                 allowFullScreen=""
