@@ -9,12 +9,31 @@ export async function GET(request) {
         const { searchParams } = new URL(request.url);
         const limit = parseInt(searchParams.get("limit")) || 10;
         const skip = parseInt(searchParams.get("skip")) || 0;
+        const searchTerm = searchParams.get("searchTerm") || "";
 
-        const totalCount = await prisma.user.count()
+        const where = searchTerm
+            ? {
+                OR: [
+                    { fullName: { contains: searchTerm } },
+                    { email: { contains: searchTerm } },
+                    { mobileNo: { contains: searchTerm } },
+                ],
+            }
+            : {};
+
+        const totalCount = await prisma.user.count({where})
 
         const users = await prisma.user.findMany({
             skip,
             take: limit,
+            where,
+            select: {
+                id: true,
+                fullName: true,
+                email: true,
+                mobileNo: true,
+                createdAt: true
+            },
             orderBy: {
                 createdAt: "desc" // latest first
             }

@@ -407,7 +407,7 @@ export default function UserDetailsPage() {
                       <div>
                         <p className="text-sm font-medium text-green-600 dark:text-green-400">Total Balance</p>
                         <p className="text-2xl font-bold text-green-700 dark:text-green-300">
-                          {showWalletDetails ? formatCurrency(userDetails.walletBalance || 0) : '****'}
+                          {showWalletDetails ? formatCurrency((userDetails.walletBalance || 0)/100) : '****'}
                         </p>
                       </div>
                       <DollarSign className="w-8 h-8 text-green-600 dark:text-green-400" />

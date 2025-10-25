@@ -818,48 +818,6 @@ const MyTeamSection = ({ userData }) => {
   return (
     <div className="space-y-6">
       <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">My Team</h2>
-      
-      {/* Current Level Card */}
-      <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-800 p-3 sm:p-6 rounded-lg">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex-1">
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-1">Current Level</p>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{getCurrentLevelDisplay()}</p>
-          </div>
-          <Users className="w-8 h-8 sm:w-10 sm:h-10 text-purple-500 dark:text-purple-400 flex-shrink-0" />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="bg-white dark:bg-gray-700 p-3 rounded-lg">
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">{currentTeams}</p>
-            <p className="text-xs text-gray-600 dark:text-gray-300">Total Teams</p>
-          </div>
-          <div className="bg-white dark:bg-gray-700 p-3 rounded-lg">
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">
-              {nextLevel.next === 'MAX LEVEL' ? 'MAX' : nextLevel.teams}
-            </p>
-            <p className="text-xs text-gray-600 dark:text-gray-300">
-              {nextLevel.next === 'MAX LEVEL' ? 'Achieved' : `For ${nextLevel.nextShort || nextLevel.next}`}
-            </p>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        {nextLevel.next !== 'MAX LEVEL' && (
-          <div className="mt-4">
-            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
-              <span>Progress to {nextLevel.nextShort || nextLevel.next}</span>
-              <span>{Math.min(currentTeams, nextLevel.teams)}/{nextLevel.teams}</span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-              <div 
-                className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${Math.min((currentTeams / nextLevel.teams) * 100, 100)}%` }}
-              ></div>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Team Overview */}
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
@@ -868,7 +826,7 @@ const MyTeamSection = ({ userData }) => {
         {teamData?.overview && teamData.overview.length > 0 ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {teamData.overview.slice(0, 4).map((levelData) => (
+              {teamData.overview.slice(0, 5).map((levelData) => (
                 <div key={levelData.level} className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Level {levelData.level}</p>
                   <p className="text-xl font-bold text-gray-900 dark:text-white">{levelData.totalMembers}</p>
