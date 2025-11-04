@@ -125,15 +125,113 @@ function AboutUsPage() {
               <div className="flex-1">
                 <h3 className="text-2xl font-bold text-purple-700 dark:text-yellow-400 mb-4">Why Choose Us?</h3>
                 <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-200">
-                  <li>25+ years of experience in the garment and networking industry</li>
                   <li>Commitment to quality, comfort, and sustainable practices</li>
                   <li>Modern, stylish, and affordable collections for every occasion</li>
                   <li>Trusted by thousands of happy customers</li>
                   <li>Personalized service and a passion for customer satisfaction</li>
+                  <li>Officially registered with GST Number: 27AKTPJ8749E1ZI</li>
+                  <li>UDYAM Registration: UDYAM-MH-18-0457476 (Micro Enterprise)</li>
+                  <li>Registered for manufacturing of wearing apparel and textile accessories</li>
                 </ul>
               </div>
               {/* Logo removed as requested */}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Company Credentials Section */}
+      <section className="py-12 bg-white dark:bg-gray-800 w-full px-4 sm:px-6 lg:px-8">
+        <div className="w-full">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              Official Registrations & Credentials
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              Trusted, verified, and officially recognized business
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-700 dark:to-gray-600 p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-semibold text-indigo-700 dark:text-indigo-300 mb-4">
+                🏢 Business Registration
+              </h3>
+              <div className="space-y-3 text-gray-700 dark:text-gray-200">
+                <div>
+                  <span className="font-medium">Legal Name:</span> BHUSHAN SAKHARAM JADHAV
+                </div>
+                <div>
+                  <span className="font-medium">Trade Name:</span> WEAR AND EARN
+                </div>
+                <div>
+                  <span className="font-medium">Business Type:</span> Micro Enterprise
+                </div>
+                <div>
+                  <span className="font-medium">Incorporated:</span> 01/07/2025
+                </div>
+              </div>
+            </div> */}
+
+            <div className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-700 dark:to-gray-600 p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4">
+                📋 Official Numbers
+              </h3>
+              <div className="space-y-3 text-gray-700 dark:text-gray-200">
+                <div>
+                  <span className="font-medium">UDYAM Registration:</span>
+                  <br />UDYAM-MH-18-0457476
+                </div>
+                <div>
+                  <span className="font-medium">GST Number:</span>
+                  <br />27AKTPJ8749E1ZI
+                </div>
+                <div>
+                  <span className="font-medium">Classification:</span> NIC Code 14101
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-violet-100 dark:from-gray-700 dark:to-gray-600 p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-semibold text-purple-700 dark:text-purple-300 mb-4">
+                🏭 Manufacturing License
+              </h3>
+              <div className="space-y-3 text-gray-700 dark:text-gray-200">
+                <div>
+                  <span className="font-medium">Primary Activity:</span> Manufacturing
+                </div>
+                <div>
+                  <span className="font-medium">Specialization:</span>
+                  <br />• Wearing Apparel Manufacturing
+                  <br />• Textile Garments & Accessories
+                </div>
+                
+              </div>
+            </div>
+
+            {/* <div className="bg-gradient-to-br from-orange-50 to-amber-100 dark:from-gray-700 dark:to-gray-600 p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-semibold text-amber-700 dark:text-amber-300 mb-4">
+                📍 Registered Address
+              </h3>
+              <div className="space-y-3 text-gray-700 dark:text-gray-200">
+                <div>
+                  <span className="font-medium">Location:</span>
+                  <br />Shop No.1, NR Shiv Darshan Society
+                  <br />Sakinaka, Andheri East
+                  <br />Mumbai, Maharashtra - 400072
+                </div>
+                <div>
+                  <span className="font-medium">State:</span> Maharashtra
+                </div>
+              </div>
+            </div> */}
+          </div>
+
+          <div className="text-center mt-8">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              All registrations are verified and up-to-date as of 2025. 
+              We maintain full compliance with Indian business regulations.
+            </p>
           </div>
         </div>
       </section>
