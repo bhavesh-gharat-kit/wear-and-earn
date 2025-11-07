@@ -58,7 +58,7 @@ export default function ProductSlider({ title = "Top Trending", showModal, setSh
           delay: 3500,
           disableOnInteraction: false
         }}
-        loop={true}
+        loop={productList && productList.length > 4} // Only enable loop if we have enough slides
         breakpoints={{
         360: {
           slidesPerView: 2.0, // Very small mobile: 2 full cards

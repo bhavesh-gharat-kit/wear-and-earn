@@ -153,26 +153,6 @@ function AboutUsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-700 dark:to-gray-600 p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold text-indigo-700 dark:text-indigo-300 mb-4">
-                🏢 Business Registration
-              </h3>
-              <div className="space-y-3 text-gray-700 dark:text-gray-200">
-                <div>
-                  <span className="font-medium">Legal Name:</span> BHUSHAN SAKHARAM JADHAV
-                </div>
-                <div>
-                  <span className="font-medium">Trade Name:</span> WEAR AND EARN
-                </div>
-                <div>
-                  <span className="font-medium">Business Type:</span> Micro Enterprise
-                </div>
-                <div>
-                  <span className="font-medium">Incorporated:</span> 01/07/2025
-                </div>
-              </div>
-            </div> */}
-
             <div className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-700 dark:to-gray-600 p-6 rounded-lg shadow-lg">
               <h3 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-4">
                 📋 Official Numbers
@@ -192,30 +172,26 @@ function AboutUsPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-50 to-violet-100 dark:from-gray-700 dark:to-gray-600 p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold text-purple-700 dark:text-purple-300 mb-4">
-                🏭 Manufacturing License
+            <div className="bg-gradient-to-br from-indigo-50 to-sky-100 dark:from-gray-700 dark:to-gray-600 p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-semibold text-indigo-700 dark:text-indigo-300 mb-4">
+                🏢 Company Details
               </h3>
               <div className="space-y-3 text-gray-700 dark:text-gray-200">
                 <div>
-                  <span className="font-medium">Primary Activity:</span> Manufacturing
+                  <span className="font-medium">Legal Name:</span> BHUSHAN SAKHARAM JADHAV
                 </div>
                 <div>
-                  <span className="font-medium">Specialization:</span>
-                  <br />• Wearing Apparel Manufacturing
-                  <br />• Textile Garments & Accessories
+                  <span className="font-medium">Trade Name:</span> WEAR AND EARN
                 </div>
-                
-              </div>
-            </div>
-
-            {/* <div className="bg-gradient-to-br from-orange-50 to-amber-100 dark:from-gray-700 dark:to-gray-600 p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold text-amber-700 dark:text-amber-300 mb-4">
-                📍 Registered Address
-              </h3>
-              <div className="space-y-3 text-gray-700 dark:text-gray-200">
                 <div>
-                  <span className="font-medium">Location:</span>
+                  <span className="font-medium">Business Type:</span> Micro Enterprise
+                </div>
+                <div>
+                  <span className="font-medium">Incorporated:</span> 01/07/2025
+                </div>
+                <hr className="my-3 border-gray-200 dark:border-gray-700" />
+                <div>
+                  <span className="font-medium">Registered Address:</span>
                   <br />Shop No.1, NR Shiv Darshan Society
                   <br />Sakinaka, Andheri East
                   <br />Mumbai, Maharashtra - 400072
@@ -224,8 +200,9 @@ function AboutUsPage() {
                   <span className="font-medium">State:</span> Maharashtra
                 </div>
               </div>
-            </div> */}
+            </div>
           </div>
+          
 
           <div className="text-center mt-8">
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -235,7 +212,7 @@ function AboutUsPage() {
           </div>
         </div>
       </section>
-
+    
   <section className="py-8 bg-gray-100 dark:bg-gray-900 w-full px-4 sm:px-6 lg:px-8">
         <div className="w-full text-center aos-init aos-animate">
           <h3 className="h4 text-2xl text-gray-800 dark:text-white font-semibold my-16 max-sm:my-6">

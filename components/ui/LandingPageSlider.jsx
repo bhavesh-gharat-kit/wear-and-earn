@@ -69,7 +69,7 @@ export default function LandingPageSlider() {
       <Swiper
         slidesPerView={1}
         spaceBetween={30}
-        loop={true}
+        loop={allBannersData && allBannersData.length > 1} // Only enable loop if we have more than 1 banner
         pagination={{
           clickable: true,
         }}
