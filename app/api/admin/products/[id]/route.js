@@ -89,6 +89,17 @@ export const DELETE = async (request, { params }) => {
             return res.json({ error: 'Product not found' }, { status: 404 });
         }
 
+        // Check if product is referenced in any orders
+        const orderProductCount = await prisma.orderProduct.count({
+            where: { productId }
+        });
+
+        if (orderProductCount > 0) {
+            return res.json({ 
+                error: 'Cannot delete product as it is referenced in existing orders' 
+            }, { status: 400 });
+        }
+
         // Delete related product images first
         await prisma.productImage.deleteMany({
             where: { productId }
