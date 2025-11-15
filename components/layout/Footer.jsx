@@ -175,7 +175,7 @@ function Footer() {
           <div className="credits text-center md:text-left font-medium">
             <a className="text-sm">Developed by </a>
             <a
-              href="https://kumarinfotech.net/"
+              href="https://kumarinfotech.com/"
               className="text-sm hover:text-orange-500 dark:hover:text-yellow-400"
             >
               kumarinfotech
