@@ -54,7 +54,7 @@ function ProductCard({ product, variant = "default", setShowModal }) {
     if (!loggedInUserId) {
       toast.error("Please Login First", { duration: 1000 });
       setTimeout(() => {
-        router.push("/login-register");
+        router.push("/login");
       }, 1200);
       return;
     }

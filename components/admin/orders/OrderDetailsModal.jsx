@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { FaTimes, FaUser, FaMapMarkerAlt, FaBox, FaRupeeSign, FaCalendarAlt, FaPhone, FaEnvelope } from "react-icons/fa";
+import { FaTimes, FaUser, FaMapMarkerAlt, FaBox, FaRupeeSign, FaCalendarAlt, FaPhone, FaEnvelope, FaDownload } from "react-icons/fa";
 import moment from "moment";
+import jsPDF from "jspdf";
 
 const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
   if (!isOpen || !order) return null;
@@ -11,6 +12,165 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
     if (onStatusUpdate) {
       onStatusUpdate(order.id, newStatus);
     }
+  };
+
+  const handleDownloadLabel = () => {
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 15;
+    let yPos = 20;
+
+    // Header
+    doc.setFillColor(59, 130, 246); // Blue background
+    doc.rect(0, 0, pageWidth, 30, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont(undefined, 'bold');
+    doc.text('DELIVERY LABEL', pageWidth / 2, 15, { align: 'center' });
+    
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Order #${order.id}`, pageWidth / 2, 23, { align: 'center' });
+
+    yPos = 40;
+    doc.setTextColor(0, 0, 0);
+
+    // Order Date
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Order Date: ${moment(order.createdAt).format('DD MMM YYYY, hh:mm A')}`, margin, yPos);
+    yPos += 10;
+
+    // Divider
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 10;
+
+    // SHIP TO Section
+    doc.setFillColor(240, 240, 240);
+    doc.rect(margin, yPos, pageWidth - 2 * margin, 10, 'F');
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('SHIP TO:', margin + 5, yPos + 7);
+    yPos += 15;
+
+    // Customer Information
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text(order.user?.fullName || 'N/A', margin, yPos);
+    yPos += 7;
+
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    if (order.user?.mobileNo) {
+      doc.text(`Phone: ${order.user.mobileNo}`, margin, yPos);
+      yPos += 6;
+    }
+    if (order.user?.email) {
+      doc.text(`Email: ${order.user.email}`, margin, yPos);
+      yPos += 6;
+    }
+    yPos += 3;
+
+    // Delivery Address Box
+    doc.setFillColor(255, 252, 240);
+    doc.setDrawColor(251, 191, 36);
+    doc.setLineWidth(0.5);
+    const addressLines = doc.splitTextToSize(order.address || 'No address provided', pageWidth - 2 * margin - 10);
+    const boxHeight = addressLines.length * 6 + 10;
+    doc.rect(margin, yPos, pageWidth - 2 * margin, boxHeight);
+    
+    doc.setFontSize(10);
+    doc.text(addressLines, margin + 5, yPos + 8);
+    yPos += boxHeight + 10;
+
+    // Divider
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 10;
+
+    // ORDER DETAILS Section
+    doc.setFillColor(240, 240, 240);
+    doc.rect(margin, yPos, pageWidth - 2 * margin, 10, 'F');
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('ORDER DETAILS:', margin + 5, yPos + 7);
+    yPos += 15;
+
+    // Order Items
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.text('Sr', margin, yPos);
+    doc.text('Item', margin + 10, yPos);
+    doc.text('Qty', pageWidth - margin - 50, yPos, { align: 'left' });
+    doc.text('Price', pageWidth - margin - 20, yPos, { align: 'right' });
+    yPos += 5;
+
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 7;
+
+    doc.setFont(undefined, 'normal');
+    order.orderProducts?.forEach((product, index) => {
+      doc.text(String(index + 1), margin, yPos);
+      const itemName = doc.splitTextToSize(product.title, pageWidth - margin - 90);
+      doc.text(itemName, margin + 10, yPos);
+      doc.text(String(product.quantity), pageWidth - margin - 50, yPos);
+      doc.text(`Rs. ${product.totalPrice.toFixed(2)}`, pageWidth - margin - 20, yPos, { align: 'right' });
+      yPos += Math.max(itemName.length * 5, 7);
+    });
+
+    yPos += 5;
+    doc.setLineWidth(0.8);
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 7;
+
+    // Order Summary
+    doc.setFont(undefined, 'normal');
+    const subtotal = (order.total || 0) - (order.deliveryCharges || 0) - (order.gstAmount || 0);
+    
+    doc.text('Subtotal:', pageWidth - margin - 55, yPos);
+    doc.text(`Rs. ${subtotal.toFixed(2)}`, pageWidth - margin - 20, yPos, { align: 'right' });
+    yPos += 6;
+
+    doc.text('Delivery:', pageWidth - margin - 55, yPos);
+    doc.text(`Rs. ${(order.deliveryCharges || 0).toFixed(2)}`, pageWidth - margin - 20, yPos, { align: 'right' });
+    yPos += 6;
+
+    doc.text('GST:', pageWidth - margin - 55, yPos);
+    doc.text(`Rs. ${(order.gstAmount || 0).toFixed(2)}`, pageWidth - margin - 20, yPos, { align: 'right' });
+    yPos += 8;
+
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(12);
+    doc.text('TOTAL:', pageWidth - margin - 60, yPos);
+    doc.text(`Rs. ${(order.total || 0).toFixed(2)}`, pageWidth - margin - 20, yPos, { align: 'right' });
+    yPos += 10;
+
+    // Payment Info
+    if (order.paymentId) {
+      yPos += 5;
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Payment ID: ${order.paymentId}`, margin, yPos);
+    }
+
+    // Footer
+    const footerY = doc.internal.pageSize.getHeight() - 20;
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, footerY, pageWidth - margin, footerY);
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Thank you for your order!', pageWidth / 2, footerY + 5, { align: 'center' });
+    doc.text(`Status: ${order.status.toUpperCase()} | Generated: ${moment().format('DD MMM YYYY, HH:mm')}`, pageWidth / 2, footerY + 10, { align: 'center' });
+
+    // Save the PDF
+    doc.save(`Order_Label_${order.id}.pdf`);
   };
 
   const getStatusBadge = (status) => {
@@ -268,7 +428,14 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
 
         {/* Footer */}
         <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t border-gray-200 dark:border-gray-600">
-          <div className="flex justify-end">
+          <div className="flex justify-between items-center">
+            <button
+              onClick={handleDownloadLabel}
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center space-x-2"
+            >
+              <FaDownload />
+              <span>Download Label</span>
+            </button>
             <button
               onClick={onClose}
               className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"

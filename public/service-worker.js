@@ -22,7 +22,7 @@ const DYNAMIC_ROUTES = [
   '/products',
   '/about-us',
   '/contact-us',
-  '/login-register',
+  '/login',
   '/account',
   '/cart',
 ];

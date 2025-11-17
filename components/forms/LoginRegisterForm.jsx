@@ -3,9 +3,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Register from './Register';
-import RegisterWithOTP from './RegisterWithOTP';
 import Login from './Login';
+import RegisterWithOTP from './RegisterWithOTP';
 
 function LoginRegisterForm() {
   const searchParams = useSearchParams();

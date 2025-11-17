@@ -87,7 +87,7 @@ function CartPage() {
     return (
       <div className="text-center py-10">
         <h1 className="text-2xl font-bold mb-4">Please Login to View Cart</h1>
-        <a href="/login-register" className="btn btn-primary">Login</a>
+        <a href="/login" className="btn btn-primary">Login</a>
       </div>
     );
   }

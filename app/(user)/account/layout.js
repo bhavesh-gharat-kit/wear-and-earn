@@ -73,7 +73,7 @@ export default function AccountLayout({ children }) {
     await signOut({ redirect: false });
     toast.success("Logged out successfully", { duration: 1000 });
     setTimeout(() => {
-      router.push("/login-register");
+      router.push("/login");
     }, 1200);
   };
 

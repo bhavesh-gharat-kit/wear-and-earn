@@ -948,7 +948,7 @@ const AccountDashboard = () => {
           isActive: !!user.isActive,
           // Referral basics
           referralCode: user.referralCode || null,
-          referralLink: user.referralLink || (user.id ? `${origin}/login-register?spid=${user.id}` : null),
+          referralLink: user.referralLink || (user.id ? `${origin}/login?spid=${user.id}` : null),
           // Wallet summary (amounts in paisa as per UI usage)
           walletBalance: wallet?.balance?.paisa ?? 0,
           totalEarnings: wallet?.totalEarned?.paisa ?? 0,
@@ -1118,7 +1118,7 @@ const AccountDashboard = () => {
   }
 
   const copyReferralLink = () => {
-    const link = mlmData?.referralLink || (mlmData?.referralCode ? `${window.location.origin}/login-register?spid=${mlmData.referralCode}` : null)
+    const link = mlmData?.referralLink || (mlmData?.referralCode ? `${window.location.origin}/login?spid=${mlmData.referralCode}` : null)
     if (link) {
       navigator.clipboard.writeText(link)
       alert('Referral link copied to clipboard!')
@@ -1865,7 +1865,7 @@ const AccountDashboard = () => {
               <div className="flex items-center space-x-3">
                 <input
                   type="text"
-                  value={mlmData?.referralCode ? `${typeof window !== 'undefined' ? window.location.origin : ''}/login-register?spid=${mlmData.referralCode}` : 'Loading...'}
+                  value={mlmData?.referralCode ? `${typeof window !== 'undefined' ? window.location.origin : ''}/login?spid=${mlmData.referralCode}` : 'Loading...'}
                   readOnly
                   className="flex-1 bg-transparent text-sm text-gray-700 dark:text-gray-300 font-medium"
                 />
@@ -2508,7 +2508,7 @@ const AccountDashboard = () => {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Please Login</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-6">You need to be logged in to access your account dashboard.</p>
           <a 
-            href="/login-register" 
+            href="/login" 
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
           >
             Go to Login

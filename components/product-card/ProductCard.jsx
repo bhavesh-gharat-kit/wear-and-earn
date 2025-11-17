@@ -52,7 +52,7 @@ function ProductCard({ product, variant = "grid", compact = false }) {
     if (!loggedInUserId) {
       toast.error("Please Login First");
       setTimeout(() => {
-        router.push("/login-register");
+        router.push("/login");
       }, 1200);
       return;
     }

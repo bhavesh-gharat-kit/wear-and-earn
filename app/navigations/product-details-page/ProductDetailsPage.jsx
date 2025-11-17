@@ -85,7 +85,7 @@ function ProductDetailsPage({ id }) {
     if (!loggedInUserId) {
       toast.error("Please Login First", { duration: 1000 });
       setTimeout(() => {
-        router.push("/login-register");
+        router.push("/login");
       }, 1200);
       return;
     }
@@ -117,7 +117,7 @@ function ProductDetailsPage({ id }) {
     if (!loggedInUserId) {
       toast.error("Please Login First", { duration: 1000 });
       setTimeout(() => {
-        router.push("/login-register");
+        router.push("/login");
       }, 1200);
       return;
     }

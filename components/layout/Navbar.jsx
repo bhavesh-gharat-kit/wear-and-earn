@@ -235,7 +235,7 @@ function Navbar() {
                           <span>Loading...</span>
                         </div>
                       ) : !id ? (
-                        <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                        <Link href={"/login"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
                           <i className="text-lg">
                             <FiUser />
                           </i>
@@ -259,7 +259,7 @@ function Navbar() {
                           <span>Loading...</span>
                         </div>
                       ) : !id ? (
-                        <Link href={"/login-register"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                        <Link href={"/login"} className="flex items-center gap-3 py-3 px-2 text-base hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
                           <i className="text-lg">
                             <FaUserPlus />
                           </i>

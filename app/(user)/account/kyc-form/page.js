@@ -71,7 +71,7 @@ export default function KYCForm() {
   }
 
   if (!session) {
-    router.push('/login-register')
+    router.push('/login')
     return null
   }
 

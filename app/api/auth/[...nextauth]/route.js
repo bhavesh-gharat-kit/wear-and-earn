@@ -103,7 +103,7 @@ export const authOptions = {
 
   pages: {
     signIn: "/login", // custom login page for regular users
-    error: "/login-register", // redirect auth errors to login page
+    error: "/login", // redirect auth errors to login page
   },
 
   callbacks: {

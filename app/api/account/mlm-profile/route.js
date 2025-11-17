@@ -156,7 +156,7 @@ export async function GET(req) {
         fullName: user.fullName,
         isActive: user.isActive,
         referralCode: user.referralCode,
-  referralLink: (user.referralCode && origin) ? `${origin}/login-register?spid=${user.id}` : null,
+  referralLink: (user.referralCode && origin) ? `${origin}/login?spid=${user.id}` : null,
         kycStatus: user.kycStatus,
         walletBalance: {
           paisa: user.walletBalance,

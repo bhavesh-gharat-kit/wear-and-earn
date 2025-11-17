@@ -63,7 +63,7 @@ function Navbar() {
     await signOut({ redirect: false });
     toast.success("Log Out Successfully", { duration: 1000 });
     setTimeout(() => {
-      router.push("/login-register");
+      router.push("/login");
     }, 1200);
     location.href = location.href;
   };
@@ -198,7 +198,7 @@ function Navbar() {
                 </div>
                 <li>
                   {!id ? (
-                    <Link href={"/login-register"}>
+                    <Link href={"/login"}>
                       <i>
                         <FiUser />
                       </i>
@@ -215,7 +215,7 @@ function Navbar() {
                 </li>
                 <li>
                   {!id ? (
-                    <Link href={"/login-register"}>
+                    <Link href={"/login"}>
                       <i>
                         <FaUserPlus />
                       </i>

@@ -157,7 +157,7 @@ export default function AccountDashboard() {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Please Login</h2>
           <p className="text-gray-600 mb-6">You need to be logged in to view your account dashboard.</p>
           <Link 
-            href="/login-register" 
+            href="/login" 
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
           >
             Go to Login
