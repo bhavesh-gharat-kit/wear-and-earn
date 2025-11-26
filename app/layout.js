@@ -21,7 +21,7 @@ export const metadata = {
   title: "Wear and Earn - Premium Clothing",
   description: "Shop premium clothing and earn rewards ",
   manifest: "/manifest.json",
-  themeColor: "#ffc107",
+  // themeColor: "#ffc107",
   viewport: {
     width: "device-width",
     initialScale: 1,

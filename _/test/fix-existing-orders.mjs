@@ -80,7 +80,7 @@ async function fixExistingPaidOrders() {
                     };
                     
                     // Import and run MLM processing
-                    const { processPoolMLMOrder } = await import('./lib/pool-mlm-system.js');
+                    const { processPoolMLMOrder } = await import('../../lib/pool-mlm-system.js');
                     const mlmResult = await processPoolMLMOrder(tx, enhancedOrder);
                     
                     console.log(`   ✅ MLM processing completed:`, {

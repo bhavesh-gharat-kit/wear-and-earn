@@ -38,7 +38,7 @@ export const GET = async (request) => {
             });
 
             const totalMLMSales = monthlyResult?._sum?.commissionAmount || 0;
-            const companyEarnings = Math.floor(totalMLMSales * 0.30);
+            const companyEarnings = Math.floor(totalMLMSales * 0.25);
 
             return NextResponse.json({
                 period: {
