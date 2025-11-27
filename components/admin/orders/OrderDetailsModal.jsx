@@ -28,12 +28,12 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
     // Header
     doc.setFillColor(59, 130, 246); // Blue background
     doc.rect(0, 0, pageWidth, 30, 'F');
-    
+
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont(undefined, 'bold');
-    doc.text('DELIVERY LABEL', pageWidth / 2, 15, { align: 'center' });
-    
+    doc.text('WEAR & EARN', pageWidth / 2, 15, { align: 'center' });
+
     doc.setFontSize(12);
     doc.setFont(undefined, 'normal');
     doc.text(`Order #${order.id}`, pageWidth / 2, 23, { align: 'center' });
@@ -85,7 +85,7 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
     const addressLines = doc.splitTextToSize(order.address || 'No address provided', pageWidth - 2 * margin - 10);
     const boxHeight = addressLines.length * 6 + 10;
     doc.rect(margin, yPos, pageWidth - 2 * margin, boxHeight);
-    
+
     doc.setFontSize(10);
     doc.text(addressLines, margin + 5, yPos + 8);
     yPos += boxHeight + 10;
@@ -121,7 +121,7 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
       const itemName = doc.splitTextToSize(product.title, pageWidth - margin - 90);
       doc.text(itemName, margin + 10, yPos);
       doc.text(String(product.quantity), pageWidth - margin - 50, yPos);
-      doc.text(`Rs. ${product.totalPrice.toFixed(2)}`, pageWidth - margin - 20, yPos, { align: 'right' });
+      doc.text(`Rs. ${(product.totalPrice - ((product.totalPrice * product.discount) / 100)).toFixed(2)}`, pageWidth - margin - 20, yPos, { align: 'right' });
       yPos += Math.max(itemName.length * 5, 7);
     });
 
@@ -133,7 +133,7 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
     // Order Summary
     doc.setFont(undefined, 'normal');
     const subtotal = (order.total || 0) - (order.deliveryCharges || 0) - (order.gstAmount || 0);
-    
+
     doc.text('Subtotal:', pageWidth - margin - 55, yPos);
     doc.text(`Rs. ${subtotal.toFixed(2)}`, pageWidth - margin - 20, yPos, { align: 'right' });
     yPos += 6;
@@ -179,7 +179,7 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
       'inProcess': 'bg-blue-100 text-blue-800 border-blue-200',
       'delivered': 'bg-green-100 text-green-800 border-green-200'
     };
-    
+
     return (
       <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${statusStyles[status] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
         {status?.charAt(0).toUpperCase() + status?.slice(1)}
@@ -358,17 +358,17 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
                         </div>
                         <div>
                           <span className="text-gray-600 dark:text-gray-400">Total:</span>
-                          <p className="font-bold text-blue-600 dark:text-blue-400">₹{(product.totalPrice || 0).toFixed(2)}</p>
+                          <p className="font-bold text-blue-600 dark:text-blue-400">₹{(product.totalPrice - ((product.totalPrice * product.discount) / 100) || 0).toFixed(2)}</p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               )) || (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                  No items found for this order
-                </p>
-              )}
+                  <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                    No items found for this order
+                  </p>
+                )}
             </div>
           </div>
 

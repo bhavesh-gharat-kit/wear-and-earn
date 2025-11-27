@@ -224,7 +224,7 @@ function AdminDashBoard() {
                       ₹{companyEarnings.totalEarningsRupees?.toLocaleString('en-IN') || '0'}
                     </p>
                     <p className="text-green-100 text-sm mt-1">
-                      30% commission from delivered MLM orders
+                      25% commission from delivered MLM orders
                     </p>
                   </div>
                   <div className="text-right">
