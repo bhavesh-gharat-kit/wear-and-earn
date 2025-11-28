@@ -40,8 +40,8 @@ const DashboardDemo = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">MLM Dashboard Components</h1>
-          <p className="text-gray-600">Interactive components for MLM user dashboard</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Bonus Dashboard Components</h1>
+          <p className="text-gray-600">Interactive components for Bonus user dashboard</p>
         </div>
 
         {/* Component Selector */}

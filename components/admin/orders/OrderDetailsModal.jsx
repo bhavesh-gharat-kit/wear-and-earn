@@ -8,6 +8,8 @@ import jsPDF from "jspdf";
 const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
   if (!isOpen || !order) return null;
 
+  const baseUrl = process.env.NEXT_PUBLIC_NEXTAUTH_URL;
+
   const handleStatusChange = (newStatus) => {
     if (onStatusUpdate) {
       onStatusUpdate(order.id, newStatus);
@@ -338,31 +340,36 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
                   key={product.id || index}
                   className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-                        {product.title}
-                      </h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                        <div>
-                          <span className="text-gray-600 dark:text-gray-400">Quantity:</span>
-                          <p className="font-medium text-gray-900 dark:text-gray-100">{product.quantity}</p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600 dark:text-gray-400">Unit Price:</span>
-                          <p className="font-medium text-gray-900 dark:text-gray-100">₹{(product.sellingPrice || 0).toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600 dark:text-gray-400">Discount:</span>
-                          <p className="font-medium text-green-600">-₹{(product.discount || 0).toFixed(2)}</p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600 dark:text-gray-400">Total:</span>
-                          <p className="font-bold text-blue-600 dark:text-blue-400">₹{(product.totalPrice - ((product.totalPrice * product.discount) / 100) || 0).toFixed(2)}</p>
+                  <a
+                    href={`${baseUrl}/product-details/${product.id}`}
+                    target="_blank"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                          {product.title}
+                        </h4>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                          <div>
+                            <span className="text-gray-600 dark:text-gray-400">Quantity:</span>
+                            <p className="font-medium text-gray-900 dark:text-gray-100">{product.quantity}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-600 dark:text-gray-400">Unit Price:</span>
+                            <p className="font-medium text-gray-900 dark:text-gray-100">₹{(product.sellingPrice || 0).toFixed(2)}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-600 dark:text-gray-400">Discount:</span>
+                            <p className="font-medium text-green-600">-₹{(product.discount || 0).toFixed(2)}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-600 dark:text-gray-400">Total:</span>
+                            <p className="font-bold text-blue-600 dark:text-blue-400">₹{(product.totalPrice - ((product.totalPrice * product.discount) / 100) || 0).toFixed(2)}</p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </a>
                 </div>
               )) || (
                   <p className="text-gray-500 dark:text-gray-400 text-center py-4">

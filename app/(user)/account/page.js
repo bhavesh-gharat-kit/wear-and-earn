@@ -1135,7 +1135,7 @@ const AccountDashboard = () => {
               Welcome back, {userData?.fullName || session?.user?.name || 'User'}! 👋
             </h1>
             <p className="text-indigo-100 dark:text-indigo-200 text-lg">
-              {userData?.isActive ? 'Your MLM account is active' : 'Complete your first purchase to activate MLM benefits'}
+              {userData?.isActive ? 'Your Bonus account is active' : 'Complete your first purchase to activate MLM benefits'}
             </p>
             <div className="flex items-center mt-4 space-x-4">
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -1891,7 +1891,7 @@ const AccountDashboard = () => {
           <UserPlus className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">MLM Not Activated</h3>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Make your first purchase to activate your MLM account and start earning referral rewards.
+            Make your first purchase to activate your Bonus account and start earning referral rewards.
           </p>
           <button className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
             Start Shopping
@@ -2538,7 +2538,7 @@ const AccountDashboard = () => {
                   Welcome back, {userData?.fullName || session?.user?.name || 'User'}!
                 </h1>
                 <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-                  {userData?.isActive ? 'Your MLM account is active and earning!' : 'Complete your first purchase to unlock earnings'}
+                  {userData?.isActive ? 'Your Bonus account is active and earning!' : 'Complete your first purchase to unlock earnings'}
                 </p>
               </div>
               <div className="flex-shrink-0">

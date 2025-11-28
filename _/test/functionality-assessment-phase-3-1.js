@@ -108,7 +108,7 @@ const functionalityAssessment = {
         features: [
           'Complete KYC form with validation',
           'Profile management interface',
-          'MLM dashboard with tree visualization',
+          'Bonus dashboard with tree visualization',
           'Order tracking and history',
           'Wallet management with transaction history',
           'Referral system with social sharing',

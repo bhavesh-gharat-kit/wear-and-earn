@@ -9,7 +9,7 @@ const MLMDashboard = ({ dashboardData }) => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">MLM Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-8">Bonus Dashboard</h1>
       
       {/* User Info Card */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
