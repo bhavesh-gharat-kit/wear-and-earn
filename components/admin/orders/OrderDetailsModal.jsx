@@ -341,7 +341,7 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
                   className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
                 >
                   <a
-                    href={`${baseUrl}/product-details/${product.id}`}
+                    href={`${baseUrl}/product-details/${product.product?.id}`}
                     target="_blank"
                   >
                     <div className="flex justify-between items-start">

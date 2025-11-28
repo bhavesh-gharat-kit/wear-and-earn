@@ -9,7 +9,7 @@ export const GET = async (request) => {
     try {
         // Check admin authentication
         const session = await getServerSession(authOptions);
-        
+
         if (!session?.user?.id) {
             return res.json({
                 success: false,
@@ -101,7 +101,12 @@ export const GET = async (request) => {
                         finalMRP: true,
                         homeDelivery: true,
                         totalPrice: true,
-                        productId: true
+                        productId: true,
+                        product: {
+                            select: {
+                                id: true
+                            }
+                        }
                     }
                 }
             },
@@ -135,7 +140,7 @@ export const PATCH = async (request) => {
     try {
         // Check admin authentication
         const session = await getServerSession(authOptions);
-        
+
         if (!session?.user?.id) {
             return res.json({
                 success: false,
