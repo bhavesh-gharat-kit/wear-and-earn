@@ -413,7 +413,7 @@ const AdminAddProduct = () => {
             <div>
               <ImagesUploader
                 label={"productImages"}
-                maxFiles={5}
+                maxFiles={10}
                 images={multipleImages}
                 setImages={setMultipleImages}
               />

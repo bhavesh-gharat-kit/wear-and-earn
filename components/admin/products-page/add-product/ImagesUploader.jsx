@@ -97,7 +97,7 @@ const ImagesUploader = ({ label, maxFiles, images, setImages }) => {
                   width={256}
                   src={imageUrl}
                   alt="Preview"
-                  className="w-24 h-24 rounded-lg border object-cover"
+                  className="w-28 h-28 rounded-lg border object-cover"
                 />
               )}
               <button
