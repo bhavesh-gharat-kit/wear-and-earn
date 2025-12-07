@@ -76,7 +76,7 @@ export async function GET(request, { params }) {
                 orderBy: { createdAt: 'desc' },
                 select: {
                     id: true,
-                    totalAmount: true,
+                    total: true,
                     status: true,
                     createdAt: true
                 }

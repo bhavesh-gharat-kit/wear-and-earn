@@ -131,7 +131,7 @@ export async function GET(request) {
             isKycApproved: true,
             orders: {
               where: { status: 'paid' },
-              select: { id: true, totalAmount: true }
+              select: { id: true, total: true }
             },
             referredUsers: {
               select: { id: true }
