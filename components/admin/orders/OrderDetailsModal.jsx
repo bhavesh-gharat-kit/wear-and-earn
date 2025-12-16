@@ -650,7 +650,6 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
     return doc.output('blob');
   };
 
->>>>>>> 845c56f (updated share delivery challan option and product size option added)
   const handleDownloadLabel = () => {
     const doc = new jsPDF({
       orientation: 'portrait',
@@ -905,7 +904,6 @@ ${order.address || 'No address provided'}`;
     }
   };
 
->>>>>>> 845c56f (updated share delivery challan option and product size option added)
   const getStatusBadge = (status) => {
     const statusStyles = {
       'pending': 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -1201,7 +1199,6 @@ ${order.address || 'No address provided'}`;
                 )}
               </button>
             </div>
->>>>>>> 845c56f (updated share delivery challan option and product size option added)
             <button
               onClick={onClose}
               className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
