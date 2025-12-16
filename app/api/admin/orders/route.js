@@ -95,6 +95,7 @@ export const GET = async (request) => {
                         id: true,
                         title: true,
                         quantity: true,
+                        size: true,
                         sellingPrice: true,
                         discount: true,
                         gst: true,

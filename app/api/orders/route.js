@@ -175,6 +175,9 @@ export async function POST(request) {
         }
       })
 
+      console.log("creating ordereditems...")
+      console.log(items)
+
       // Create order products
       const orderProducts = await Promise.all(
         items.map(item => {
@@ -184,6 +187,7 @@ export async function POST(request) {
           return tx.orderProducts.create({
             data: {
               orderId: order.id,
+              size: item.size,
               productId: item.productId,
               title: item.title,
               quantity: item.quantity,

@@ -15,7 +15,8 @@ export async function GET(request, { params }) {
       );
     }
 
-    const orderId = parseInt(params.id);
+    const param = await params;
+    const orderId = parseInt(param.id);
     const sessionUserId = session.user.id;
     const userRole = session.user.role;
 

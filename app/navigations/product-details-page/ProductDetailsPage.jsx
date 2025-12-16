@@ -11,15 +11,17 @@ import { useRouter } from "next/navigation";
 import LoaderEffect from "@/components/ui/LoaderEffect";
 import toast from "react-hot-toast";
 import CreateContext from "@/components/context/createContext";
+import { MdFormatSize } from "react-icons/md";
 
 function ProductDetailsPage({ id }) {
   const [productDetails, setProductDetails] = useState(null);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-  
+  const [selectedSize, setSelectedSize] = useState("");
+
   const { data: session } = useSession();
   const router = useRouter();
   const { addToCartList, setAddtoCartList, fetchUserProductCartDetails } = useContext(CreateContext);
-  
+
   const loggedInUserId = session?.user?.id;
 
   // FETCHING ALL PRODUCTS DETAILS
@@ -36,6 +38,16 @@ function ProductDetailsPage({ id }) {
   useEffect(() => {
     fetchProductDetails(id);
   }, [id]);
+
+  // Set default size when product details are loaded
+  useEffect(() => {
+    if (productDetails?.sizes) {
+      const sizesArray = productDetails.sizes.split(", ").map(s => s.trim());
+      if (sizesArray.length > 0 && !selectedSize) {
+        setSelectedSize(sizesArray[0]); // Set first size as default
+      }
+    }
+  }, [productDetails]);
 
   if (productDetails === null) {
     return <LoaderEffect />;
@@ -56,6 +68,7 @@ function ProductDetailsPage({ id }) {
     keyFeature,
     gst,
     homeDelivery,
+    sizes,
   } = productDetails;
 
   // Calculate display prices with fallback - ensure all values are numbers
@@ -66,20 +79,28 @@ function ProductDetailsPage({ id }) {
   const safePrice = Number(price) || 0;
   const safeDiscount = Number(discount) || 0;
   const safeGst = Number(gst) || 0;
-  
+
   // Calculate display prices with fallback
   const displayProductPrice = safeProductPrice || (safeSellingPrice ? safeSellingPrice * 0.7 : 0);
   const displayMlmPrice = safeMlmPrice || (safeSellingPrice ? safeSellingPrice * 0.3 : 0);
-  
+
   // Use sellingPrice as the main price if available, otherwise calculate from components
   const basePrice = safeSellingPrice || (displayProductPrice + displayMlmPrice + safeHomeDelivery);
   const discountAmount = (basePrice * safeDiscount) / 100;
   const discountedPrice = basePrice - discountAmount;
   const gstAmount = (discountedPrice * safeGst) / 100;
   const finalAmount = discountedPrice + gstAmount;
-  
+
   // Show original price vs final amount for comparison
   const originalPrice = safePrice || basePrice;
+
+  // Parse sizes into array
+  const sizesArray = sizes ? sizes.split(", ").map(s => s.trim()) : [];
+  const hasSizes = sizesArray.length > 0;
+
+  const handleSizeSelect = (size) => {
+    setSelectedSize(size);
+  };
 
   const handleAddToCart = async () => {
     if (!loggedInUserId) {
@@ -90,12 +111,25 @@ function ProductDetailsPage({ id }) {
       return;
     }
 
+    // Validate size selection if product has sizes
+    if (hasSizes && !selectedSize) {
+      toast.error("Please select a size", { duration: 1500 });
+      return;
+    }
+
     try {
-      const response = await axios.post("/api/cart", {
+      const cartData = {
         productId: id,
         userId: loggedInUserId,
-        quantity: selectedQuantity
-      });
+        quantity: selectedQuantity,
+      };
+
+      // Include size if product has sizes
+      if (hasSizes && selectedSize) {
+        cartData.size = selectedSize;
+      }
+
+      const response = await axios.post("/api/cart", cartData);
 
       if (response.data.success || response.status === 200) {
         toast.success(response.data.message || "Item added to cart");
@@ -113,7 +147,7 @@ function ProductDetailsPage({ id }) {
     }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!loggedInUserId) {
       toast.error("Please Login First", { duration: 1000 });
       setTimeout(() => {
@@ -121,26 +155,54 @@ function ProductDetailsPage({ id }) {
       }, 1200);
       return;
     }
-    
+
+    // Validate size selection if product has sizes
+    if (hasSizes && !selectedSize) {
+      toast.error("Please select a size", { duration: 1500 });
+      return;
+    }
+
     // Add to cart first, then redirect to checkout page
-    handleAddToCart().then(() => {
-      router.push("/checkout");
-    });
+    try {
+      const cartData = {
+        productId: id,
+        userId: loggedInUserId,
+        quantity: selectedQuantity,
+      };
+
+      if (hasSizes && selectedSize) {
+        cartData.size = selectedSize;
+      }
+
+      const response = await axios.post("/api/cart", cartData);
+
+      if (response.data.success || response.status === 200) {
+        router.push("/checkout");
+      }
+    } catch (error) {
+      if (error.response?.status === 409) {
+        // Item already in cart, still proceed to checkout
+        router.push("/checkout");
+      } else {
+        toast.error("Failed to process. Please try again.");
+        console.error("Error:", error);
+      }
+    }
   };
 
   const handleShare = async () => {
     try {
       const origin = typeof window !== 'undefined' ? window.location.origin : '';
       const shareUrl = `${origin}/product-details/${id}`;
-      const title = productDetails?.title || 'Product';
-      
+      const productTitle = productDetails?.title || 'Product';
+
       // Create WhatsApp message - simpler format for better link detection
-      const message = `${title}
+      const message = `${productTitle}
 
 Price: ₹${finalAmount?.toLocaleString("en-IN")}
 
 ${shareUrl}`;
-      
+
       // Try to include product image when possible.
       // Determine image URL (handle relative paths stored in `images`)
       const firstImage = images && images.length ? images[0] : null;
@@ -164,13 +226,13 @@ ${shareUrl}`;
           if (imageUrl && window.fetch) {
             const resp = await fetch(imageUrl);
             const blob = await resp.blob();
-            const fileName = `${(title || 'product').replace(/\s+/g, '_').toLowerCase()}.jpg`;
+            const fileName = `${(productTitle || 'product').replace(/\s+/g, '_').toLowerCase()}.jpg`;
             const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
 
             // Some browsers support sharing files
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
               await navigator.share({
-                title,
+                title: productTitle,
                 text: message,
                 files: [file],
                 url: shareUrl
@@ -181,7 +243,7 @@ ${shareUrl}`;
 
             // If cannot share files, fallback to sharing text+url
             await navigator.share({
-              title,
+              title: productTitle,
               text: `${message}\n${imageUrl}`,
               url: shareUrl
             });
@@ -190,7 +252,7 @@ ${shareUrl}`;
           }
 
           // If no image, share text+url using Web Share API
-          await navigator.share({ title, text: `${message}\n${shareUrl}`, url: shareUrl });
+          await navigator.share({ title: productTitle, text: `${message}\n${shareUrl}`, url: shareUrl });
           toast.success('Shared via device share');
           return;
         } catch (shareErr) {
@@ -211,8 +273,8 @@ ${shareUrl}`;
   };
 
   return (
-  <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-  <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
         {/* Main Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
           {/* Product Images */}
@@ -253,7 +315,7 @@ ${shareUrl}`;
                   </>
                 )}
               </div>
-              
+
               {/* Detailed Price Breakdown */}
               <div className="bg-blue-50 dark:bg-blue-900 rounded-lg p-3 space-y-2 text-sm transition-colors">
                 <div className="flex justify-between items-center">
@@ -288,6 +350,44 @@ ${shareUrl}`;
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{longDescription}</p>
             </div>
 
+            {/* Size Selection */}
+            {hasSizes && (
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <MdFormatSize className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <span className="font-medium text-gray-900 dark:text-gray-100">Select Size:</span>
+                  {selectedSize && (
+                    <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                      Selected: {selectedSize}
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {sizesArray.map((size, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSizeSelect(size)}
+                      className={`
+                        min-w-[48px] px-4 py-2 rounded-lg border-2 font-medium text-sm
+                        transition-all duration-200 ease-in-out
+                        ${selectedSize === size
+                          ? 'border-blue-600 bg-blue-600 text-white shadow-md scale-105'
+                          : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700'
+                        }
+                      `}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+                {!selectedSize && (
+                  <p className="text-sm text-amber-600 dark:text-amber-400">
+                    Please select a size to continue
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Stock Status */}
             <div className="flex items-center space-x-2">
               <FaCheckCircle className="h-5 w-5 text-green-500" />
@@ -299,18 +399,18 @@ ${shareUrl}`;
             <div className="flex items-center space-x-4">
               <span className="font-medium text-gray-900 dark:text-gray-100">Quantity:</span>
               <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">
-                <button 
+                <button
                   onClick={() => setSelectedQuantity(Math.max(1, selectedQuantity - 1))}
-                  className="px-3 py-2 text-gray-600 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="px-3 py-2 text-gray-600 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   -
                 </button>
                 <span className="px-4 py-2 border-x border-gray-300 dark:border-gray-600 font-medium text-gray-900 dark:text-gray-100">
                   {selectedQuantity}
                 </span>
-                <button 
+                <button
                   onClick={() => setSelectedQuantity(Math.min(inStock, selectedQuantity + 1))}
-                  className="px-3 py-2 text-gray-600 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="px-3 py-2 text-gray-600 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   +
                 </button>
@@ -321,14 +421,28 @@ ${shareUrl}`;
             <div className="flex space-x-4">
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center space-x-2 transition-colors duration-200"
+                disabled={hasSizes && !selectedSize}
+                className={`
+                  flex-1 px-6 py-3 rounded-lg font-medium flex items-center justify-center space-x-2 transition-all duration-200
+                  ${hasSizes && !selectedSize
+                    ? 'bg-gray-400 cursor-not-allowed text-gray-200'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }
+                `}
               >
                 <FaShoppingCart />
                 <span>Add to Cart</span>
               </button>
               <button
                 onClick={handleBuyNow}
-                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center space-x-2 transition-colors duration-200"
+                disabled={hasSizes && !selectedSize}
+                className={`
+                  flex-1 px-6 py-3 rounded-lg font-medium flex items-center justify-center space-x-2 transition-all duration-200
+                  ${hasSizes && !selectedSize
+                    ? 'bg-gray-400 cursor-not-allowed text-gray-200'
+                    : 'bg-orange-500 hover:bg-orange-600 text-white'
+                  }
+                `}
               >
                 <IoBag />
                 <span>Buy Now</span>

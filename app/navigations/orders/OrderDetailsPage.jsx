@@ -136,7 +136,7 @@ export default function OrderDetailsPage({ orderId }) {
                       <Package className="h-8 w-8 text-gray-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 dark:text-gray-100">{item.title}</h4>
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100">{item.title}{item.size && <span>(size: {item.size})</span>}</h4>
                       <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300">
                         <span>Qty: {item.quantity}</span>
                         <span>₹{(item.sellingPrice / 100).toLocaleString()}</span>

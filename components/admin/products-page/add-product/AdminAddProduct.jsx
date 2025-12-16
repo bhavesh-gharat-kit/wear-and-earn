@@ -12,6 +12,7 @@ import Image from "next/image";
 const AdminAddProduct = () => {
   const formInitilizer = {
     title: "",
+    sizes: "",
     description: "",
     category: "",
     productPrice: "",      // Pr - Product Price (NEW SPEC)
@@ -36,7 +37,7 @@ const AdminAddProduct = () => {
 
   const fetchAllCategoryDetails = async () => {
     try {
-      const response = await axios.get("/api/admin/manage-category?limit=1000&skip=0");
+      const response = await axios.get("/api/admin/manage-category?limit=150&skip=0");
       setCategories(response.data.response);
     } catch (error) {
       console.log("Internal Server Error", error);
@@ -99,14 +100,15 @@ const AdminAddProduct = () => {
 
     const form = new FormData();
     form.append("title", formData.title);
+    form.append("sizes", formData.sizes);
     form.append("description", formData.description);
     form.append("category", formData.category);
-    
+
     // NEW SPEC: Append pricing data according to spec
     form.append("productPrice", formData.productPrice);  // Pr
     form.append("mlmPrice", formData.mlmPrice);          // Pm
     form.append("discount", formData.discount || "0");   // Discount percentage
-    
+
     form.append("overview", formData.overview || "");
     form.append("keyFeatures", formData.keyFeatures || "");
     form.append("gst", formData.gst || "0");
@@ -365,20 +367,35 @@ const AdminAddProduct = () => {
             </div>
           </div>
 
-          {/* Product Type */}
-          <div className="col-span-2">
-            <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-              Product Type
-            </label>
-            <select
-              name="productType"
-              value={formData.productType}
-              onChange={handleInputChange}
-              className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            >
-              <option value="REGULAR">Regular Product</option>
-              <option value="TRENDING">Trending Product</option>
-            </select>
+          {/* Product type and size */}
+          <div className="col-span-2 grid grid-cols-2 gap-x-2">
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                Enter Sizes(M, L, XL)
+              </label>
+              <input
+                type="text"
+                name="sizes"
+                value={formData.sizes || ""}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                placeholder="Enter product sizes"
+              />
+            </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                Product Type
+              </label>
+              <select
+                name="productType"
+                value={formData.productType}
+                onChange={handleInputChange}
+                className="w-full pl-2 py-2 text-sm rounded-md border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              >
+                <option value="REGULAR">Regular Product</option>
+                <option value="TRENDING">Trending Product</option>
+              </select>
+            </div>
           </div>
 
           {/* Overview and Key Features */}
@@ -437,7 +454,7 @@ const AdminAddProduct = () => {
           </button>
         </div>
       </form>
-      
+
     </section>
   );
 };

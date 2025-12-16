@@ -128,6 +128,7 @@ export default function CheckoutPage() {
       const orderData = {
         items: addToCartList.map(item => ({
           productId: item.product.id,
+          size: item.size,
           title: item.product.title,
           quantity: item.quantity,
           sellingPrice: item.product.sellingPrice,

@@ -3,10 +3,10 @@ import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { formatDate } from '@/lib/serialization-utils'
-import { 
-  Package, 
-  Truck, 
-  CheckCircle, 
+import {
+  Package,
+  Truck,
+  CheckCircle,
   Clock,
   Eye,
   ArrowLeft,
@@ -120,7 +120,7 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
         <div className="flex items-center mb-4">
-          <Link 
+          <Link
             href="/account"
             className="mr-4 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
@@ -128,7 +128,7 @@ export default function OrdersPage() {
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Orders</h1>
         </div>
-        
+
         {/* Filter Tabs */}
         <div className="border-b border-gray-200 dark:border-gray-600">
           <nav className="-mb-px flex space-x-8">
@@ -141,11 +141,10 @@ export default function OrdersPage() {
               <button
                 key={tab.key}
                 onClick={() => setFilter(tab.key)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  filter === tab.key
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${filter === tab.key
                     ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                     : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'
-                }`}
+                  }`}
               >
                 {tab.label}
                 {tab.key !== 'all' && (
@@ -209,7 +208,7 @@ export default function OrdersPage() {
                     <div className="space-y-2">
                       {order.products.map((product, index) => (
                         <div key={index} className="flex justify-between items-center text-sm">
-                          <span className="text-gray-600 dark:text-gray-300">{product.title}</span>
+                          <span className="text-gray-600 dark:text-gray-300">{product.title}{product.size && <span>(size: {product.size})</span>}</span>
                           <div className="text-right">
                             <span className="text-gray-900 dark:text-white font-medium">Qty: {product.quantity}</span>
                             <span className="ml-2 text-gray-600 dark:text-gray-300">₹{(product.totalPriceInRupees || product.totalPrice / 100).toLocaleString()}</span>
@@ -232,7 +231,7 @@ export default function OrdersPage() {
                       <span>Note: {order.orderNotice}</span>
                     )}
                   </div>
-                  <Link 
+                  <Link
                     href={`/account/orders/${order.id}`}
                     className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                   >
@@ -252,13 +251,13 @@ export default function OrdersPage() {
               {filter === 'all' ? 'No orders yet' : `No ${filter} orders`}
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-6">
-              {filter === 'all' 
-                ? 'Start shopping to see your orders here!' 
+              {filter === 'all'
+                ? 'Start shopping to see your orders here!'
                 : `You don&apos;t have any ${filter} orders.`
               }
             </p>
             {filter === 'all' && (
-              <Link 
+              <Link
                 href="/products"
                 className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
               >

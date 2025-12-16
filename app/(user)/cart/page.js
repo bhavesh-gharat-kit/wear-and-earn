@@ -11,7 +11,8 @@ import {
   Plus,
   Minus,
   ArrowLeft,
-  CreditCard
+  CreditCard,
+  Ruler
 } from 'lucide-react'
 import CreateContext from '@/components/context/createContext'
 import toast from 'react-hot-toast'
@@ -25,10 +26,16 @@ export default function CartPage() {
   const [loadingItems, setLoadingItems] = useState(new Set())
   const [checkoutLoading, setCheckoutLoading] = useState(false)
 
-  const handleRemoveItemFromCart = async (productId) => {
-    setLoadingItems(prev => new Set(prev.add(`remove-${productId}`)))
+  const handleRemoveItemFromCart = async (productId, size = null) => {
+    const loadingKey = size ? `remove-${productId}-${size}` : `remove-${productId}`;
+    setLoadingItems(prev => new Set(prev.add(loadingKey)))
     try {
-      const response = await axios.delete(`/api/cart/${productId}`)
+      // Include size in the delete request if available
+      const url = size 
+        ? `/api/cart/${productId}?size=${encodeURIComponent(size)}`
+        : `/api/cart/${productId}`;
+      
+      const response = await axios.delete(url)
       if (response.status === 200) {
         toast.success(response.data.message || "Item removed from cart")
         fetchUserProductCartDetails()
@@ -39,20 +46,32 @@ export default function CartPage() {
     } finally {
       setLoadingItems(prev => {
         const newSet = new Set(prev)
-        newSet.delete(`remove-${productId}`)
+        newSet.delete(loadingKey)
         return newSet
       })
     }
   }
 
-  const handleQuantityChange = async (productId, newQuantity) => {
+  useEffect(()=>{
+    console.log(addToCartList)
+  },[addToCartList])
+
+  const handleQuantityChange = async (productId, newQuantity, size = null) => {
     if (newQuantity < 1) return
     
-    setLoadingItems(prev => new Set(prev.add(`quantity-${productId}`)))
+    const loadingKey = size ? `quantity-${productId}-${size}` : `quantity-${productId}`;
+    setLoadingItems(prev => new Set(prev.add(loadingKey)))
     try {
+      const requestData = { quantity: parseInt(newQuantity) };
+      
+      // Include size in the update request if available
+      if (size) {
+        requestData.size = size;
+      }
+
       const response = await axios.put(
         `/api/cart/${productId}`,
-        { quantity: parseInt(newQuantity) },
+        requestData,
         { headers: { "Content-Type": "application/json" } }
       )
 
@@ -66,7 +85,7 @@ export default function CartPage() {
     } finally {
       setLoadingItems(prev => {
         const newSet = new Set(prev)
-        newSet.delete(`quantity-${productId}`)
+        newSet.delete(loadingKey)
         return newSet
       })
     }
@@ -106,6 +125,17 @@ export default function CartPage() {
     if (addToCartList.length === 0) {
       toast.error("Your cart is empty")
       return
+    }
+
+    // Validate that all items with sizes have a size selected
+    const itemsWithoutSize = addToCartList.filter(item => {
+      const hasSizes = item.product.sizes && item.product.sizes.trim() !== '';
+      return hasSizes && !item.size;
+    });
+
+    if (itemsWithoutSize.length > 0) {
+      toast.error("Some items are missing size selection. Please update your cart.");
+      return;
     }
 
     setCheckoutLoading(true)
@@ -201,14 +231,19 @@ export default function CartPage() {
         {/* Cart Items */}
         <div className="flex-1 space-y-3">
           {addToCartList.map((item) => {
-            const { id, quantity, productId, product } = item
-            const { images, title, price, sellingPrice, discount } = product
+            const { id, quantity, productId, product, size } = item
+            const { images, title, price, sellingPrice, discount, sizes } = product
             const productImage = images && images.length > 0 ? images[0].imageUrl : "/images/brand-logo.png"
             const basePrice = sellingPrice || price || 0;
             const discountAmount = (basePrice * (Number(discount) || 0)) / 100;
             const finalAmount = basePrice - discountAmount;
             const itemTotal = finalAmount * quantity
             const savings = (price - finalAmount) * quantity
+
+            // Check if product has sizes
+            const hasSizes = sizes && sizes.trim() !== '';
+            const loadingKeyQuantity = size ? `quantity-${productId}-${size}` : `quantity-${productId}`;
+            const loadingKeyRemove = size ? `remove-${productId}-${size}` : `remove-${productId}`;
 
             return (
               <div key={id} className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden hover:shadow-md transition-shadow w-full md:w-[800px] mx-auto">
@@ -229,6 +264,23 @@ export default function CartPage() {
                     <div className="flex-1 min-w-0">
                       <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">{title}</h3>
                       
+                      {/* Size Display */}
+                      {hasSizes && (
+                        <div className="mb-2">
+                          {size ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                              <Ruler className="h-3 w-3 mr-1" />
+                              Size: {size}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">
+                              <Ruler className="h-3 w-3 mr-1" />
+                              Size not selected
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      
                       {/* Price Information */}
                       <div className="mb-2">
                         <div className="flex items-center space-x-3 mb-1">
@@ -248,11 +300,11 @@ export default function CartPage() {
                           <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Qty:</span>
                           <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded">
                             <button
-                              onClick={() => handleQuantityChange(productId, quantity - 1)}
-                              disabled={quantity <= 1 || loadingItems.has(`quantity-${productId}`)}
+                              onClick={() => handleQuantityChange(productId, quantity - 1, size)}
+                              disabled={quantity <= 1 || loadingItems.has(loadingKeyQuantity)}
                               className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                              {loadingItems.has(`quantity-${productId}`) ? (
+                              {loadingItems.has(loadingKeyQuantity) ? (
                                 <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                               ) : (
                                 <Minus className="h-3 w-3 text-gray-700 dark:text-gray-200" />
@@ -260,11 +312,11 @@ export default function CartPage() {
                             </button>
                             <span className="px-3 py-1 font-medium text-gray-900 dark:text-gray-100 text-sm min-w-[2rem] text-center">{quantity}</span>
                             <button
-                              onClick={() => handleQuantityChange(productId, quantity + 1)}
-                              disabled={loadingItems.has(`quantity-${productId}`)}
+                              onClick={() => handleQuantityChange(productId, quantity + 1, size)}
+                              disabled={loadingItems.has(loadingKeyQuantity)}
                               className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                              {loadingItems.has(`quantity-${productId}`) ? (
+                              {loadingItems.has(loadingKeyQuantity) ? (
                                 <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                               ) : (
                                 <Plus className="h-3 w-3 text-gray-700 dark:text-gray-200" />
@@ -274,11 +326,11 @@ export default function CartPage() {
                         </div>
                         
                         <button
-                          onClick={() => handleRemoveItemFromCart(productId)}
-                          disabled={loadingItems.has(`remove-${productId}`)}
+                          onClick={() => handleRemoveItemFromCart(productId, size)}
+                          disabled={loadingItems.has(loadingKeyRemove)}
                           className="inline-flex items-center px-2 py-1 border border-red-300 dark:border-red-400 text-xs font-medium rounded text-red-700 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                          {loadingItems.has(`remove-${productId}`) ? (
+                          {loadingItems.has(loadingKeyRemove) ? (
                             <>
                               <div className="w-3 h-3 border border-red-400 border-t-transparent rounded-full animate-spin mr-1"></div>
                               Removing...

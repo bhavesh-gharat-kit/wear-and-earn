@@ -26,6 +26,7 @@ export async function GET() {
         orderProducts: {
           select: {
             title: true,
+            size: true,
             quantity: true,
             totalPrice: true,
             sellingPrice: true

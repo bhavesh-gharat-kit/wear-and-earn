@@ -147,6 +147,7 @@ export async function POST(req) {
         const newProduct = await prisma.product.create({
             data: {
                 title: data.title,
+                sizes: data.sizes,
                 description: data.description,
                 longDescription: data.overview || "",
                 inStock: data.inStock ? Number(data.inStock) : 1,

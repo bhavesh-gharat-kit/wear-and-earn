@@ -82,7 +82,7 @@ export default function ProductSlider({ title = "Top Trending", showModal, setSh
           spaceBetween: 28,
         },
         1280: {
-          slidesPerView: 5, // Large screens: 5 cards
+          slidesPerView: 4, // Large screens: 4 cards
           spaceBetween: 32,
         },
       }}

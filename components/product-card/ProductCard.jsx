@@ -165,14 +165,14 @@ function ProductCard({ product, variant = "grid", compact = false }) {
 
             {/* Mobile-Optimized Actions */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-              <button
+              {/* <button
                 onClick={handleAddToCart}
                 disabled={isLoading || !inStock}
                 className="flex items-center justify-center gap-1.5 sm:gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors font-medium text-sm sm:text-base active:scale-95"
               >
                 <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span className="truncate">{isLoading ? 'Adding...' : 'Add to Cart'}</span>
-              </button>
+              </button> */}
               
               <Link
                 href={`/product-details/${id}`}
@@ -281,14 +281,14 @@ function ProductCard({ product, variant = "grid", compact = false }) {
 
         {/* Compact Mode Action Buttons */}
         <div className={compact ? "space-y-1" : "space-y-1.5 sm:space-y-2"}>
-          <button
+          {/* <button
             onClick={(e) => { e.stopPropagation(); handleAddToCart(); }}
             disabled={isLoading || !inStock}
             className={`w-full flex items-center justify-center ${compact ? 'gap-1 py-1.5 px-2 text-xs' : 'gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-3 sm:px-4 text-sm sm:text-base'} bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors font-medium active:scale-95`}
           >
             <ShoppingCart className={compact ? "h-3 w-3" : "h-3.5 w-3.5 sm:h-4 sm:w-4"} />
             <span className="truncate">{isLoading ? (compact ? 'Adding...' : 'Adding...') : (compact ? 'Add' : 'Add to Cart')}</span>
-          </button>
+          </button> */}
           
           <button
             onClick={(e) => { e.stopPropagation(); handleBuyNow(); }}
