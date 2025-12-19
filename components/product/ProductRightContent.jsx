@@ -105,7 +105,7 @@ function ProductRightContent({setSelectedFilterCategoryId, setSelectedCategoryNa
           {/* Secondary Filters Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Price Range (spans 2 cols on desktop for wider inputs) */}
-            <div className="grid grid-cols-2 gap-2 lg:col-span-2">
+            {/* <div className="grid grid-cols-2 gap-2 lg:col-span-2">
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Min Price</label>
                 <div className="relative">
@@ -136,7 +136,7 @@ function ProductRightContent({setSelectedFilterCategoryId, setSelectedCategoryNa
                   />
                 </div>
               </div>
-            </div>
+            </div> */}
             {/* Desktop-only Clear Filters button */}
             <div className="hidden lg:flex items-center justify-end lg:mt-3.5">
               <button

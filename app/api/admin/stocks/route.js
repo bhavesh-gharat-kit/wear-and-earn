@@ -9,9 +9,10 @@ export async function GET(request) {
         const limit = parseInt(searchParams.get("limit")) || 10;
         const skip = parseInt(searchParams.get("skip")) || 0;
 
-        const totalCount = await prisma.product.count()
+        const totalCount = await prisma.product.count({ where: { isActive: true } })
 
         const products = await prisma.product.findMany({
+            where: { isActive: true },
             skip,
             take: limit,
             select: {

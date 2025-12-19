@@ -12,10 +12,19 @@ export const GET = async (request) => {
         // for pagination query
         const limit = parseInt(searchParams.get("limit")) || 10;
         const skip = parseInt(searchParams.get("skip")) || 0;
+        const show = searchParams.get("show") || "all";
+        const where = {}
 
-        const totalCount = await prisma.product.count()
+        if (show === "active") {
+            where.isActive = true;
+        } else if (show === "inactive") {
+            where.isActive = false;
+        }
+
+        const totalCount = await prisma.product.count({where})
 
         const products = await prisma.product.findMany({
+            where,
             take: limit,
             skip,
             include: {
@@ -28,7 +37,7 @@ export const GET = async (request) => {
             }
         });
 
-        return res.json({ success: true, message: "Product fetched successfully", products , totalCount}, { status: 200 });
+        return res.json({ success: true, message: "Product fetched successfully", products, totalCount }, { status: 200 });
 
     } catch (error) {
         console.error('Error fetching products:', error);

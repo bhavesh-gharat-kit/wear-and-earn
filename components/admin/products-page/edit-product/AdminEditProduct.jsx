@@ -387,7 +387,7 @@ const AdminEditProduct = ({ params }) => {
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-green-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 placeholder="MLM commission amount"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">30% company, 70% pool distribution</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">25% company, 75% pool distribution</p>
             </div>
             <div>
               <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">

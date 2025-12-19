@@ -18,6 +18,7 @@ function AdminProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPage, setRowsPage] = useState(20);
   const [totalProductsCount, setTotalProductsCount] = useState(0);
+  const [show, setShow] = useState("active");
 
   const totalPages = Math.ceil(totalProductsCount / rowsPage);
 
@@ -34,7 +35,7 @@ function AdminProductsPage() {
 
     try {
       const response = await axios.get(
-        `/api/admin/products?limit=${rowsPerPage}&skip=${skip}`
+        `/api/admin/products?limit=${rowsPerPage}&skip=${skip}&show=${show}`
       );
       const productDetails = response.data.products;
 
@@ -112,7 +113,7 @@ function AdminProductsPage() {
 
   useEffect(() => {
     fetchAllProductsDetails();
-  }, [currentPage, rowsPage]);
+  }, [currentPage, rowsPage, show]);
 
   return (
     <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
@@ -131,22 +132,37 @@ function AdminProductsPage() {
       {/* Search - Responsive */}
       <form
         onSubmit={handleSubmitSearchProductQuery}
-        className="w-full sm:w-2/3 lg:w-1/2 xl:w-5/12 p-0.5 rounded h-10 sm:h-12 flex items-center border border-gray-300 dark:border-gray-600"
-        action=""
+        className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
       >
-        <input
-          className="w-full px-3 py-2 bg-slate-200 dark:bg-gray-800 h-full rounded-l border-0 outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base"
-          type="search"
-          placeholder="Search products..."
-          onChange={(e) => setSearchProduct(e.target.value)}
-          value={searchProduct}
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 h-full text-white px-3 sm:px-4 cursor-pointer rounded-r border-0 hover:bg-blue-700 transition-colors"
+        {/* Search box */}
+        <div className="flex w-full sm:w-2/3 lg:w-1/2 xl:w-5/12 h-10 sm:h-12 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+          <input
+            type="search"
+            placeholder="Search products..."
+            value={searchProduct}
+            onChange={(e) => setSearchProduct(e.target.value)}
+            className="flex-1 px-3 bg-slate-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-base outline-none"
+          />
+
+          <button
+            type="submit"
+            className="px-4 bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors"
+          >
+            <IoMdSearch size={18} />
+          </button>
+        </div>
+
+        {/* Filter */}
+        <select
+          name="show"
+          value={show}
+          onChange={(e) => setShow(e.target.value)}
+          className="h-10 sm:h-12 px-4 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors w-full sm:w-auto"
         >
-          <IoMdSearch fontSize={18} />
-        </button>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="all">All</option>
+        </select>
       </form>
 
       {/* Products Table/Cards - Responsive */}
@@ -178,11 +194,10 @@ function AdminProductsPage() {
                   <div className="flex-1 space-y-2">
                     <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{product.title}</h3>
                     <div className="flex flex-wrap gap-2 text-xs">
-                      <span className={`px-2 py-1 rounded ${
-                        product.type === 'MLM' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+                      <span className={`px-2 py-1 rounded ${product.type === 'MLM' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
                         product.type === 'TRENDING' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                      }`}>
+                          'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                        }`}>
                         {product.type}
                       </span>
                       <span className="text-gray-600 dark:text-gray-400">Stock: {product.inStock}</span>
@@ -198,9 +213,8 @@ function AdminProductsPage() {
                 <div className="flex justify-between items-center pt-2">
                   <button
                     onClick={() => handleProductStatusToggler(product.id)}
-                    className={`${
-                      product.isActive ? "bg-green-600" : "bg-red-600"
-                    } px-3 py-1 cursor-pointer rounded text-xs text-white hover:opacity-80 transition-opacity`}
+                    className={`${product.isActive ? "bg-green-600" : "bg-red-600"
+                      } px-3 py-1 cursor-pointer rounded text-xs text-white hover:opacity-80 transition-opacity`}
                     title="Toggle status"
                   >
                     {product.isActive ? "Active" : "Inactive"}
@@ -269,11 +283,10 @@ function AdminProductsPage() {
                     </td>
                     <td className="p-3 text-gray-900 dark:text-gray-100">{product.title}</td>
                     <td className="p-3">
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        product.type === 'MLM' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+                      <span className={`px-2 py-1 rounded text-xs ${product.type === 'MLM' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
                         product.type === 'TRENDING' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                      }`}>
+                          'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                        }`}>
                         {product.type}
                       </span>
                     </td>
@@ -287,9 +300,8 @@ function AdminProductsPage() {
                     <td className="p-3">
                       <button
                         onClick={() => handleProductStatusToggler(product.id)}
-                        className={`${
-                          product.isActive ? "bg-green-600" : "bg-red-600"
-                        } px-2 py-1 cursor-pointer rounded text-xs text-white hover:opacity-80 transition-opacity`}
+                        className={`${product.isActive ? "bg-green-600" : "bg-red-600"
+                          } px-2 py-1 cursor-pointer rounded text-xs text-white hover:opacity-80 transition-opacity`}
                         title="Toggle status"
                       >
                         {product.isActive ? "Active" : "Inactive"}
@@ -302,19 +314,19 @@ function AdminProductsPage() {
                       >
                         <BiPencil fontSize={16} />
                       </Link>
-                      <button
+                      {/* <button
                         onClick={() => handleConfirmAction(product.id)}
                         className="text-white bg-red-600 px-3 py-2 rounded hover:bg-red-700 text-xs flex items-center cursor-pointer transition-colors"
                       >
                         <BiTrash fontSize={16} />
-                      </button>
+                      </button> */}
                     </td>
                   </tr>
                 ))}
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
@@ -330,7 +342,7 @@ function AdminProductsPage() {
         )}
       </div>
 
-      
+
     </div>
   );
 }
