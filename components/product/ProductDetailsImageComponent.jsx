@@ -16,7 +16,12 @@ import "./styles.css";
 import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 import Image from "next/image";
 
-export default function ProductDetailsImageComponent({ productDetails }) {
+export default function ProductDetailsImageComponent({
+  productDetails,
+  activeIndex,
+  setActiveIndex,
+}) {
+
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [panX, setPanX] = useState(0);
@@ -24,7 +29,8 @@ export default function ProductDetailsImageComponent({ productDetails }) {
   const [isDragging, setIsDragging] = useState(false);
   const [lastTapTime, setLastTapTime] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
-  
+  const mainSwiperRef = useRef(null);
+
   // Hover zoom states for desktop
   const [isHovering, setIsHovering] = useState(false);
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
@@ -268,6 +274,17 @@ export default function ProductDetailsImageComponent({ productDetails }) {
       zoomToPoint(zoom - ZOOM_STEP, rect.width / 2, rect.height / 2, rect);
     }
   };
+ useEffect(() => {
+  if (mainSwiperRef.current && typeof activeIndex === "number") {
+    if (hasMultipleImages) {
+      mainSwiperRef.current.slideToLoop(activeIndex);
+    } else {
+      mainSwiperRef.current.slideTo(activeIndex);
+    }
+  }
+}, [activeIndex, hasMultipleImages]);
+
+
 
   return (
     <div className="space-y-4">
@@ -277,17 +294,21 @@ export default function ProductDetailsImageComponent({ productDetails }) {
           "--swiper-navigation-color": "#3B82F6",
           "--swiper-pagination-color": "#3B82F6",
         }}
+        onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
         loop={hasMultipleImages}
         spaceBetween={10}
         navigation={true}
         thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
         onSlideChange={(swiper) => {
-          setCurrentSlide(swiper.realIndex || swiper.activeIndex || 0);
-          resetZoomAndPan();
-        }}
+  const index = swiper.realIndex ?? swiper.activeIndex ?? 0;
+  setCurrentSlide(index);
+  setActiveIndex?.(index);
+  resetZoomAndPan();
+}}
         modules={[FreeMode, Navigation, Thumbs]}
         className="main-swiper w-full h-[700px] sm:h-[650px] md:h-[600px] lg:h-[500px] rounded-lg overflow-hidden bg-gray-100"
       >
+        
         {productDetails.images?.map((product, index) => (
           <SwiperSlide key={index} className="flex items-center justify-center overflow-hidden">
             <div

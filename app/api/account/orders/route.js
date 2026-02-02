@@ -20,40 +20,58 @@ export async function GET() {
 
     // Get all orders with order products
     const orders = await prisma.order.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        orderProducts: {
+  where: { userId },
+  orderBy: { createdAt: 'desc' },
+  include: {
+    orderProducts: {
+      select: {
+        title: true,
+        size: true,
+        color: true,
+        quantity: true,
+        totalPrice: true,
+        sellingPrice: true,
+
+        product: {
           select: {
-            title: true,
-            size: true,
-            quantity: true,
-            totalPrice: true,
-            sellingPrice: true
+            images: {
+              select: {
+                imageUrl: true,
+                color: true
+              }
+            }
           }
         }
       }
-    })
+    }
+  }
+})
+
 
     // Serialize the orders to handle BigInt values
     const serializedOrders = orders.map(serializeOrderData);
 
     // Format the orders data
-    const formattedOrders = serializedOrders.map(order => ({
-      id: order.id,
-      status: order.status,
-      total: order.total,
-      totalInRupees: order.totalInRupees,
-      deliveryCharges: order.deliveryCharges,
-      deliveryChargesInRupees: order.deliveryChargesInRupees,
-      createdAt: order.createdAt,
-      deliveredAt: order.deliveredAt,
-      paymentId: order.paymentId,
-      address: order.address,
-      orderNotice: order.orderNotice,
-      itemCount: order.orderProducts.reduce((sum, product) => sum + product.quantity, 0),
-      products: order.orderProducts
-    }))
+   const formattedOrders = orders.map(order => ({
+  ...order,
+  products: order.orderProducts.map(op => {
+    const matchingImage =
+      op.product.images.find(img => img.color === op.color)
+      || op.product.images[0]
+      || null
+
+    return {
+      title: op.title,
+      size: op.size,
+      color: op.color,
+      quantity: op.quantity,
+      totalPrice: op.totalPrice,
+      sellingPrice: op.sellingPrice,
+      image: matchingImage?.imageUrl || null
+    }
+  })
+}))
+
 
     return NextResponse.json(formattedOrders)
 

@@ -2,6 +2,7 @@
 import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { formatDate } from '@/lib/serialization-utils'
 import {
   Package,
@@ -202,27 +203,60 @@ export default function OrdersPage() {
                 </div>
 
                 {/* Products Preview */}
-                {order.products && order.products.length > 0 && (
-                  <div className="border-t dark:border-gray-600 pt-4">
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Items:</h4>
-                    <div className="space-y-2">
-                      {order.products.map((product, index) => (
-                        <div key={index} className="flex justify-between items-center text-sm">
-                          <span className="text-gray-600 dark:text-gray-300">{product.title}{product.size && <span>(size: {product.size})</span>}</span>
-                          <div className="text-right">
-                            <span className="text-gray-900 dark:text-white font-medium">Qty: {product.quantity}</span>
-                            <span className="ml-2 text-gray-600 dark:text-gray-300">₹{(product.totalPriceInRupees || product.totalPrice / 100).toLocaleString()}</span>
-                          </div>
-                        </div>
-                      ))}
-                      {order.itemCount > order.products.length && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                          +{order.itemCount - order.products.length} more items
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
+               {order.products.map((product, index) => (
+  <div
+    key={index}
+    className="flex items-center justify-between gap-4 text-sm py-3"
+  >
+    {/* LEFT: Image + Info */}
+    <div className="flex items-center gap-4">
+      {/* Product Image */}
+      {product.image ? (
+        <Image
+           src={product.image}
+  alt={product.title}
+  width={56}
+  height={56}
+  className="rounded-lg object-cover border flex-shrink-0"
+  sizes="56px"
+        />
+      ) : (
+        <div className="h-14 w-14 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+          <Package className="h-6 w-6 text-gray-400" />
+        </div>
+      )}
+
+      {/* Product Details */}
+      <div>
+        <p className="font-medium text-gray-900 dark:text-white">
+          {product.title}
+        </p>
+
+        <div className="flex flex-wrap gap-2 text-xs">
+  <span className="px-2 py-1 rounded-full bg-blue-900 text-white">
+    Size: {product.size}
+  </span>
+
+  <span className="px-2 py-1 rounded-full bg-blue-900 text-white">
+    Color: {product.color}
+  </span>
+</div>
+
+      </div>
+    </div>
+
+    {/* RIGHT: Quantity + Price */}
+    <div className="text-right">
+      <p className="font-medium text-gray-900 dark:text-white">
+        Qty: {product.quantity}
+      </p>
+      <p className="text-gray-600 dark:text-gray-300">
+        ₹{(product.totalPriceInRupees || product.totalPrice / 100).toLocaleString()}
+      </p>
+    </div>
+  </div>
+))}
+
 
                 {/* Order Actions */}
                 <div className="mt-6 flex justify-between items-center pt-4 border-t dark:border-gray-600">

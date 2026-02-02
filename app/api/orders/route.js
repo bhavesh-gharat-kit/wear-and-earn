@@ -188,6 +188,7 @@ export async function POST(request) {
             data: {
               orderId: order.id,
               size: item.size,
+              color: item.color,
               productId: item.productId,
               title: item.title,
               quantity: item.quantity,

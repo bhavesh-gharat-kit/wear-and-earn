@@ -13,6 +13,7 @@ const AdminAddProduct = () => {
   const formInitilizer = {
     title: "",
     sizes: "",
+    Color: "",
     description: "",
     category: "",
     productPrice: "",      // Pr - Product Price (NEW SPEC)
@@ -101,6 +102,7 @@ const AdminAddProduct = () => {
     const form = new FormData();
     form.append("title", formData.title);
     form.append("sizes", formData.sizes);
+    form.append("Color", formData.Color);
     form.append("description", formData.description);
     form.append("category", formData.category);
 
@@ -116,9 +118,11 @@ const AdminAddProduct = () => {
     form.append("productType", formData.productType || "REGULAR");
 
     // Append multiple images
-    multipleImages.forEach((file) => {
-      form.append("productImages", file);
-    });
+    multipleImages.forEach((img) => {
+  form.append("productImages", img.file);     // actual image file
+  form.append("imageColors", img.color || ""); // matching color
+});
+
 
     console.log("FormData entries:");
     for (let [key, value] of form.entries()) {
@@ -382,6 +386,7 @@ const AdminAddProduct = () => {
                 placeholder="Enter product sizes"
               />
             </div>
+           
             <div>
               <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
                 Product Type

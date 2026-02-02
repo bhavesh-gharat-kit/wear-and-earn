@@ -19,7 +19,7 @@ const ImagesUploader = ({ label, maxFiles, images, setImages }) => {
     return () => {
       if (images && Array.isArray(images)) {
         images.forEach(image => {
-          if (image instanceof File) {
+          if (image?.file instanceof File) {
             // Find any blob URLs that might have been created for this file
             const blobUrls = document.querySelectorAll('img[src^="blob:"]');
             blobUrls.forEach(img => {
@@ -48,7 +48,11 @@ const ImagesUploader = ({ label, maxFiles, images, setImages }) => {
         toast.error(`Each file must be less than 1MB: ${file.name}`);
         return;
       }
-      validFiles.push(file);
+    validFiles.push({
+  file,
+  color: ""
+});
+
     }
 
     setImages((prev) => [...prev, ...validFiles].slice(0, maxFiles));
@@ -70,24 +74,22 @@ const ImagesUploader = ({ label, maxFiles, images, setImages }) => {
         className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
       />
       <div className="flex flex-wrap gap-2 mt-2">
-        {images?.map((file, index) => {
+        {images?.map((image, index) => {
           // Safe URL creation function
-          const getSafeImageUrl = (file) => {
-            if (file.imageUrl) {
-              return file.imageUrl;
-            }
-            if (file instanceof File) {
-              try {
-                return URL.createObjectURL(file);
-              } catch (error) {
-                console.error("Error creating object URL:", error);
-                return null;
-              }
-            }
-            return null;
-          };
+         const getSafeImageUrl = (imageObj) => {
+  if (imageObj?.imageUrl) {
+    return imageObj.imageUrl;
+  }
+  if (imageObj?.file instanceof File) {
+    return URL.createObjectURL(imageObj.file);
+  }
+  return null;
+};
 
-          const imageUrl = getSafeImageUrl(file);
+      
+
+const imageUrl = getSafeImageUrl(image)
+
           
           return (
             <div key={index} className="relative">
@@ -99,7 +101,20 @@ const ImagesUploader = ({ label, maxFiles, images, setImages }) => {
                   alt="Preview"
                   className="w-28 h-28 rounded-lg border object-cover"
                 />
+                
               )}
+              <input
+  type="text"
+  placeholder="Color (e.g. Red)"
+  value={image.color}
+  onChange={(e) => {
+    const updatedImages = [...images];
+    updatedImages[index].color = e.target.value;
+    setImages(updatedImages);
+  }}
+  className="mt-1 w-full text-sm border rounded px-2 py-1"
+/>
+
               <button
                 type="button"
                 onClick={() => removeImage(index)}

@@ -129,6 +129,7 @@ export default function CheckoutPage() {
         items: addToCartList.map(item => ({
           productId: item.product.id,
           size: item.size,
+           color: item.color, 
           title: item.product.title,
           quantity: item.quantity,
           sellingPrice: item.product.sellingPrice,
@@ -309,6 +310,9 @@ export default function CheckoutPage() {
     );
   }
 
+
+
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
@@ -437,26 +441,43 @@ export default function CheckoutPage() {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Order Summary</h3>
               <div className="space-y-4">
-                {addToCartList.map((item) => (
-                  <div key={item.id} className="flex items-center space-x-4">
-                    <div className="relative w-16 h-16 bg-gray-100 dark:bg-gray-900 rounded-lg overflow-hidden">
-                      <img
-                        src={item.product.images && item.product.images.length > 0 ? item.product.images[0].imageUrl : "/images/brand-logo.png"}
-                        alt={item.product.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                        {item.product.title}
-                      </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Qty: {item.quantity}</p>
-                    </div>
-                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      ₹{(item.product.sellingPrice * item.quantity).toLocaleString()}
-                    </div>
-                  </div>
-                ))}
+               {addToCartList.map((item) => {
+  const selectedColorImage =
+    item.product.images?.find(
+      (img) =>
+        img.color?.toLowerCase() === item.color?.toLowerCase()
+    )?.imageUrl ||
+    item.product.images?.[0]?.imageUrl ||
+    "/images/brand-logo.png";
+
+  return (
+    <div key={item.id} className="flex items-center space-x-4">
+      <div className="relative w-16 h-16 bg-gray-100 dark:bg-gray-900 rounded-lg overflow-hidden">
+        <img
+          src={selectedColorImage}
+          alt={item.product.title}
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+          {item.product.title}
+        </h4>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Qty: {item.quantity}
+          {item.size && ` | Size: ${item.size}`}
+          {item.color && ` | Color: ${item.color}`}
+        </p>
+      </div>
+
+      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+        ₹{(item.product.sellingPrice * item.quantity).toLocaleString()}
+      </div>
+    </div>
+  );
+})}
+              
               </div>
             </div>
 
