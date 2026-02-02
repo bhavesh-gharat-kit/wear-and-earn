@@ -120,6 +120,10 @@ export const DELETE = async (request, { params }) => {
     }
 };
 
+
+
+
+
 export async function PUT(request, { params }) {
     try {
         const parameter = await params;
@@ -129,7 +133,15 @@ export async function PUT(request, { params }) {
         }
 
         const formData = await request.formData();
+        const rawImages = formData.getAll("productImages");
+const imageColors = formData.getAll("imageColors");
+const existingImages = formData.getAll("existingImages"); // JSON strings
+console.log("🛬 BACKEND RECEIVED:");
+console.log("productImages:", formData.getAll("productImages"));
+console.log("existingImages:", formData.getAll("existingImages"));
+console.log("imageColors:", formData.getAll("imageColors"));
         const data = {};
+
         for (const [key, value] of formData.entries()) {
             // Check if value is a file by checking if it has file-like properties
             if (typeof value === 'object' && value !== null && 'name' in value && 'size' in value && 'type' in value) {
@@ -150,7 +162,7 @@ export async function PUT(request, { params }) {
         // Thumbnail logic (unchanged)...
 
         const hasProductImagesField = formData.has("productImages");
-        const rawImages = hasProductImagesField ? formData.getAll("productImages") : null;
+    
 
         if (rawImages) {
             rawImages.forEach((item, index) => {
@@ -164,49 +176,49 @@ export async function PUT(request, { params }) {
             });
         }
 
-        const incomingImageUrls = [];
-        if (rawImages) {
-            for (const item of rawImages) {
-                // Check if item is a file by checking file-like properties
-                if (typeof item === 'object' && item !== null && 'name' in item && 'size' in item && 'type' in item && item.name) {
-                    try {
-                        console.log('Processing product image:', {
-                            name: item.name,
-                            size: item.size,
-                            type: item.type
-                        });
-                        
-                        const buffer = Buffer.from(await item.arrayBuffer());
-                        console.log('Buffer created, size:', buffer.length, 'bytes');
-                        
-                        const cloudinaryResult = await uploadImageToCloudinary(buffer, {
-                            folder: 'products/images',
-                            public_id: `product-edit-${Date.now()}-${Math.random().toString(36).substring(2)}`
-                        });
-                        
-                        incomingImageUrls.push(cloudinaryResult.url);
-                        console.log('✅ Product image uploaded successfully:', cloudinaryResult.url);
-                    } catch (uploadError) {
-                        console.error('❌ Error uploading product image:', uploadError);
-                        // Continue with other images instead of failing completely
-                    }
-                } else if (typeof item === "string") {
-                    const trimmed = item.trim();
-                    if (trimmed && trimmed !== "[object Object]") {
-                        try {
-                            const parsed = JSON.parse(trimmed);
-                            if (parsed?.imageUrl) incomingImageUrls.push(parsed.imageUrl);
-                            else incomingImageUrls.push(trimmed);
-                        } catch {
-                            incomingImageUrls.push(trimmed);
-                        }
-                    }
-                }
-            }
-        }
+    
+const incomingImages = [];
 
-        const finalIncomingUrls = Array.from(new Set(incomingImageUrls.filter(Boolean)));
-        console.log("🔍 Final processed URLs:", finalIncomingUrls);
+// 1️⃣ new uploaded files
+for (let i = 0; i < rawImages.length; i++) {
+  const img = rawImages[i];
+  const color = imageColors[i] || null;
+
+  if (img instanceof File) {
+    const buffer = Buffer.from(await img.arrayBuffer());
+    const upload = await uploadImageToCloudinary(buffer, {
+      folder: "products/images",
+    });
+
+    incomingImages.push({
+      imageUrl: upload.url,
+      color,
+    });
+  }
+}
+
+// 2️⃣ existing images (already uploaded)
+for (const item of existingImages) {
+  try {
+    const parsed = JSON.parse(item);
+    incomingImages.push({
+      imageUrl: parsed.imageUrl,
+      color: parsed.color || null,
+    });
+  } catch {}
+}
+const dbImages = existingProduct.images;
+
+const dbUrls = dbImages.map(i => i.imageUrl);
+const incomingUrls = incomingImages.map(i => i.imageUrl);
+
+const toDelete = dbImages.filter(i => !incomingUrls.includes(i.imageUrl));
+const toCreate = incomingImages.filter(i => !dbUrls.includes(i.imageUrl));
+const toUpdate = incomingImages.filter(i =>
+  dbUrls.includes(i.imageUrl)
+);
+
+
 
         // Handle thumbnail upload
         let thumbnailImageUrl = existingProduct.mainImage; // Keep existing if no new one
@@ -261,6 +273,30 @@ export async function PUT(request, { params }) {
             mainImage: thumbnailImageUrl,
         };
 
+        
+  // 1️⃣ Add new images
+for (const img of toCreate) {
+  await prisma.productImage.create({
+    data: { imageUrl: img.imageUrl, color: img.color, productId },
+  });
+}
+
+// 2️⃣ Update existing images (color updates only)
+for (const img of toUpdate) {
+  const dbImg = existingProduct.images.find(d => d.imageUrl === img.imageUrl);
+  if (dbImg && dbImg.color !== img.color) {
+    await prisma.productImage.update({
+      where: { id: dbImg.id },
+      data: { color: img.color },
+    });
+  }
+}
+
+if (!rawImages.length && !existingImages.length) {
+  console.log("⚠️ No images sent — skipping image update");
+  delete updateData.images;
+}
+
         // Handle category update
         if (data.category) {
             const category = await prisma.category.findUnique({
@@ -271,33 +307,7 @@ export async function PUT(request, { params }) {
             }
         }
 
-        if (rawImages !== null) {
-            const existingUrls = existingProduct.images.map(img => img.imageUrl);
-            const toDelete = existingUrls.filter(u => !finalIncomingUrls.includes(u));
-            const toCreate = finalIncomingUrls.filter(u => !existingUrls.includes(u));
-            
-            console.log("🔍 Database operations debug:");
-            console.log("- Existing URLs:", existingUrls);
-            console.log("- URLs to delete:", toDelete);
-            console.log("- URLs to create:", toCreate);
-            
-            const imagesOps = {};
-
-            if (toDelete.length > 0) {
-                imagesOps.deleteMany = { imageUrl: { in: toDelete } };
-                // Additional unlink logic...
-            } else if (finalIncomingUrls.length === 0 && existingUrls.length > 0) {
-                imagesOps.deleteMany = {};
-            }
-
-            if (toCreate.length > 0) {
-                imagesOps.create = toCreate.map(u => ({ imageUrl: u }));
-            }
-
-            if (Object.keys(imagesOps).length > 0) {
-                updateData.images = imagesOps;
-            }
-        }
+ 
 
         const updatedProduct = await prisma.product.update({
             where: { id: productId },
@@ -315,5 +325,4 @@ export async function PUT(request, { params }) {
         }, { status: 500 });
     }
 }
-
 

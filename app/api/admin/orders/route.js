@@ -96,6 +96,7 @@ export const GET = async (request) => {
                         title: true,
                         quantity: true,
                         size: true,
+                        color: true,
                         sellingPrice: true,
                         discount: true,
                         gst: true,
@@ -103,13 +104,20 @@ export const GET = async (request) => {
                         homeDelivery: true,
                         totalPrice: true,
                         productId: true,
-                        product: {
-                            select: {
-                                id: true
+
+                       product: {
+  select: {
+    images: {
+      select: {
+        imageUrl: true,
+        color: true
+      }
+    }
+  }
+}
+
                             }
-                        }
-                    }
-                }
+                   }
             },
             orderBy: {
                 createdAt: 'desc'

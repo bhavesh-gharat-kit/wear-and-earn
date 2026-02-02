@@ -231,9 +231,18 @@ export default function CartPage() {
         {/* Cart Items */}
         <div className="flex-1 space-y-3">
           {addToCartList.map((item) => {
-            const { id, quantity, productId, product, size } = item
+            const { id, quantity, productId, product, size, color } = item
             const { images, title, price, sellingPrice, discount, sizes } = product
-            const productImage = images && images.length > 0 ? images[0].imageUrl : "/images/brand-logo.png"
+            const selectedColorImage =
+  images?.find(
+    (img) =>
+      img.color &&
+      color &&
+      img.color.trim().toLowerCase() === color.trim().toLowerCase()
+  )?.imageUrl ||
+  images?.[0]?.imageUrl ||
+  "/images/brand-logo.png";
+
             const basePrice = sellingPrice || price || 0;
             const discountAmount = (basePrice * (Number(discount) || 0)) / 100;
             const finalAmount = basePrice - discountAmount;
@@ -252,12 +261,13 @@ export default function CartPage() {
                     {/* Product Image */}
                     <div className="flex-shrink-0">
                       <Image 
-                        src={productImage} 
-                        alt={title}
-                        width={80}
-                        height={80}
-                        className="w-20 h-20 object-cover rounded-lg"
-                      />
+  src={selectedColorImage} 
+  alt={`${title} - ${color || 'default'}`}
+  width={80}
+  height={80}
+  className="w-20 h-20 object-cover rounded-lg"
+/>
+
                     </div>
 
                     {/* Product Details */}
@@ -281,6 +291,14 @@ export default function CartPage() {
                         </div>
                       )}
                       
+                      {color && (
+  <div className="mb-2">
+    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
+      Color: {color}
+    </span>
+  </div>
+)}
+
                       {/* Price Information */}
                       <div className="mb-2">
                         <div className="flex items-center space-x-3 mb-1">

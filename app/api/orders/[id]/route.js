@@ -38,14 +38,28 @@ export async function GET(request, { params }) {
     }
 
     const order = await prisma.order.findFirst({
-      where: {
-        id: orderId,
-        userId: userId // Ensure user can only access their own orders
-      },
+  where: {
+    id: orderId,
+    userId: userId, // Ensure user can only access their own orders
+  },
+  include: {
+    orderProducts: {
       include: {
-        orderProducts: true
-      }
-    });
+        product: {
+          select: {
+            images: {
+              select: {
+                imageUrl: true,
+                color: true,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+});
+
 
     if (!order) {
       return NextResponse.json(

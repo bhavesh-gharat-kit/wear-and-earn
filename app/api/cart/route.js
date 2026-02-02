@@ -33,6 +33,7 @@ export const POST = async (request) => {
     const productId = Number(body?.productId);
     const quantity = Number(body?.quantity) || 1;
     const size = body?.size || null; // Get size from request body
+    const color = body?.color || null; 
 
     if (!userId || isNaN(userId) || !productId || isNaN(productId)) {
         return NextResponse.json({ error: "Missing fields or invalid user/product ID" }, { status: 400 });
@@ -42,7 +43,7 @@ export const POST = async (request) => {
         // Check if product exists and get its details
         const product = await prisma.product.findUnique({
             where: { id: productId },
-            select: { sizes: true }
+            select: { sizes: true, colors: true }
         });
 
         if (!product) {
@@ -72,12 +73,32 @@ export const POST = async (request) => {
             }
         }
 
+        // Validate color if product has colors
+const productHasColors = product.colors && product.colors.trim() !== '';
+if (productHasColors) {
+    if (!color) {
+        return NextResponse.json(
+            { success: false, message: "Please select a color" },
+            { status: 400 }
+        );
+    }
+
+    const availableColors = product.colors.split(",").map(c => c.trim());
+    if (!availableColors.includes(color)) {
+        return NextResponse.json(
+            { success: false, message: "Invalid color selected" },
+            { status: 400 }
+        );
+    }
+}
+
         // Check if product with same size already in cart
         const existingCartItem = await prisma.cart.findFirst({
             where: {
                 userId,
                 productId,
                 size: size, // Include size in the check
+                color: color,
             },
         });
 
@@ -97,6 +118,7 @@ export const POST = async (request) => {
                 productId,
                 quantity,
                 size, // Include size in cart item
+                color
             },
         });
 

@@ -51,7 +51,7 @@ const AdminEditProduct = ({ params }) => {
       toast.error("Failed to fetch categories");
     }
   };
-
+// using get method to fetch existing product details for editing 
   const fetchProductDetails = async () => {
     try {
       setLoading(true);
@@ -130,30 +130,34 @@ const AdminEditProduct = ({ params }) => {
     form.append("shipping", formData.shipping || "0");
     form.append("productType", formData.productType || "REGULAR");
 
-    // Detect if any productImages are new files or strings
-    const hasAnyProductImages = multipleImages && multipleImages.length > 0;
-    const shouldSendProductImages =
-      hasAnyProductImages &&
-      multipleImages.some(
-        (img) => img instanceof File || img.imageUrl || typeof img === "string"
-      );
-
-    if (shouldSendProductImages) {
-      multipleImages.forEach((img) => {
-        if (img instanceof File) {
-          form.append("productImages", img);
-        } else if (typeof img === "string") {
-          form.append("productImages", img);
-        } else if (typeof img === "object" && img.imageUrl) {
-          form.append(
-            "productImages",
-            JSON.stringify({ imageUrl: img.imageUrl })
-          );
-        }
-      });
-    }
+  
 
     const toastId = toast.loading("Updating product...");
+
+    // 🔹 EXISTING IMAGES (already in DB)
+multipleImages
+  .filter(img => img.isExisting)
+  .forEach(img => {
+    form.append(
+      "existingImages",
+      JSON.stringify({
+        imageUrl: img.imageUrl,
+        color: img.color || "",
+      })
+    );
+  });
+
+// 🔹 NEW IMAGES (uploaded files)
+multipleImages
+  .filter(img => img.file)
+  .forEach(img => {
+    form.append("productImages", img.file);
+    form.append("imageColors", img.color || "");
+  });
+console.log("📦 SENDING IMAGES:", multipleImages);
+for (let pair of form.entries()) {
+  console.log("FORMDATA:", pair[0], pair[1]);
+}
 
     try {
       const response = await axios.put(`/api/admin/products/${id}`, form, {
@@ -234,7 +238,14 @@ const AdminEditProduct = ({ params }) => {
 
     // Handle images from ProductImage table
     if (images && images.length > 0) {
-      setMultipleImages([...images]);
+     setMultipleImages(
+  images.map((img) => ({
+    imageUrl: img.imageUrl,
+    color: img.color || "",
+    isExisting: true, // 🔑 important flag
+  }))
+);
+
     } else {
       setMultipleImages([]);
     }

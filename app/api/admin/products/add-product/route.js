@@ -25,6 +25,7 @@ export async function POST(req) {
 
         // 3. Handle multiple product images + thumbnail
         const productImageFiles = formData.getAll('productImages');
+        const imageColors = formData.getAll("imageColors");
         const productImageUrls = [];
 
         // Add thumbnail as first image if exists
@@ -47,7 +48,12 @@ export async function POST(req) {
                     public_id: `thumbnail-${Date.now()}-${Math.random().toString(36).substring(2)}`
                 });
                 
-                productImageUrls.push(cloudinaryResult.url); // Add thumbnail as first image
+                productImageUrls.push({
+  imageUrl: cloudinaryResult.url,
+  color: null
+});
+
+ // Add thumbnail as first image
                 console.log("✅ Thumbnail uploaded successfully:", cloudinaryResult.url);
             } catch (fileError) {
                 console.error("❌ Error processing thumbnail:", fileError);
@@ -88,7 +94,11 @@ export async function POST(req) {
                     public_id: `product-${Date.now()}-${index}-${Math.random().toString(36).substring(2)}`
                 });
                 
-                productImageUrls.push(cloudinaryResult.url);
+                productImageUrls.push({
+  imageUrl: cloudinaryResult.url,
+  color: imageColors[index] || null
+});
+
                 console.log(`✅ Product image ${index + 1} uploaded successfully:`, cloudinaryResult.url);
             } catch (fileError) {
                 console.error(`❌ Error processing product image ${index + 1}:`, fileError);
@@ -170,9 +180,13 @@ export async function POST(req) {
                     connect: { id: Number(data.category) }
                 },
                 
-                images: {
-                    create: productImageUrls.map((url) => ({ imageUrl: url }))
-                }
+               images: {
+  create: productImageUrls.map(img => ({
+    imageUrl: img.imageUrl,
+    color: img.color
+  }))
+}
+
             },
             include: {
                 images: true,

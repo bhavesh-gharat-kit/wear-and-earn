@@ -17,6 +17,9 @@ function ProductDetailsPage({ id }) {
   const [productDetails, setProductDetails] = useState(null);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
+
 
   const { data: session } = useSession();
   const router = useRouter();
@@ -94,6 +97,7 @@ function ProductDetailsPage({ id }) {
   // Show original price vs final amount for comparison
   const originalPrice = safePrice || basePrice;
 
+   
   // Parse sizes into array
   const sizesArray = sizes ? sizes.split(", ").map(s => s.trim()) : [];
   const hasSizes = sizesArray.length > 0;
@@ -101,6 +105,19 @@ function ProductDetailsPage({ id }) {
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
   };
+
+
+const handleColorClick = (color) => {
+  setSelectedColor(color);
+
+  const index = images.findIndex(
+    (img) => img.color?.toLowerCase() === color.toLowerCase()
+  );
+
+  if (index !== -1) {
+    setActiveIndex(index);
+  }
+};
 
   const handleAddToCart = async () => {
     if (!loggedInUserId) {
@@ -116,19 +133,24 @@ function ProductDetailsPage({ id }) {
       toast.error("Please select a size", { duration: 1500 });
       return;
     }
+if (!selectedColor) {
+  toast.error("Please select a color", { duration: 1500 });
+  return;
+}
 
     try {
       const cartData = {
         productId: id,
         userId: loggedInUserId,
         quantity: selectedQuantity,
+        color: selectedColor,
       };
 
       // Include size if product has sizes
       if (hasSizes && selectedSize) {
         cartData.size = selectedSize;
       }
-
+   
       const response = await axios.post("/api/cart", cartData);
 
       if (response.data.success || response.status === 200) {
@@ -161,6 +183,10 @@ function ProductDetailsPage({ id }) {
       toast.error("Please select a size", { duration: 1500 });
       return;
     }
+if (!selectedColor) {
+  toast.error("Please select a color", { duration: 1500 });
+  return;
+}
 
     // Add to cart first, then redirect to checkout page
     try {
@@ -168,6 +194,7 @@ function ProductDetailsPage({ id }) {
         productId: id,
         userId: loggedInUserId,
         quantity: selectedQuantity,
+        color: selectedColor,
       };
 
       if (hasSizes && selectedSize) {
@@ -272,6 +299,11 @@ ${shareUrl}`;
     }
   };
 
+  const uniqueColors = [
+  ...new Map(productDetails.images.map(img => [img.color, img])).values()
+];
+
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
@@ -280,7 +312,12 @@ ${shareUrl}`;
           {/* Product Images */}
           <div className="space-y-4">
             <div className="rounded-lg shadow-sm transition-colors">
-              <ProductDetailsImageComponent productDetails={productDetails} />
+              <ProductDetailsImageComponent
+  productDetails={productDetails}
+  activeIndex={activeIndex}
+  setActiveIndex={setActiveIndex}
+/>
+
             </div>
           </div>
 
@@ -387,7 +424,42 @@ ${shareUrl}`;
                 )}
               </div>
             )}
-
+  {/* Color Selection */}
+{productDetails.images && productDetails.images.length > 0 && (
+  <div className="space-y-3">
+    <div className="flex items-center space-x-2">
+      <span className="font-medium text-gray-900 dark:text-gray-100">Select Color:</span>
+      {selectedColor && (
+        <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+          Selected: {selectedColor}
+        </span>
+      )}
+    </div>
+    <div className="flex flex-wrap gap-2">
+    {uniqueColors.map((img) => (
+  <button
+    key={img.color}
+    onClick={() => handleColorClick(img.color)}
+    className={`
+      px-4 py-2 rounded-lg border-2 font-medium text-sm transition-all duration-200
+      ${selectedColor === img.color
+        ? "border-blue-600 bg-blue-600 text-white shadow-md scale-105"
+        : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700"
+      }
+    `}
+  >
+    {img.color}
+  </button>
+))}
+<span className="text-sm text-amber-600 dark:text-amber-400"></span>
+    </div>
+    {!selectedColor && (
+      <p className="text-sm text-amber-600 dark:text-amber-400">
+        Please select a color to continue
+      </p>
+    )}
+  </div>
+)}
             {/* Stock Status */}
             <div className="flex items-center space-x-2">
               <FaCheckCircle className="h-5 w-5 text-green-500" />

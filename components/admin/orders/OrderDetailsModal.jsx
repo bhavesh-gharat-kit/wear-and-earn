@@ -476,7 +476,7 @@ import { FaTimes, FaUser, FaMapMarkerAlt, FaBox, FaRupeeSign, FaCalendarAlt, FaP
 import moment from "moment";
 import jsPDF from "jspdf";
 import toast from "react-hot-toast";
-
+import Image from "next/image";
 const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
   const [isSharing, setIsSharing] = useState(false);
 
@@ -489,6 +489,19 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate }) => {
       onStatusUpdate(order.id, newStatus);
     }
   };
+
+const getProductImage = (product) => {
+  const images = product.product?.images || []; // or product.productImages
+
+  const matchedImage = images.find(
+    img => img.color?.toLowerCase() === product.color?.toLowerCase()
+  );
+
+  return matchedImage?.imageUrl || images[0]?.imageUrl || '/placeholder.png';
+};
+
+const imageUrl = getProductImage(order);
+console.log(imageUrl);
 
   // Generate PDF and return as Blob (reusable for both download and share)
   const generatePDFBlob = () => {
@@ -1078,6 +1091,18 @@ ${order.address || 'No address provided'}`;
                         <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
                           {product.title}
                         </h4>
+                        <div>
+                          
+
+<Image
+      src={getProductImage(product)}
+      alt={product.title}
+      width={80}
+      height={80}
+      className="rounded"
+    />
+                          
+                        </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                           <div>
                             <span className="text-gray-600 dark:text-gray-400">Quantity:</span>
@@ -1101,6 +1126,14 @@ ${order.address || 'No address provided'}`;
                           <div className="mt-2">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                               Size: {product.size}
+                            </span>
+                          </div>
+                        )}
+                        {/* Display color if available */}
+                        {product.color && (
+                          <div className="mt-2">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                              Color: {product.color}
                             </span>
                           </div>
                         )}
